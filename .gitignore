@@ -1,0 +1,5 @@
+.stack-work/
+*~
+.cabal-home
+.cabal-store
+.stack-work
