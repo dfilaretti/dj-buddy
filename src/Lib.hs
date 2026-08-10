@@ -1,6 +1,5 @@
 module Lib
     ( someFunc
-    , Key(..)
     , TrackId(..)
     , Track(..)
     , Library
@@ -10,27 +9,21 @@ module Lib
     ) where
 
 import qualified Data.Map.Strict as Map
+import qualified Key as Key
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
 ----------------------------------
------ Data -----------------------
+----- Other ----------------------
 ----------------------------------
-
--- TODO: do I need Ord here?
--- TODO: instead of Int, can we be more specifc and use an enum or something?
-data Key
-    = A Int
-    | B Int
-    deriving (Eq, Ord, Show)
 
 newtype TrackId = TrackId Int
     deriving (Eq, Ord, Show)
 
 data Track = Track
     { title :: String
-    , key :: Key
+    , key :: Key.Key
     }
     deriving (Eq, Show)
 
@@ -55,10 +48,6 @@ type Graph = Map.Map TrackId [Edge]
 ----- Functions ------------------
 ----------------------------------
 
-
-----------------------------------
------ Notes ----------------------
-----------------------------------
 
 -- title <$> Map.lookup (TrackId 1) library
 -- [(tid, title track) | (tid, track) <- Map.toList library]
