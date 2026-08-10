@@ -3,3 +3,4 @@
 .cabal-home
 .cabal-store
 .stack-work
+*.cabal
