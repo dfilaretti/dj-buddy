@@ -73,10 +73,10 @@ type Graph = Map.Map TrackId [Edge]
 trackKey :: TrackId -> Library -> Maybe Key.Key
 trackKey n lib = key <$> Map.lookup n lib
 
-sameKeySuccessors :: Library -> TrackId -> [TrackId]
-sameKeySuccessors lib tId =
+sameKeySuccessors :: TrackId -> Library -> [TrackId]
+sameKeySuccessors tId lib =
     case desiredKey of
-        Just k  -> filter (/= tId) $ getTrackIds (\t -> key t == k) lib
+        Just k  -> filter (/= tId) $ getTrackIds ((==k) . key) lib
         Nothing -> []
     where
         desiredKey = trackKey tId lib
