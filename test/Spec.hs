@@ -6,17 +6,20 @@ import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
-    describe "Key" $ do
-        it "compares equal values correctly" $ do
-            (K_3, A) `shouldBe` (K_3, A)
+    describe "trackKey" $ do
+        it "gives Nothing if library is empty" $ do
+            trackKey 0 emptyLibrary
+                `shouldBe` Nothing
 
-        it "distinguishes different values" $ do
-            (K_3, A) `shouldNotBe` (K_3, B)
+        it "... or if track is not found" $ do
+            trackKey 123 (addToLibrary 0 (Track "foo" (K_1, A)) emptyLibrary)
+                `shouldBe` Nothing
 
-    describe "Track" $ do
-        it "stores its title and key" $ do
-            Track "Thunderfunk" (K_3, A)
-                `shouldBe` Track "Thunderfunk" (K_3, A)
+        it "gives you the key if track is found" $ do
+            trackKey 0 (addToLibrary 0 (Track "foo" (K_1, A)) emptyLibrary)
+                `shouldBe` Just (K_1, A)
+
+
 
 -- stack test --test-arguments "--match Key"
 -- stack test

@@ -1,11 +1,14 @@
 module Lib
     ( someFunc
-    , TrackId(..)
+    , TrackId
     , Track(..)
     , Library
+    , emptyLibrary
+    , addToLibrary
     , Transition(..)
     , Edge(..)
     , Graph
+    , trackKey
     ) where
 
 import qualified Data.Map.Strict as Map
@@ -18,8 +21,7 @@ someFunc = putStrLn "someFunc"
 ----- Other ----------------------
 ----------------------------------
 
-newtype TrackId = TrackId Int
-    deriving (Eq, Ord, Show)
+type TrackId = Int
 
 data Track = Track
     { title :: String
@@ -28,6 +30,13 @@ data Track = Track
     deriving (Eq, Show)
 
 type Library = Map.Map TrackId Track
+
+emptyLibrary :: Library
+emptyLibrary = Map.fromList []
+
+addToLibrary :: TrackId -> Track -> Library -> Library
+addToLibrary trackId track lib =
+    Map.insert trackId track lib
 
 data Transition
     = Tested
@@ -47,6 +56,9 @@ type Graph = Map.Map TrackId [Edge]
 ----------------------------------
 ----- Functions ------------------
 ----------------------------------
+
+trackKey :: TrackId -> Library -> Maybe Key.Key
+trackKey n lib = key <$> Map.lookup n lib
 
 
 -- title <$> Map.lookup (TrackId 1) library
