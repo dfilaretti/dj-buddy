@@ -12,7 +12,7 @@ library =
     Map.fromList
         [ (1, Track "Thunderfunk" (K_3, A))
         , (2, Track "Howl At The Moon" (K_7, B))
-        , (3, Track "How Could I Say It" (K_1, A))
+        , (3, Track "How Could I Say It" (K_3, A))
         , (4, Track "Feels So Good" (K_11, B))
         ]
 
