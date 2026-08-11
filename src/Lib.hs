@@ -38,11 +38,10 @@ emptyLibrary :: Library
 emptyLibrary = Map.fromList []
 
 addToLibrary :: TrackId -> Track -> Library -> Library
-addToLibrary trackId track lib =
-    Map.insert trackId track lib
+addToLibrary = Map.insert
 
 filterLibrary :: (Track -> Bool) -> Library -> Library
-filterLibrary p = Map.filter p
+filterLibrary = Map.filter
 
 getTrackIds :: (Track -> Bool) -> Library -> [TrackId]
 getTrackIds p  = Map.keys . filterLibrary p
