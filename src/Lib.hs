@@ -5,8 +5,10 @@ module Lib
     , Library
     , emptyLibrary
     , addToLibrary
+    , removeFromLibrary
     , filterLibrary
     , getTrackIds
+    , sameKeySuccessors
     -- , sameKeySuccessors
     , Transition(..)
     , Edge(..)
@@ -40,6 +42,9 @@ emptyLibrary = Map.fromList []
 addToLibrary :: TrackId -> Track -> Library -> Library
 addToLibrary = Map.insert
 
+removeFromLibrary :: TrackId -> Library -> Library
+removeFromLibrary = Map.delete
+
 filterLibrary :: (Track -> Bool) -> Library -> Library
 filterLibrary = Map.filter
 
@@ -68,15 +73,13 @@ type Graph = Map.Map TrackId [Edge]
 trackKey :: TrackId -> Library -> Maybe Key.Key
 trackKey n lib = key <$> Map.lookup n lib
 
--- sameKeySuccessors :: Library -> TrackId -> [TrackId]
---sameKeySuccessors lib tId = Map.delete tId filtered
---    where
---        desiredKey = trackKey tId lib
---        filtered = case desiredKey of
---            Just k -> Map.filter pred lib
---                where pred = \t -> key t == k
---            Nothing -> emptyLibrary
-
+sameKeySuccessors :: Library -> TrackId -> [TrackId]
+sameKeySuccessors lib tId =
+    case desiredKey of
+        Just k  -> filter (/= tId) $ getTrackIds (\t -> key t == k) lib
+        Nothing -> []
+    where
+        desiredKey = trackKey tId lib
 
 
 
