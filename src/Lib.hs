@@ -109,6 +109,10 @@ harmonicSuccessors :: TrackId -> Library -> [TrackId]
 harmonicSuccessors tId lib =
     sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
 
+-- all the tracks that are confirmed (by the user) to be good transition from this one
+confirmedSuccessors :: TrackId -> Graph -> [TrackId]
+--confirmedSuccessort = _
+
 -- title <$> Map.lookup (TrackId 1) library
 -- [(tid, title track) | (tid, track) <- Map.toList library]
 -- [edge | edge <- graph Map.! TrackId 1]
