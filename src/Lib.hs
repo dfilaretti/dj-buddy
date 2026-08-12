@@ -7,8 +7,12 @@ module Lib
     , addToLibrary
     , removeFromLibrary
     , filterLibrary
-    , getTrackIds
+    , getTracks
     , sameKeySuccessors
+    , keyJumpSuccessors
+    , harmonicSuccessors
+    , getTracksWithKey
+    , getTracksWithKeys
     -- , sameKeySuccessors
     , Transition(..)
     , Edge(..)
@@ -48,8 +52,16 @@ removeFromLibrary = Map.delete
 filterLibrary :: (Track -> Bool) -> Library -> Library
 filterLibrary = Map.filter
 
-getTrackIds :: (Track -> Bool) -> Library -> [TrackId]
-getTrackIds p  = Map.keys . filterLibrary p
+getTracks :: (Track -> Bool) -> Library -> [TrackId]
+getTracks p  = Map.keys . filterLibrary p
+
+getTracksWithKey :: Key.Key -> Library -> [TrackId]
+getTracksWithKey k = getTracks ((==k) . key)
+
+-- TODO: refactor?
+getTracksWithKeys :: [Key.Key] -> Library -> [TrackId]
+getTracksWithKeys ks lib =
+    concat $ fmap (\k -> getTracksWithKey k lib) ks
 
 data Transition
     = Tested
@@ -73,16 +85,29 @@ type Graph = Map.Map TrackId [Edge]
 trackKey :: TrackId -> Library -> Maybe Key.Key
 trackKey n lib = key <$> Map.lookup n lib
 
+-- all the tracks with the same key as this one
 sameKeySuccessors :: TrackId -> Library -> [TrackId]
 sameKeySuccessors tId lib =
     case desiredKey of
-        Just k  -> filter (/= tId) $ getTrackIds ((==k) . key) lib
+        Just k  -> filter (/= tId) $ getTracksWithKey k lib
         Nothing -> []
     where
         desiredKey = trackKey tId lib
 
+-- all the tracks we can jump to based on the Camelot wheel, excluding same key!
+keyJumpSuccessors :: TrackId -> Library -> [TrackId]
+keyJumpSuccessors tId lib =
+    case initialKey of
+        Just k  -> getTracksWithKeys (Key.compatibleKeys k) lib
+        Nothing -> []
+    where
+        initialKey = trackKey tId lib
 
-
+-- all the tracks we can jump to according to the Camelot wheel
+-- TODO: this doesn't include weird jumps such as the "Armin Van Buuren transition" etc. Consider adding later.
+harmonicSuccessors :: TrackId -> Library -> [TrackId]
+harmonicSuccessors tId lib =
+    sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
 
 -- title <$> Map.lookup (TrackId 1) library
 -- [(tid, title track) | (tid, track) <- Map.toList library]

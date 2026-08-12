@@ -6,6 +6,7 @@ module Key
     , increment
     , decrement
     , relative
+    , compatibleKeys
     ) where
 
 ----------------------------------
@@ -49,6 +50,9 @@ increment = add 1
 
 decrement :: Key -> Key
 decrement = add (-1)
+
+compatibleKeys :: Key -> [Key]
+compatibleKeys k = [increment k, decrement k, relative k]
 
 ----------------------------------
 ----- Internal Functions  --------

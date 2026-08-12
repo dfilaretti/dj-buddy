@@ -13,7 +13,10 @@ library =
         [ (1, Track "Thunderfunk" (K_3, A))
         , (2, Track "Howl At The Moon" (K_7, B))
         , (3, Track "How Could I Say It" (K_3, A))
-        , (4, Track "Feels So Good" (K_11, B))
+        , (4, Track "Feels So Good" (K_4, A))
+        , (5, Track "xoxo" (K_2, A))
+        , (566, Track "xoxdo" (K_8, A))
+        , (9, Track "xoxfeo" (K_3, B))
         ]
 
 graph :: Graph
