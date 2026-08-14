@@ -13,6 +13,8 @@ module Lib
     , harmonicSuccessors
     , getTracksWithKey
     , getTracksWithKeys
+    , confirmedSuccessors
+    , successors
     -- , sameKeySuccessors
     , Transition(..)
     , Edge(..)
@@ -58,6 +60,9 @@ getTracks p  = Map.keys . filterLibrary p
 getTracksWithKey :: Key.Key -> Library -> [TrackId]
 getTracksWithKey k = getTracks ((==k) . key)
 
+getEdges :: TrackId -> Graph -> Maybe [Edge]
+getEdges tId g = Map.lookup tId g
+
 -- TODO: refactor?
 getTracksWithKeys :: [Key.Key] -> Library -> [TrackId]
 getTracksWithKeys ks lib =
@@ -69,6 +74,7 @@ data Transition
     | Harmonic
     deriving (Eq, Ord, Show)
 
+-- TODO: rename this to Transition
 data Edge = Edge
     { to         :: TrackId
     , transition :: Transition
@@ -86,6 +92,7 @@ trackKey :: TrackId -> Library -> Maybe Key.Key
 trackKey n lib = key <$> Map.lookup n lib
 
 -- all the tracks with the same key as this one
+-- TODO: this should return [Edge]
 sameKeySuccessors :: TrackId -> Library -> [TrackId]
 sameKeySuccessors tId lib =
     case desiredKey of
@@ -95,6 +102,7 @@ sameKeySuccessors tId lib =
         desiredKey = trackKey tId lib
 
 -- all the tracks we can jump to based on the Camelot wheel, excluding same key!
+-- TODO: this should return [Edge]
 keyJumpSuccessors :: TrackId -> Library -> [TrackId]
 keyJumpSuccessors tId lib =
     case initialKey of
@@ -105,13 +113,23 @@ keyJumpSuccessors tId lib =
 
 -- all the tracks we can jump to according to the Camelot wheel
 -- TODO: this doesn't include weird jumps such as the "Armin Van Buuren transition" etc. Consider adding later.
+-- TODO: this should return [Edge]
 harmonicSuccessors :: TrackId -> Library -> [TrackId]
 harmonicSuccessors tId lib =
     sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
 
 -- all the tracks that are confirmed (by the user) to be good transition from this one
+-- TODO: this should return [Edge]
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
---confirmedSuccessort = _
+confirmedSuccessors tId g =
+    case getEdges tId g of
+        Nothing    -> []
+        Just edges -> map to edges
+
+-- TODO: this should return something like [(score, Edge)]
+successors :: Library -> Graph -> TrackId -> [TrackId]
+successors lib gph tid =
+    (confirmedSuccessors tid gph) ++ (harmonicSuccessors tid lib) ++ (sameKeySuccessors tid lib)
 
 -- title <$> Map.lookup (TrackId 1) library
 -- [(tid, title track) | (tid, track) <- Map.toList library]

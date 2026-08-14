@@ -15,8 +15,8 @@ library =
         , (3, Track "How Could I Say It" (K_3, A))
         , (4, Track "Feels So Good" (K_4, A))
         , (5, Track "xoxo" (K_2, A))
-        , (566, Track "xoxdo" (K_8, A))
-        , (9, Track "xoxfeo" (K_3, B))
+        , (6, Track "xoxdo" (K_8, A))
+        , (7, Track "xoxfeo" (K_3, B))
         ]
 
 graph :: Graph
@@ -27,4 +27,5 @@ graph =
             , Edge 3 SameKey
             ])
         , (2, [Edge 2 Tested])
+        , (7, [Edge 5 Harmonic])
         ]
