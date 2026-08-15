@@ -150,15 +150,15 @@ data TransitionType
   deriving (Eq, Ord, Show)
 
 mkCandidates :: TransitionType -> [TrackId] -> [Candidate]
-mkCandidates transitionType = map (Candidate transitionType)
+mkCandidates t = map (Candidate t)
 
 candidates :: Library -> Graph -> TrackId -> [Candidate]
 candidates lib graph trackId =
-  sameKeyCandidates ++ harmonicCandidates ++ testedCandidates
+  sameKey ++ harmonic ++ tested
   where
-    sameKeyCandidates = mkCandidates SameKey (sameKeySuccessors trackId lib)
-    harmonicCandidates = mkCandidates Harmonic (keyJumpSuccessors trackId lib)
-    testedCandidates = mkCandidates Tested (confirmedSuccessors trackId graph)
+    sameKey = mkCandidates SameKey (sameKeySuccessors trackId lib)
+    harmonic = mkCandidates Harmonic (keyJumpSuccessors trackId lib)
+    tested = mkCandidates Tested (confirmedSuccessors trackId graph)
 
 scoreCandidates :: Library -> Graph -> [Candidate] -> [(Candidate, Score)]
 scoreCandidates lib graph xs =
