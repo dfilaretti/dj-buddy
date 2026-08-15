@@ -1,13 +1,14 @@
 module Key
-    ( Key
-    , KeyNumber(..)
-    , KeyType(..)
-    , add
-    , increment
-    , decrement
-    , relative
-    , compatibleKeys
-    ) where
+  ( Key,
+    KeyNumber (..),
+    KeyType (..),
+    add,
+    increment,
+    decrement,
+    relative,
+    compatibleKeys,
+  )
+where
 
 ----------------------------------
 ----- Types ----------------------
@@ -16,24 +17,24 @@ module Key
 type Key = (KeyNumber, KeyType)
 
 data KeyNumber
-    = K_1
-    | K_2
-    | K_3
-    | K_4
-    | K_5
-    | K_6
-    | K_7
-    | K_8
-    | K_9
-    | K_10
-    | K_11
-    | K_12
-    deriving (Eq, Ord, Enum, Bounded, Show)
+  = K_1
+  | K_2
+  | K_3
+  | K_4
+  | K_5
+  | K_6
+  | K_7
+  | K_8
+  | K_9
+  | K_10
+  | K_11
+  | K_12
+  deriving (Eq, Ord, Enum, Bounded, Show)
 
 data KeyType
-    = A
-    | B
-     deriving (Eq, Ord, Enum, Bounded, Show)
+  = A
+  | B
+  deriving (Eq, Ord, Enum, Bounded, Show)
 
 ----------------------------------
 ----- Public Functions  ----------
@@ -61,4 +62,4 @@ compatibleKeys k = [increment k, decrement k, relative k]
 
 incrementKeyNumber :: Int -> KeyNumber -> KeyNumber
 incrementKeyNumber n k =
-    toEnum ((fromEnum k + n) `mod` 12)
+  toEnum ((fromEnum k + n) `mod` 12)

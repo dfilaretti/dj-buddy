@@ -1,34 +1,35 @@
 module Lib
-    ( someFunc
-    , TrackId
-    , Track(..)
-    , Library
-    , emptyLibrary
-    , addToLibrary
-    , removeFromLibrary
-    , scoreCandidates
-    , filterLibrary
-    , getTracks
-    , sameKeySuccessors
-    , keyJumpSuccessors
-    , harmonicSuccessors
-    , getTracksWithKey
-    , getTracksWithKeys
-    , confirmedSuccessors
-    , candidates
-    , scoreCandidate
-    , rankedCandidates
-    , bestCandidates
+  ( someFunc,
+    TrackId,
+    Track (..),
+    Library,
+    emptyLibrary,
+    addToLibrary,
+    removeFromLibrary,
+    scoreCandidates,
+    filterLibrary,
+    getTracks,
+    sameKeySuccessors,
+    keyJumpSuccessors,
+    harmonicSuccessors,
+    getTracksWithKey,
+    getTracksWithKeys,
+    confirmedSuccessors,
+    candidates,
+    scoreCandidate,
+    rankedCandidates,
+    bestCandidates,
     -- , sameKeySuccessors
-    , TransitionType(..)
-    , Edge(..)
-    , Graph
-    , trackKey
-    ) where
+    TransitionType (..),
+    Edge (..),
+    Graph,
+    trackKey,
+  )
+where
 
+import Data.List (groupBy, sortOn)
 import qualified Data.Map.Strict as Map
 import qualified Key as Key
-import Data.List(sortOn, groupBy)
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -40,12 +41,12 @@ someFunc = putStrLn "someFunc"
 type TrackId = Int
 
 data Track = Track
-    { title :: String
-    , key :: Key.Key
+  { title :: String,
+    key :: Key.Key
     -- , author: String
     -- etc.
-    }
-    deriving (Eq, Show)
+  }
+  deriving (Eq, Show)
 
 ----------------------------------
 ----- Library --------------------
@@ -66,39 +67,39 @@ filterLibrary :: (Track -> Bool) -> Library -> Library
 filterLibrary = Map.filter
 
 getTracks :: (Track -> Bool) -> Library -> [TrackId]
-getTracks p  = Map.keys . filterLibrary p
+getTracks p = Map.keys . filterLibrary p
 
 getTracksWithKey :: Key.Key -> Library -> [TrackId]
-getTracksWithKey k = getTracks ((==k) . key)
+getTracksWithKey k = getTracks ((== k) . key)
 
 -- all the tracks with the same key as this one
 sameKeySuccessors :: TrackId -> Library -> [TrackId]
 sameKeySuccessors tId lib =
-    case desiredKey of
-        Just k  -> filter (/= tId) $ getTracksWithKey k lib
-        Nothing -> []
-    where
-        desiredKey = trackKey tId lib
+  case desiredKey of
+    Just k -> filter (/= tId) $ getTracksWithKey k lib
+    Nothing -> []
+  where
+    desiredKey = trackKey tId lib
 
 -- all the tracks we can jump to based on the Camelot wheel, excluding same key!
 keyJumpSuccessors :: TrackId -> Library -> [TrackId]
 keyJumpSuccessors tId lib =
-    case initialKey of
-        Just k  -> getTracksWithKeys (Key.compatibleKeys k) lib
-        Nothing -> []
-    where
-        initialKey = trackKey tId lib
+  case initialKey of
+    Just k -> getTracksWithKeys (Key.compatibleKeys k) lib
+    Nothing -> []
+  where
+    initialKey = trackKey tId lib
 
 -- all the tracks we can jump to according to the Camelot wheel
 -- TODO: this doesn't include weird jumps such as the "Armin Van Buuren transition" etc. Consider adding later.
 harmonicSuccessors :: TrackId -> Library -> [TrackId]
 harmonicSuccessors tId lib =
-    sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
+  sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
 
 -- TODO: refactor?
 getTracksWithKeys :: [Key.Key] -> Library -> [TrackId]
 getTracksWithKeys ks lib =
-    concat $ fmap (\k -> getTracksWithKey k lib) ks
+  concat $ fmap (\k -> getTracksWithKey k lib) ks
 
 trackKey :: TrackId -> Library -> Maybe Key.Key
 trackKey n lib = key <$> Map.lookup n lib
@@ -111,12 +112,12 @@ type Graph = Map.Map TrackId [Edge]
 
 -- TODO: rename this to Transition
 data Edge = Edge
-    { to         :: TrackId
-    -- notes     :: String
-    -- rating    :: Rating
-    --
-    }
-    deriving (Eq, Show)
+  { to :: TrackId
+  -- notes     :: String
+  -- rating    :: Rating
+  --
+  }
+  deriving (Eq, Show)
 
 -- TODO: this return [Edge]
 getEdges :: TrackId -> Graph -> Maybe [Edge]
@@ -126,54 +127,54 @@ getEdges tId g = Map.lookup tId g
 -- TODO: maybe return a new type [ConfirmedSuccessor] so we can keep additional info?
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
 confirmedSuccessors tId g =
-    case getEdges tId g of
-        Nothing    -> []
-        Just edges -> map to edges
+  case getEdges tId g of
+    Nothing -> []
+    Just edges -> map to edges
 
 ----------------------------------
 ----- Candidate ------------------
 ----------------------------------
 
 data Candidate = Candidate
-    { transitionType :: TransitionType
-    , track          :: TrackId
-    }
-    deriving (Eq, Show)
+  { transitionType :: TransitionType,
+    track :: TrackId
+  }
+  deriving (Eq, Show)
 
 data TransitionType
-    = Tested
-    | SameKey
-    | Harmonic
-    deriving (Eq, Ord, Show)
+  = Tested
+  | SameKey
+  | Harmonic
+  deriving (Eq, Ord, Show)
 
 mkCandidates :: TransitionType -> [TrackId] -> [Candidate]
 mkCandidates transitionType = map (Candidate transitionType)
 
 candidates :: Library -> Graph -> TrackId -> [Candidate]
 candidates lib graph trackId =
-    sameKeyCandidates ++ harmonicCandidates ++ testedCandidates
-    where
-        sameKeyCandidates  = mkCandidates SameKey (sameKeySuccessors trackId lib)
-        harmonicCandidates = mkCandidates Harmonic (keyJumpSuccessors trackId lib)
-        testedCandidates   = mkCandidates Tested (confirmedSuccessors trackId graph)
+  sameKeyCandidates ++ harmonicCandidates ++ testedCandidates
+  where
+    sameKeyCandidates = mkCandidates SameKey (sameKeySuccessors trackId lib)
+    harmonicCandidates = mkCandidates Harmonic (keyJumpSuccessors trackId lib)
+    testedCandidates = mkCandidates Tested (confirmedSuccessors trackId graph)
 
 scoreCandidates :: Library -> Graph -> [Candidate] -> [(Candidate, Score)]
 scoreCandidates lib graph xs =
-    zip xs scores
-        where
-            scores = fmap (scoreCandidate lib graph) xs
+  zip xs scores
+  where
+    scores = fmap (scoreCandidate lib graph) xs
 
 rankedCandidates :: Library -> Graph -> TrackId -> [(Candidate, Score)]
 rankedCandidates lib graph trackId =
-    sortOn snd $ scoreCandidates lib graph $ candidates lib graph trackId
+  sortOn snd $ scoreCandidates lib graph $ candidates lib graph trackId
 
 bestCandidates :: Library -> Graph -> TrackId -> [Candidate]
-bestCandidates lib graph x  =
-    case rankedCandidates lib graph x of
-        [] -> []
-        xs -> fmap fst $ head $ groupBy p $ xs
-        where
-            p = \c1 c2 -> snd c1 == snd c2
+bestCandidates lib graph x =
+  case rankedCandidates lib graph x of
+    [] -> []
+    xs -> fmap fst $ head $ groupBy p $ xs
+  where
+    p = \c1 c2 -> snd c1 == snd c2
 
 ----------------------------------
 ----- Scoring --------------------
@@ -183,6 +184,6 @@ type Score = Int
 
 -- this is where the magic will eventually happen...
 scoreCandidate :: Library -> Graph -> Candidate -> Score
-scoreCandidate _ _ (Candidate Tested _)   = 0
-scoreCandidate _ _ (Candidate SameKey _)  = 1
+scoreCandidate _ _ (Candidate Tested _) = 0
+scoreCandidate _ _ (Candidate SameKey _) = 1
 scoreCandidate _ _ (Candidate Harmonic _) = 2
