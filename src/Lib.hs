@@ -14,6 +14,7 @@ module Lib
     harmonicSuccessors,
     getTracksWithKey,
     getTracksWithKeys,
+    Candidate (..),
     confirmedSuccessors,
     candidates,
     scoreCandidate,

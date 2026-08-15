@@ -5,7 +5,7 @@ module Examples
 where
 
 import qualified Data.Map.Strict as Map
-import Key (KeyNumber (..), KeyType (..))
+import Key
 import Lib
 
 library :: Library

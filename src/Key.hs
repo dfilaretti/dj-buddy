@@ -2,10 +2,6 @@ module Key
   ( Key,
     KeyNumber (..),
     KeyType (..),
-    add,
-    increment,
-    decrement,
-    relative,
     compatibleKeys,
   )
 where
@@ -40,6 +36,17 @@ data KeyType
 ----- Public Functions  ----------
 ----------------------------------
 
+compatibleKeys :: Key -> [Key]
+compatibleKeys k = [increment k, decrement k, relative k]
+
+----------------------------------
+----- Internal Functions  --------
+----------------------------------
+
+incrementKeyNumber :: Int -> KeyNumber -> KeyNumber
+incrementKeyNumber n k =
+  toEnum ((fromEnum k + n) `mod` 12)
+
 add :: Int -> Key -> Key
 add n (keyNumber, keyType) = (incrementKeyNumber n keyNumber, keyType)
 
@@ -52,14 +59,3 @@ increment = add 1
 
 decrement :: Key -> Key
 decrement = add (-1)
-
-compatibleKeys :: Key -> [Key]
-compatibleKeys k = [increment k, decrement k, relative k]
-
-----------------------------------
------ Internal Functions  --------
-----------------------------------
-
-incrementKeyNumber :: Int -> KeyNumber -> KeyNumber
-incrementKeyNumber n k =
-  toEnum ((fromEnum k + n) `mod` 12)
