@@ -119,17 +119,19 @@ data Edge = Edge
   }
   deriving (Eq, Show)
 
--- TODO: this return [Edge]
-getEdges :: TrackId -> Graph -> Maybe [Edge]
-getEdges tId g = Map.lookup tId g
+getEdges :: TrackId -> Graph -> [Edge]
+getEdges tId g =
+  case Map.lookup tId g of
+    Nothing -> []
+    Just edges -> edges
 
 -- all the tracks that are confirmed (by the user) to be good transition from this one
 -- TODO: maybe return a new type [ConfirmedSuccessor] so we can keep additional info?
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
 confirmedSuccessors tId g =
-  case getEdges tId g of
-    Nothing -> []
-    Just edges -> map to edges
+  map
+    to
+    (getEdges tId g)
 
 ----------------------------------
 ----- Candidate ------------------
