@@ -6,6 +6,7 @@ module Lib
     , emptyLibrary
     , addToLibrary
     , removeFromLibrary
+    , scoreCandidates
     , filterLibrary
     , getTracks
     , sameKeySuccessors
@@ -17,7 +18,7 @@ module Lib
     , candidates
     , scoreCandidate
     , rankedCandidates
-    , highestScoringCandidates
+    , bestCandidates
     -- , sameKeySuccessors
     , TransitionType(..)
     , Edge(..)
@@ -117,11 +118,12 @@ data Edge = Edge
     }
     deriving (Eq, Show)
 
+-- TODO: this return [Edge]
 getEdges :: TrackId -> Graph -> Maybe [Edge]
 getEdges tId g = Map.lookup tId g
 
 -- all the tracks that are confirmed (by the user) to be good transition from this one
--- TODO: this should return [Edge]
+-- TODO: maybe return a new type [ConfirmedSuccessor] so we can keep additional info?
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
 confirmedSuccessors tId g =
     case getEdges tId g of
@@ -155,15 +157,18 @@ candidates lib graph trackId =
         harmonicCandidates = mkCandidates Harmonic (keyJumpSuccessors trackId lib)
         testedCandidates   = mkCandidates Tested (confirmedSuccessors trackId graph)
 
+scoreCandidates :: Library -> Graph -> [Candidate] -> [(Candidate, Score)]
+scoreCandidates lib graph xs =
+    zip xs scores
+        where
+            scores = fmap (scoreCandidate lib graph) xs
+
 rankedCandidates :: Library -> Graph -> TrackId -> [(Candidate, Score)]
 rankedCandidates lib graph trackId =
-    sortOn snd $ zip cand scores
-        where
-            cand   = candidates lib graph trackId
-            scores = fmap scoreCandidate cand
+    sortOn snd $ scoreCandidates lib graph $ candidates lib graph trackId
 
-highestScoringCandidates :: Library -> Graph -> TrackId -> [Candidate]
-highestScoringCandidates lib graph x  =
+bestCandidates :: Library -> Graph -> TrackId -> [Candidate]
+bestCandidates lib graph x  =
     case rankedCandidates lib graph x of
         [] -> []
         xs -> fmap fst $ head $ groupBy p $ xs
@@ -177,7 +182,7 @@ highestScoringCandidates lib graph x  =
 type Score = Int
 
 -- this is where the magic will eventually happen...
-scoreCandidate :: Candidate -> Int
-scoreCandidate (Candidate Tested _)   = 0
-scoreCandidate (Candidate SameKey _)  = 1
-scoreCandidate (Candidate Harmonic _) = 2
+scoreCandidate :: Library -> Graph -> Candidate -> Score
+scoreCandidate _ _ (Candidate Tested _)   = 0
+scoreCandidate _ _ (Candidate SameKey _)  = 1
+scoreCandidate _ _ (Candidate Harmonic _) = 2
