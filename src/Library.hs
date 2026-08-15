@@ -1,37 +1,19 @@
 module Library
-  ( TrackId,
-    Track (..),
+  ( module Track,
     Library,
-    emptyLibrary,
-    addToLibrary,
-    removeFromLibrary,
-    filterLibrary,
-    getTracks,
     sameKeySuccessors,
     keyJumpSuccessors,
     harmonicSuccessors,
-    getTracksWithKey,
-    getTracksWithKeys,
-    trackKey,
   )
 where
 
 import qualified Data.Map.Strict as Map
 import qualified Key as Key
+import Track
 
 ----------------------------------
 ----- Library --------------------
 ----------------------------------
-
-type TrackId = Int
-
-data Track = Track
-  { title :: String,
-    key :: Key.Key
-    -- , author: String
-    -- etc.
-  }
-  deriving (Eq, Show)
 
 type Library = Map.Map TrackId Track
 

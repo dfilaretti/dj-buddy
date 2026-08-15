@@ -5,8 +5,9 @@ module Examples
 where
 
 import qualified Data.Map.Strict as Map
+import Graph (Edge (Edge), Graph)
 import Key
-import Lib
+import Library (Library, Track (Track))
 
 library :: Library
 library =
