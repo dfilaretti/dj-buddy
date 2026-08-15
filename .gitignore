@@ -4,3 +4,4 @@
 .cabal-store
 .stack-work
 *.cabal
+dist-newstyle
