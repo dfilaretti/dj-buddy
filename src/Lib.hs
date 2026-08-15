@@ -167,8 +167,8 @@ scoreCandidates lib graph xs =
     scores = fmap (scoreCandidate lib graph) xs
 
 rankedCandidates :: Library -> Graph -> TrackId -> [(Candidate, Score)]
-rankedCandidates lib graph trackId =
-  sortOn snd $ scoreCandidates lib graph $ candidates lib graph trackId
+rankedCandidates lib graph =
+  sortOn snd . scoreCandidates lib graph . candidates lib graph
 
 bestCandidates :: Library -> Graph -> TrackId -> [Candidate]
 bestCandidates lib graph x =
