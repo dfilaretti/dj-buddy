@@ -14,9 +14,12 @@ module Lib
     , getTracksWithKey
     , getTracksWithKeys
     , confirmedSuccessors
-    , successors
+    , candidates
+    , scoreCandidate
+    , rankedCandidates
+    , highestScoringCandidates
     -- , sameKeySuccessors
-    , Transition(..)
+    , TransitionType(..)
     , Edge(..)
     , Graph
     , trackKey
@@ -24,12 +27,13 @@ module Lib
 
 import qualified Data.Map.Strict as Map
 import qualified Key as Key
+import Data.List(sortOn, groupBy)
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
 ----------------------------------
------ Other ----------------------
+----- Track ----------------------
 ----------------------------------
 
 type TrackId = Int
@@ -37,8 +41,14 @@ type TrackId = Int
 data Track = Track
     { title :: String
     , key :: Key.Key
+    -- , author: String
+    -- etc.
     }
     deriving (Eq, Show)
+
+----------------------------------
+----- Library --------------------
+----------------------------------
 
 type Library = Map.Map TrackId Track
 
@@ -60,39 +70,7 @@ getTracks p  = Map.keys . filterLibrary p
 getTracksWithKey :: Key.Key -> Library -> [TrackId]
 getTracksWithKey k = getTracks ((==k) . key)
 
-getEdges :: TrackId -> Graph -> Maybe [Edge]
-getEdges tId g = Map.lookup tId g
-
--- TODO: refactor?
-getTracksWithKeys :: [Key.Key] -> Library -> [TrackId]
-getTracksWithKeys ks lib =
-    concat $ fmap (\k -> getTracksWithKey k lib) ks
-
-data Transition
-    = Tested
-    | SameKey
-    | Harmonic
-    deriving (Eq, Ord, Show)
-
--- TODO: rename this to Transition
-data Edge = Edge
-    { to         :: TrackId
-    , transition :: Transition
-    -- TODO: add notes etc.
-    }
-    deriving (Eq, Show)
-
-type Graph = Map.Map TrackId [Edge]
-
-----------------------------------
------ Functions ------------------
-----------------------------------
-
-trackKey :: TrackId -> Library -> Maybe Key.Key
-trackKey n lib = key <$> Map.lookup n lib
-
 -- all the tracks with the same key as this one
--- TODO: this should return [Edge]
 sameKeySuccessors :: TrackId -> Library -> [TrackId]
 sameKeySuccessors tId lib =
     case desiredKey of
@@ -102,7 +80,6 @@ sameKeySuccessors tId lib =
         desiredKey = trackKey tId lib
 
 -- all the tracks we can jump to based on the Camelot wheel, excluding same key!
--- TODO: this should return [Edge]
 keyJumpSuccessors :: TrackId -> Library -> [TrackId]
 keyJumpSuccessors tId lib =
     case initialKey of
@@ -113,10 +90,35 @@ keyJumpSuccessors tId lib =
 
 -- all the tracks we can jump to according to the Camelot wheel
 -- TODO: this doesn't include weird jumps such as the "Armin Van Buuren transition" etc. Consider adding later.
--- TODO: this should return [Edge]
 harmonicSuccessors :: TrackId -> Library -> [TrackId]
 harmonicSuccessors tId lib =
     sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
+
+-- TODO: refactor?
+getTracksWithKeys :: [Key.Key] -> Library -> [TrackId]
+getTracksWithKeys ks lib =
+    concat $ fmap (\k -> getTracksWithKey k lib) ks
+
+trackKey :: TrackId -> Library -> Maybe Key.Key
+trackKey n lib = key <$> Map.lookup n lib
+
+----------------------------------
+----- Graph ----------------------
+----------------------------------
+
+type Graph = Map.Map TrackId [Edge]
+
+-- TODO: rename this to Transition
+data Edge = Edge
+    { to         :: TrackId
+    -- notes     :: String
+    -- rating    :: Rating
+    --
+    }
+    deriving (Eq, Show)
+
+getEdges :: TrackId -> Graph -> Maybe [Edge]
+getEdges tId g = Map.lookup tId g
 
 -- all the tracks that are confirmed (by the user) to be good transition from this one
 -- TODO: this should return [Edge]
@@ -126,11 +128,56 @@ confirmedSuccessors tId g =
         Nothing    -> []
         Just edges -> map to edges
 
--- TODO: this should return something like [(score, Edge)]
-successors :: Library -> Graph -> TrackId -> [TrackId]
-successors lib gph tid =
-    (confirmedSuccessors tid gph) ++ (harmonicSuccessors tid lib) ++ (sameKeySuccessors tid lib)
+----------------------------------
+----- Candidate ------------------
+----------------------------------
 
--- title <$> Map.lookup (TrackId 1) library
--- [(tid, title track) | (tid, track) <- Map.toList library]
--- [edge | edge <- graph Map.! TrackId 1]
+data Candidate = Candidate
+    { transitionType :: TransitionType
+    , track          :: TrackId
+    }
+    deriving (Eq, Show)
+
+data TransitionType
+    = Tested
+    | SameKey
+    | Harmonic
+    deriving (Eq, Ord, Show)
+
+mkCandidates :: TransitionType -> [TrackId] -> [Candidate]
+mkCandidates transitionType = map (Candidate transitionType)
+
+candidates :: Library -> Graph -> TrackId -> [Candidate]
+candidates lib graph trackId =
+    sameKeyCandidates ++ harmonicCandidates ++ testedCandidates
+    where
+        sameKeyCandidates  = mkCandidates SameKey (sameKeySuccessors trackId lib)
+        harmonicCandidates = mkCandidates Harmonic (keyJumpSuccessors trackId lib)
+        testedCandidates   = mkCandidates Tested (confirmedSuccessors trackId graph)
+
+rankedCandidates :: Library -> Graph -> TrackId -> [(Candidate, Score)]
+rankedCandidates lib graph trackId =
+    sortOn snd $ zip cand scores
+        where
+            cand   = candidates lib graph trackId
+            scores = fmap scoreCandidate cand
+
+highestScoringCandidates :: Library -> Graph -> TrackId -> [Candidate]
+highestScoringCandidates lib graph x  =
+    case rankedCandidates lib graph x of
+        [] -> []
+        xs -> fmap fst $ head $ groupBy p $ xs
+        where
+            p = \c1 c2 -> snd c1 == snd c2
+
+----------------------------------
+----- Scoring --------------------
+----------------------------------
+
+type Score = Int
+
+-- this is where the magic will eventually happen...
+scoreCandidate :: Candidate -> Int
+scoreCandidate (Candidate Tested _)   = 0
+scoreCandidate (Candidate SameKey _)  = 1
+scoreCandidate (Candidate Harmonic _) = 2

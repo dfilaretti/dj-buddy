@@ -43,7 +43,8 @@ add :: Int -> Key -> Key
 add n (keyNumber, keyType) = (incrementKeyNumber n keyNumber, keyType)
 
 relative :: Key -> Key
-relative (keyNumber, keyType) = (keyNumber, succ keyType)
+relative (keyNumber, A) = (keyNumber, B)
+relative (keyNumber, B) = (keyNumber, A)
 
 increment :: Key -> Key
 increment = add 1
