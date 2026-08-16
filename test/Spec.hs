@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Key (KeyNumber(..), KeyType(..))
+import Camelot (KeyNumber (..), KeyType (..))
 import Lib
 import Test.Hspec
 

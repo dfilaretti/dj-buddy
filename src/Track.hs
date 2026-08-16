@@ -4,13 +4,13 @@ module Track
   )
 where
 
-import qualified Key as Key
+import qualified Camelot
 
 type TrackId = Int
 
 data Track = Track
   { title :: String,
-    key :: Key.Key
+    key :: Camelot.Key
     -- , author: String
     -- etc.
   }

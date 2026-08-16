@@ -10,7 +10,7 @@ module TrackCatalog
 where
 
 import qualified Data.Map.Strict as Map
-import qualified Key as Key
+import qualified Camelot
 import Track
 
 ----------------------------------
@@ -34,7 +34,7 @@ filter_ = Map.filter
 getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
 getTracks p = Map.keys . filter_ p
 
-getTracksWithKey :: Key.Key -> TrackCatalog -> [TrackId]
+getTracksWithKey :: Camelot.Key -> TrackCatalog -> [TrackId]
 getTracksWithKey k = getTracks ((== k) . key)
 
 -- all the tracks with the same key as this one
@@ -50,7 +50,7 @@ sameKeySuccessors tId lib =
 keyJumpSuccessors :: TrackId -> TrackCatalog -> [TrackId]
 keyJumpSuccessors tId lib =
   case initialKey of
-    Just k -> getTracksWithKeys (Key.compatibleKeys k) lib
+    Just k -> getTracksWithKeys (Camelot.compatibleKeys k) lib
     Nothing -> []
   where
     initialKey = trackKey tId lib
@@ -62,9 +62,9 @@ harmonicSuccessors tId lib =
   sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
 
 -- TODO: refactor?
-getTracksWithKeys :: [Key.Key] -> TrackCatalog -> [TrackId]
+getTracksWithKeys :: [Camelot.Key] -> TrackCatalog -> [TrackId]
 getTracksWithKeys ks lib =
   concat $ fmap (\k -> getTracksWithKey k lib) ks
 
-trackKey :: TrackId -> TrackCatalog -> Maybe Key.Key
+trackKey :: TrackId -> TrackCatalog -> Maybe Camelot.Key
 trackKey n lib = key <$> Map.lookup n lib

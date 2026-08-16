@@ -1,4 +1,4 @@
-module Key
+module Camelot
   ( Key,
     KeyNumber (..),
     KeyType (..),

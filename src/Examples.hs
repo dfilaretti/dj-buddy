@@ -4,7 +4,7 @@ module Examples
 where
 
 import Graph (Edge (..))
-import Key
+import Camelot
 import qualified MusicLibrary as M
 import Track
 
