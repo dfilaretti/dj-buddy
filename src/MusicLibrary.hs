@@ -37,6 +37,7 @@ addTracks :: [Track.Track] -> MusicLibrary -> MusicLibrary
 addTracks [] lib = lib
 addTracks (t : ts) lib = addTracks ts (addTrack t lib)
 
+-- TODO: this should check that the track ID exists in the track catalog (and give error if not)
 addTransition :: Track.TrackId -> G.Edge -> MusicLibrary -> MusicLibrary
 addTransition trackId edge (MusicLibrary catalog graph nextId) =
   MusicLibrary

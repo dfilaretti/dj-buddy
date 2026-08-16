@@ -9,8 +9,8 @@ where
 
 import Data.List (groupBy, sortOn)
 import Graph (Graph, confirmedSuccessors)
-import TrackCatalog (TrackCatalog, keyJumpSuccessors, sameKeySuccessors)
 import Track (TrackId)
+import TrackCatalog (TrackCatalog, keyJumpSuccessors, sameKeySuccessors)
 
 ----------------------------------
 ----- Data -----------------------
