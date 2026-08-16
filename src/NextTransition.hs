@@ -1,4 +1,4 @@
-module Transition
+module NextTransition
   ( Score,
     TransitionType (..),
     Transition (..),
