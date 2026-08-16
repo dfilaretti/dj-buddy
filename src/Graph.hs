@@ -2,9 +2,12 @@ module Graph
   ( Graph,
     Edge (..),
     confirmedSuccessors,
+    empty,
+    addEdge,
   )
 where
 
+import qualified Data.IntSet as Map.Map
 import qualified Data.Map.Strict as Map
 import Track (TrackId)
 
@@ -18,6 +21,12 @@ data Edge = Edge
   --
   }
   deriving (Eq, Show)
+
+empty :: Graph
+empty = Map.fromList []
+
+addEdge :: TrackId -> Edge -> Graph -> Graph
+addEdge trackId edge = Map.insert trackId [edge]
 
 getEdges :: TrackId -> Graph -> [Edge]
 getEdges tId g =

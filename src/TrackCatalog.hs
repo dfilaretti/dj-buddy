@@ -4,6 +4,8 @@ module TrackCatalog
     sameKeySuccessors,
     keyJumpSuccessors,
     harmonicSuccessors,
+    empty,
+    add,
   )
 where
 
