@@ -1,6 +1,6 @@
-module Library
+module TrackCatalog
   ( module Track,
-    Library,
+    TrackCatalog,
     sameKeySuccessors,
     keyJumpSuccessors,
     harmonicSuccessors,
@@ -12,31 +12,31 @@ import qualified Key as Key
 import Track
 
 ----------------------------------
------ Library --------------------
+----- Track catalog --------------
 ----------------------------------
 
-type Library = Map.Map TrackId Track
+type TrackCatalog = Map.Map TrackId Track
 
-emptyLibrary :: Library
-emptyLibrary = Map.fromList []
+empty :: TrackCatalog
+empty = Map.fromList []
 
-addToLibrary :: TrackId -> Track -> Library -> Library
-addToLibrary = Map.insert
+add :: TrackId -> Track -> TrackCatalog -> TrackCatalog
+add = Map.insert
 
-removeFromLibrary :: TrackId -> Library -> Library
-removeFromLibrary = Map.delete
+remove :: TrackId -> TrackCatalog -> TrackCatalog
+remove = Map.delete
 
-filterLibrary :: (Track -> Bool) -> Library -> Library
-filterLibrary = Map.filter
+filter_ :: (Track -> Bool) -> TrackCatalog -> TrackCatalog
+filter_ = Map.filter
 
-getTracks :: (Track -> Bool) -> Library -> [TrackId]
-getTracks p = Map.keys . filterLibrary p
+getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
+getTracks p = Map.keys . filter_ p
 
-getTracksWithKey :: Key.Key -> Library -> [TrackId]
+getTracksWithKey :: Key.Key -> TrackCatalog -> [TrackId]
 getTracksWithKey k = getTracks ((== k) . key)
 
 -- all the tracks with the same key as this one
-sameKeySuccessors :: TrackId -> Library -> [TrackId]
+sameKeySuccessors :: TrackId -> TrackCatalog -> [TrackId]
 sameKeySuccessors tId lib =
   case desiredKey of
     Just k -> filter (/= tId) $ getTracksWithKey k lib
@@ -45,7 +45,7 @@ sameKeySuccessors tId lib =
     desiredKey = trackKey tId lib
 
 -- all the tracks we can jump to based on the Camelot wheel, excluding same key!
-keyJumpSuccessors :: TrackId -> Library -> [TrackId]
+keyJumpSuccessors :: TrackId -> TrackCatalog -> [TrackId]
 keyJumpSuccessors tId lib =
   case initialKey of
     Just k -> getTracksWithKeys (Key.compatibleKeys k) lib
@@ -55,14 +55,14 @@ keyJumpSuccessors tId lib =
 
 -- all the tracks we can jump to according to the Camelot wheel
 -- TODO: this doesn't include weird jumps such as the "Armin Van Buuren transition" etc. Consider adding later.
-harmonicSuccessors :: TrackId -> Library -> [TrackId]
+harmonicSuccessors :: TrackId -> TrackCatalog -> [TrackId]
 harmonicSuccessors tId lib =
   sameKeySuccessors tId lib ++ keyJumpSuccessors tId lib
 
 -- TODO: refactor?
-getTracksWithKeys :: [Key.Key] -> Library -> [TrackId]
+getTracksWithKeys :: [Key.Key] -> TrackCatalog -> [TrackId]
 getTracksWithKeys ks lib =
   concat $ fmap (\k -> getTracksWithKey k lib) ks
 
-trackKey :: TrackId -> Library -> Maybe Key.Key
+trackKey :: TrackId -> TrackCatalog -> Maybe Key.Key
 trackKey n lib = key <$> Map.lookup n lib

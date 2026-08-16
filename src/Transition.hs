@@ -9,7 +9,7 @@ where
 
 import Data.List (groupBy, sortOn)
 import Graph (Graph, confirmedSuccessors)
-import Library (Library, keyJumpSuccessors, sameKeySuccessors)
+import TrackCatalog (TrackCatalog, keyJumpSuccessors, sameKeySuccessors)
 import Track (TrackId)
 
 ----------------------------------
@@ -34,11 +34,11 @@ type Score = Int
 ----- Public functions -----------
 ----------------------------------
 
-sortedTransitions :: Library -> Graph -> TrackId -> [(Transition, Score)]
+sortedTransitions :: TrackCatalog -> Graph -> TrackId -> [(Transition, Score)]
 sortedTransitions lib graph =
   sortOn snd . scoreTransitions lib graph . transitions lib graph
 
-bestTransitions :: Library -> Graph -> TrackId -> [Transition]
+bestTransitions :: TrackCatalog -> Graph -> TrackId -> [Transition]
 bestTransitions lib graph x =
   case sortedTransitions lib graph x of
     [] -> []
@@ -53,7 +53,7 @@ bestTransitions lib graph x =
 mkTransitions :: TransitionType -> [TrackId] -> [Transition]
 mkTransitions t = map (Transition t)
 
-transitions :: Library -> Graph -> TrackId -> [Transition]
+transitions :: TrackCatalog -> Graph -> TrackId -> [Transition]
 transitions lib graph trackId =
   sameKey ++ harmonic ++ tested
   where
@@ -61,14 +61,14 @@ transitions lib graph trackId =
     harmonic = mkTransitions Harmonic (keyJumpSuccessors trackId lib)
     tested = mkTransitions Tested (confirmedSuccessors trackId graph)
 
-scoreTransitions :: Library -> Graph -> [Transition] -> [(Transition, Score)]
+scoreTransitions :: TrackCatalog -> Graph -> [Transition] -> [(Transition, Score)]
 scoreTransitions lib graph xs =
   zip xs scores
   where
     scores = fmap (scoreTransition lib graph) xs
 
 -- this is where the magic will eventually happen...
-scoreTransition :: Library -> Graph -> Transition -> Score
+scoreTransition :: TrackCatalog -> Graph -> Transition -> Score
 scoreTransition _ _ (Transition Tested _) = 0
 scoreTransition _ _ (Transition SameKey _) = 1
 scoreTransition _ _ (Transition Harmonic _) = 2

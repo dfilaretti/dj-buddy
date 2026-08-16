@@ -7,9 +7,9 @@ where
 import qualified Data.Map.Strict as Map
 import Graph (Edge (Edge), Graph)
 import Key
-import Library (Library, Track (Track))
+import TrackCatalog (Track (Track), TrackCatalog)
 
-library :: Library
+library :: TrackCatalog
 library =
   Map.fromList
     [ (1, Track "A" (K_3, A)),
