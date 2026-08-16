@@ -1,4 +1,4 @@
-module Graph
+module TransitionsGraph
   ( Graph,
     Edge (..),
     confirmedSuccessors,

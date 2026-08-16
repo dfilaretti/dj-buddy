@@ -3,7 +3,7 @@ module Examples
   )
 where
 
-import Graph (Edge (..))
+import TransitionsGraph (Edge (..))
 import Camelot
 import qualified MusicLibrary as M
 import Track

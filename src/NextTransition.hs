@@ -8,9 +8,9 @@ module NextTransition
 where
 
 import Data.List (groupBy, sortOn)
-import Graph (Graph, confirmedSuccessors)
 import Track (TrackId)
 import TrackCatalog (TrackCatalog, keyJumpSuccessors, sameKeySuccessors)
+import TransitionsGraph (Graph, confirmedSuccessors)
 
 ----------------------------------
 ----- Data -----------------------
