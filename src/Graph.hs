@@ -7,7 +7,6 @@ module Graph
   )
 where
 
-import qualified Data.IntSet as Map.Map
 import qualified Data.Map.Strict as Map
 import Track (TrackId)
 
