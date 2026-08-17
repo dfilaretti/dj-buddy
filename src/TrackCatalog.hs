@@ -5,7 +5,7 @@ module TrackCatalog
     keyJumpSuccessors,
     harmonicSuccessors,
     empty,
-    add,
+    addTrack,
   )
 where
 
@@ -22,8 +22,8 @@ type TrackCatalog = Map.Map TrackId Track
 empty :: TrackCatalog
 empty = Map.fromList []
 
-add :: TrackId -> Track -> TrackCatalog -> TrackCatalog
-add = Map.insert
+addTrack :: TrackId -> Track -> TrackCatalog -> TrackCatalog
+addTrack = Map.insert
 
 remove :: TrackId -> TrackCatalog -> TrackCatalog
 remove = Map.delete

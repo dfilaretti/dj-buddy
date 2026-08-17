@@ -29,7 +29,7 @@ empty =
 addTrack :: Track -> MusicLibrary -> MusicLibrary
 addTrack track (MusicLibrary catalog graph nextId) =
   MusicLibrary
-    { trackCatalog = T.add nextId track catalog,
+    { trackCatalog = T.addTrack nextId track catalog,
       transitionGraph = graph,
       nextTrackId = nextId + 1
     }
