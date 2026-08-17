@@ -20,7 +20,6 @@ transitions :: [(TrackId, Edge)]
 transitions = [(0, Edge 2)]
 
 library :: M.MusicLibrary
-library =
-  populate M.empty
+library = populate M.empty
   where
     populate = M.addTransitions transitions . M.addTracks tracks
