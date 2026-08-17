@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
+
 module Lib
   ( library,
   )
@@ -9,59 +11,139 @@ import qualified MusicLibrary as M
 import Track
 import TransitionsGraph (Edge (..))
 
+another_summer_id = 0
+
+how_could_i_say_it_id = 1
+
+nothing_is_impossible_id = 2
+
+spirit_id = 3
+
+mahon_id = 4
+
+howl_at_the_moon_id = 5
+
+melody_express_id = 6
+
+tribe_of_the_sun_id = 7
+
+inferno_id = 8
+
+against_the_wind_id = 9
+
+resilience_id = 10
+
+too_much_rain_id = 11
+
+aeterna_id = 12
+
+set_me_free_id = 13
+
+thunderfunk_id = 14
+
+polkatorju_id = 15
+
+falling_id = 16
+
+feels_so_good_id = 17
+
+colossal_id = 18
+
+aniara_id = 19
+
+marulio_id = 20
+
+sorrento_id = 21
+
 library :: M.MusicLibrary
 library =
   M.MusicLibrary
     { M.nextTrackId = 100,
       M.trackCatalog =
         Map.fromList
-          [ (0, (Track "Another Summer" (K_3, D))),
-            (1, (Track "How Could I say It" (K_10, D))),
-            (2, (Track "Nothing Is Impossible" (K_7, D))),
-            (3, (Track "Spirit" (K_9, D))),
-            (4, (Track "Mahon" (K_8, D))),
-            (5, (Track "Howl At The Moon" (K_1, M))),
-            (6, (Track "Melody Express" (K_3, D))),
-            (7, (Track "Tribe Of The Sun" (K_4, D))),
-            (8, (Track "Inferno" (K_4, D))),
-            (9, (Track "Against The Wind" (K_10, D))),
-            (10, (Track "Resilience" (K_5, D))),
-            (11, (Track "Too Much Rain" (K_1, D))),
-            (12, (Track "Aeterna" (K_2, D))),
-            (13, (Track "Set Me Free" (K_9, M))),
-            (14, (Track "Thunderfunk" (K_1, M))),
-            (15, (Track "Polkatorju" (K_10, D))),
-            (16, (Track "Falling" (K_6, D))),
-            (17, (Track "Feels So Good" (K_10, D))),
-            (18, (Track "Colossal" (K_4, M))),
-            (19, (Track "Aniara" (K_9, D))),
-            (20, (Track "Marulio" (K_1, D))),
-            (21, (Track "Sorrento" (K_9, M)))
+          [ (another_summer_id, (Track "Another Summer" (K_3, D))),
+            (how_could_i_say_it_id, (Track "How Could I say It" (K_10, D))),
+            (nothing_is_impossible_id, (Track "Nothing Is Impossible" (K_7, D))),
+            (spirit_id, (Track "Spirit" (K_9, D))),
+            (mahon_id, (Track "Mahon" (K_8, D))),
+            (howl_at_the_moon_id, (Track "Howl At The Moon" (K_1, M))),
+            (melody_express_id, (Track "Melody Express" (K_3, D))),
+            (tribe_of_the_sun_id, (Track "Tribe Of The Sun" (K_4, D))),
+            (inferno_id, (Track "Inferno" (K_4, D))),
+            (against_the_wind_id, (Track "Against The Wind" (K_10, D))),
+            (resilience_id, (Track "Resilience" (K_5, D))),
+            (too_much_rain_id, (Track "Too Much Rain" (K_1, D))),
+            (aeterna_id, (Track "Aeterna" (K_2, D))),
+            (set_me_free_id, (Track "Set Me Free" (K_9, M))),
+            (thunderfunk_id, (Track "Thunderfunk" (K_1, M))),
+            (polkatorju_id, (Track "Polkatorju" (K_10, D))),
+            (falling_id, (Track "Falling" (K_6, D))),
+            (feels_so_good_id, (Track "Feels So Good" (K_10, D))),
+            (colossal_id, (Track "Colossal" (K_4, M))),
+            (aniara_id, (Track "Aniara" (K_9, D))),
+            (marulio_id, (Track "Marulio" (K_1, D))),
+            (sorrento_id, (Track "Sorrento" (K_9, M)))
           ],
       M.transitionGraph =
         Map.fromList
           [ -- melody espress => Another Summer
-            (6, [Edge 0]),
+            ( melody_express_id,
+              [ Edge another_summer_id
+              ]
+            ),
             -- thunderfunk => howl at the moon
-            (14, [Edge 5]),
+            ( thunderfunk_id,
+              [Edge howl_at_the_moon_id]
+            ),
             -- howl at the moon => colossal
-            (5, [Edge 18]),
+            ( howl_at_the_moon_id,
+              [Edge colossal_id]
+            ),
             -- nopthing is impossible
             --     => mahon
             --     => falling
-            (2, [Edge 4, Edge 16])
-            -- aniara => how could I say it
-            -- feels so good => polkatorju
-            -- set me free => spirit
-            -- spirit => aniara
-            -- colossal => inferno
-            -- resilience => falling (*** mashup!!)
-            -- mahon -> spirit
-            -- against the wind -> feels so good
-            -- set me free <-> sorrento (bidirectional)
-            -- sorrento -> spirit (*)
-            -- Mahon -> Feels so good (+2 jump!)
-            -- Marulio => melody express (not so great)
-            -- Falling => mahon
+            ( nothing_is_impossible_id,
+              [ Edge mahon_id,
+                Edge falling_id
+              ]
+            ),
+            ( aniara_id,
+              [Edge how_could_i_say_it_id]
+            ),
+            ( feels_so_good_id,
+              [Edge polkatorju_id]
+            ),
+            ( set_me_free_id,
+              [Edge spirit_id, Edge sorrento_id]
+            ),
+            ( spirit_id,
+              [Edge aniara_id]
+            ),
+            ( colossal_id,
+              [Edge inferno_id]
+            ),
+            ( resilience_id,
+              [Edge falling_id] -- Mashup
+            ),
+            ( mahon_id,
+              [ Edge spirit_id,
+                Edge feels_so_good_id -- +2 jump to Feels So Good
+              ]
+            ),
+            ( against_the_wind_id,
+              [Edge feels_so_good_id]
+            ),
+            ( sorrento_id,
+              [ Edge set_me_free_id,
+                Edge spirit_id
+              ]
+            ),
+            -- Not so great
+            ( marulio_id,
+              [Edge melody_express_id]
+            ),
+            ( falling_id,
+              [Edge mahon_id]
+            )
           ]
     }
