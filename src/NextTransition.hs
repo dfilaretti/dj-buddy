@@ -8,7 +8,8 @@ module NextTransition
 where
 
 import Data.List (groupBy, sortOn)
-import MusicLibrary (MusicLibrary (..), TrackId)
+import MusicLibrary (MusicLibrary (..))
+import Track (TrackId)
 import TrackCatalog (keyJumpSuccessors, sameKeySuccessors)
 import TransitionsGraph (confirmedSuccessors)
 

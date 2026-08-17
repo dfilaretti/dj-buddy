@@ -3,7 +3,6 @@ module MusicLibrary
     empty,
     addTracks,
     addTransitions,
-    module Track,
   )
 where
 
