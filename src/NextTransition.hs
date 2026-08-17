@@ -8,6 +8,7 @@ module NextTransition
 where
 
 import Data.List (groupBy, sortOn)
+import qualified MusicLibrary as ML
 import Track (TrackId)
 import TrackCatalog (TrackCatalog, keyJumpSuccessors, sameKeySuccessors)
 import TransitionsGraph (Graph, confirmedSuccessors)
@@ -34,13 +35,13 @@ type Score = Int
 ----- Public functions -----------
 ----------------------------------
 
-sortedTransitions :: TrackCatalog -> Graph -> TrackId -> [(Transition, Score)]
-sortedTransitions lib graph =
+sortedTransitions :: ML.MusicLibrary -> TrackId -> [(Transition, Score)]
+sortedTransitions (ML.MusicLibrary lib graph _) =
   sortOn snd . scoreTransitions lib graph . transitions lib graph
 
-bestTransitions :: TrackCatalog -> Graph -> TrackId -> [Transition]
-bestTransitions lib graph x =
-  case sortedTransitions lib graph x of
+bestTransitions :: ML.MusicLibrary -> TrackId -> [Transition]
+bestTransitions ml x =
+  case sortedTransitions ml x of
     [] -> []
     xs -> fmap fst $ head $ groupBy p $ xs
   where

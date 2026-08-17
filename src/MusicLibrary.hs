@@ -1,5 +1,5 @@
 module MusicLibrary
-  ( MusicLibrary,
+  ( MusicLibrary (..),
     empty,
     addTracks,
     addTransitions,

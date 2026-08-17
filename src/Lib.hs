@@ -10,10 +10,10 @@ import TransitionsGraph (Edge (..))
 
 tracks :: [Track]
 tracks =
-  [ (Track "X" (K_1, A)),
-    (Track "Y" (K_1, A)),
-    (Track "X" (K_1, A)),
-    (Track "X" (K_1, A))
+  [ (Track "A" (K_1, A)),
+    (Track "B" (K_1, A)),
+    (Track "C" (K_1, B)),
+    (Track "D" (K_1, A))
   ]
 
 transitions :: [(TrackId, Edge)]
