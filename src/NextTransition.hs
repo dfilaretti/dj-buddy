@@ -8,10 +8,10 @@ module NextTransition
 where
 
 import Data.List (groupBy, sortOn)
-import qualified MusicLibrary as ML
+import MusicLibrary (MusicLibrary (..))
 import Track (TrackId)
-import TrackCatalog (TrackCatalog, keyJumpSuccessors, sameKeySuccessors)
-import TransitionsGraph (Graph, confirmedSuccessors)
+import TrackCatalog (keyJumpSuccessors, sameKeySuccessors)
+import TransitionsGraph (confirmedSuccessors)
 
 ----------------------------------
 ----- Data -----------------------
@@ -35,11 +35,11 @@ type Score = Int
 ----- Public functions -----------
 ----------------------------------
 
-sortedTransitions :: ML.MusicLibrary -> TrackId -> [(Transition, Score)]
-sortedTransitions (ML.MusicLibrary lib graph _) =
-  sortOn snd . scoreTransitions lib graph . transitions lib graph
+sortedTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
+sortedTransitions musicLib =
+  sortOn snd . scoreTransitions musicLib . transitions musicLib
 
-bestTransitions :: ML.MusicLibrary -> TrackId -> [Transition]
+bestTransitions :: MusicLibrary -> TrackId -> [Transition]
 bestTransitions ml x =
   case sortedTransitions ml x of
     [] -> []
@@ -52,24 +52,24 @@ bestTransitions ml x =
 ----------------------------------
 
 mkTransitions :: TransitionType -> [TrackId] -> [Transition]
-mkTransitions t = map (Transition t)
+mkTransitions = map . Transition
 
-transitions :: TrackCatalog -> Graph -> TrackId -> [Transition]
-transitions lib graph trackId =
+transitions :: MusicLibrary -> TrackId -> [Transition]
+transitions (MusicLibrary lib graph _) trackId =
   sameKey ++ harmonic ++ tested
   where
     sameKey = mkTransitions SameKey (sameKeySuccessors trackId lib)
     harmonic = mkTransitions Harmonic (keyJumpSuccessors trackId lib)
     tested = mkTransitions Tested (confirmedSuccessors trackId graph)
 
-scoreTransitions :: TrackCatalog -> Graph -> [Transition] -> [(Transition, Score)]
-scoreTransitions lib graph xs =
+scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
+scoreTransitions ml xs =
   zip xs scores
   where
-    scores = fmap (scoreTransition lib graph) xs
+    scores = fmap (scoreTransition ml) xs
 
 -- this is where the magic will eventually happen...
-scoreTransition :: TrackCatalog -> Graph -> Transition -> Score
-scoreTransition _ _ (Transition Tested _) = 0
-scoreTransition _ _ (Transition SameKey _) = 1
-scoreTransition _ _ (Transition Harmonic _) = 2
+scoreTransition :: MusicLibrary -> Transition -> Score
+scoreTransition _ (Transition Tested _) = 0
+scoreTransition _ (Transition SameKey _) = 1
+scoreTransition _ (Transition Harmonic _) = 2
