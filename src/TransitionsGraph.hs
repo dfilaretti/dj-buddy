@@ -10,6 +10,10 @@ where
 import qualified Data.Map.Strict as Map
 import Track (TrackId)
 
+----------------------------------
+----- Data -----------------------
+----------------------------------
+
 type Graph = Map.Map TrackId [Edge]
 
 -- TODO: rename this to Transition
@@ -21,19 +25,27 @@ data Edge = Edge
   }
   deriving (Eq, Show)
 
+----------------------------------
+----- Public ---------------------
+----------------------------------
+
 emptyGraph :: Graph
 emptyGraph = Map.fromList []
 
 addEdge :: TrackId -> Edge -> Graph -> Graph
 addEdge trackId edge = Map.insert trackId [edge]
 
+-- all the tracks that are confirmed (by the user) to be good transition from this one
+-- TODO: maybe return a new type [ConfirmedSuccessor] so we can keep additional info?
+confirmedSuccessors :: TrackId -> Graph -> [TrackId]
+confirmedSuccessors tId g = map to (getEdges tId g)
+
+----------------------------------
+----- Private --------------------
+----------------------------------
+
 getEdges :: TrackId -> Graph -> [Edge]
 getEdges tId g =
   case Map.lookup tId g of
     Nothing -> []
     Just edges -> edges
-
--- all the tracks that are confirmed (by the user) to be good transition from this one
--- TODO: maybe return a new type [ConfirmedSuccessor] so we can keep additional info?
-confirmedSuccessors :: TrackId -> Graph -> [TrackId]
-confirmedSuccessors tId g = map to (getEdges tId g)
