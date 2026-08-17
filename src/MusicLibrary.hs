@@ -21,8 +21,8 @@ data MusicLibrary = MusicLibrary
 empty :: MusicLibrary
 empty =
   MusicLibrary
-    { trackCatalog = T.empty,
-      transitionGraph = TG.empty,
+    { trackCatalog = T.emptyCatalog,
+      transitionGraph = TG.emptyGraph,
       nextTrackId = 0
     }
 

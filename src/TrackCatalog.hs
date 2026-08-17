@@ -4,7 +4,7 @@ module TrackCatalog
     sameKeySuccessors,
     keyJumpSuccessors,
     harmonicSuccessors,
-    empty,
+    emptyCatalog,
     addTrack,
   )
 where
@@ -19,8 +19,8 @@ import Track (Track (..), TrackId)
 
 type TrackCatalog = Map.Map TrackId Track
 
-empty :: TrackCatalog
-empty = Map.fromList []
+emptyCatalog :: TrackCatalog
+emptyCatalog = Map.fromList []
 
 addTrack :: TrackId -> Track -> TrackCatalog -> TrackCatalog
 addTrack = Map.insert

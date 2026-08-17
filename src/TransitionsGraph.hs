@@ -2,7 +2,7 @@ module TransitionsGraph
   ( Graph,
     Edge (..),
     confirmedSuccessors,
-    empty,
+    emptyGraph,
     addEdge,
   )
 where
@@ -21,8 +21,8 @@ data Edge = Edge
   }
   deriving (Eq, Show)
 
-empty :: Graph
-empty = Map.fromList []
+emptyGraph :: Graph
+emptyGraph = Map.fromList []
 
 addEdge :: TrackId -> Edge -> Graph -> Graph
 addEdge trackId edge = Map.insert trackId [edge]
