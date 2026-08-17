@@ -11,6 +11,7 @@ where
 
 import Camelot (Key, compatibleKeys)
 import qualified Data.Map.Strict as Map
+import Track
 
 ----------------------------------
 ----- Track catalog --------------
