@@ -22,6 +22,7 @@ data TransitionType
   | Harmonic
   deriving (Eq, Ord, Show)
 
+-- TODO: this should have both to/from tracks!
 data Transition = Transition
   { transitionType :: TransitionType,
     track :: TrackId
