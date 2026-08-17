@@ -3,10 +3,11 @@ module MusicLibrary
     empty,
     addTracks,
     addTransitions,
+    module Track,
   )
 where
 
-import qualified Track as Track
+import Track
 import qualified TrackCatalog as T
 import qualified TransitionsGraph as TG
 
@@ -25,7 +26,7 @@ empty =
       nextTrackId = 0
     }
 
-addTrack :: Track.Track -> MusicLibrary -> MusicLibrary
+addTrack :: Track -> MusicLibrary -> MusicLibrary
 addTrack track (MusicLibrary catalog graph nextId) =
   MusicLibrary
     { trackCatalog = T.add nextId track catalog,
@@ -33,12 +34,12 @@ addTrack track (MusicLibrary catalog graph nextId) =
       nextTrackId = nextId + 1
     }
 
-addTracks :: [Track.Track] -> MusicLibrary -> MusicLibrary
+addTracks :: [Track] -> MusicLibrary -> MusicLibrary
 addTracks [] lib = lib
 addTracks (t : ts) lib = addTracks ts (addTrack t lib)
 
 -- TODO: this should check that the track ID exists in the track catalog (and give error if not)
-addTransition :: Track.TrackId -> TG.Edge -> MusicLibrary -> MusicLibrary
+addTransition :: TrackId -> TG.Edge -> MusicLibrary -> MusicLibrary
 addTransition trackId edge (MusicLibrary catalog graph nextId) =
   MusicLibrary
     { trackCatalog = catalog,
@@ -46,7 +47,7 @@ addTransition trackId edge (MusicLibrary catalog graph nextId) =
       nextTrackId = nextId
     }
 
-addTransitions :: [(Track.TrackId, TG.Edge)] -> MusicLibrary -> MusicLibrary
+addTransitions :: [(TrackId, TG.Edge)] -> MusicLibrary -> MusicLibrary
 addTransitions [] lib = lib
 addTransitions ((tid, edge) : ts) lib =
   addTransitions ts $ addTransition tid edge lib
