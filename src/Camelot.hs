@@ -28,8 +28,8 @@ data KeyNumber
   deriving (Eq, Ord, Enum, Bounded, Show)
 
 data KeyType
-  = A
-  | B
+  = D
+  | M
   deriving (Eq, Ord, Enum, Bounded, Show)
 
 ----------------------------------
@@ -51,8 +51,8 @@ add :: Int -> Key -> Key
 add n (keyNumber, keyType) = (incrementKeyNumber n keyNumber, keyType)
 
 relative :: Key -> Key
-relative (keyNumber, A) = (keyNumber, B)
-relative (keyNumber, B) = (keyNumber, A)
+relative (keyNumber, D) = (keyNumber, M)
+relative (keyNumber, M) = (keyNumber, D)
 
 increment :: Key -> Key
 increment = add 1
