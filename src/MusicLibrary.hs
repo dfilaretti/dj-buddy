@@ -1,8 +1,8 @@
 module MusicLibrary
   ( MusicLibrary (..),
-    empty,
-    addTracks,
-    addTransitions,
+  -- empty,
+  -- addTracks,
+  -- addTransitions,
   )
 where
 
@@ -10,12 +10,23 @@ import Track
 import TrackCatalog (TrackCatalog, addTrack, emptyCatalog)
 import TransitionsGraph (Edge, Graph, addEdge, emptyGraph)
 
+----------------------------------
+----- Data -----------------------
+----------------------------------
+
 data MusicLibrary = MusicLibrary
   { trackCatalog :: TrackCatalog,
     transitionGraph :: Graph,
     nextTrackId :: Int
   }
   deriving (Show)
+
+----------------------------------
+----- Functions ------------------
+----------------------------------
+
+-- TODO: reinstate those once the data structure is "final".
+-- But until now it's ok to play with the raw dats structure.
 
 empty :: MusicLibrary
 empty =
