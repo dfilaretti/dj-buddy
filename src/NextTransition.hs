@@ -21,7 +21,12 @@ data TransitionType
   = Tested
   | SameKey
   | Harmonic
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show TransitionType where
+  show Tested = "Tested"
+  show SameKey = "Same key"
+  show Harmonic = "Harmonic"
 
 -- TODO: this should have both to/from tracks!
 data Transition = Transition
