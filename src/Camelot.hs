@@ -1,5 +1,5 @@
 module Camelot
-  ( Key,
+  ( Key (..),
     KeyNumber (..),
     KeyType (..),
     compatibleKeys,
@@ -10,7 +10,9 @@ where
 ----- Types ----------------------
 ----------------------------------
 
-type Key = (KeyNumber, KeyType)
+data Key
+  = Key KeyNumber KeyType
+  deriving (Eq)
 
 data KeyNumber
   = K_1
@@ -25,12 +27,35 @@ data KeyNumber
   | K_10
   | K_11
   | K_12
-  deriving (Eq, Ord, Enum, Bounded, Show)
+  deriving (Eq, Ord, Enum, Bounded)
 
 data KeyType
   = D
   | M
   deriving (Eq, Ord, Enum, Bounded, Show)
+
+----------------------------------
+----- Instances  -----------------
+----------------------------------
+
+instance Show KeyNumber where
+  -- show :: KeyNumber -> String
+  show K_1 = "1"
+  show K_2 = "2"
+  show K_3 = "3"
+  show K_4 = "4"
+  show K_5 = "5"
+  show K_6 = "6"
+  show K_7 = "7"
+  show K_8 = "8"
+  show K_9 = "9"
+  show K_10 = "10"
+  show K_11 = "11"
+  show K_12 = "12"
+
+instance Show Key where
+  -- show :: Key -> String
+  show (Key n t) = show n ++ show t
 
 ----------------------------------
 ----- Public Functions  ----------
@@ -48,11 +73,11 @@ incrementKeyNumber n k =
   toEnum ((fromEnum k + n) `mod` 12)
 
 add :: Int -> Key -> Key
-add n (keyNumber, keyType) = (incrementKeyNumber n keyNumber, keyType)
+add n (Key keyNumber keyType) = Key (incrementKeyNumber n keyNumber) keyType
 
 relative :: Key -> Key
-relative (keyNumber, D) = (keyNumber, M)
-relative (keyNumber, M) = (keyNumber, D)
+relative (Key keyNumber D) = Key keyNumber M
+relative (Key keyNumber M) = Key keyNumber D
 
 increment :: Key -> Key
 increment = add 1
