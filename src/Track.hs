@@ -14,4 +14,7 @@ data Track = Track
     -- , author: String
     -- etc.
   }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show Track where
+  show (Track t k) = "\"" ++ t ++ "\" (" ++ show k ++ ")"
