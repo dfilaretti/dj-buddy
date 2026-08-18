@@ -26,7 +26,8 @@ data TransitionType
 -- TODO: this should have both to/from tracks!
 data Transition = Transition
   { transitionType :: TransitionType,
-    track :: TrackId
+    from :: TrackId,
+    to :: TrackId
   }
   deriving (Eq, Show)
 
@@ -52,16 +53,16 @@ bestTransitions ml x =
 ----- Internal functions ---------
 ----------------------------------
 
-mkTransitions :: TransitionType -> [TrackId] -> [Transition]
-mkTransitions = map . Transition
+mkTransitions :: TransitionType -> TrackId -> [TrackId] -> [Transition]
+mkTransitions tType tFrom tTos = map (Transition tType tFrom) tTos
 
 transitions :: MusicLibrary -> TrackId -> [Transition]
 transitions (MusicLibrary lib graph _) trackId =
   sameKey ++ harmonic ++ tested
   where
-    sameKey = mkTransitions SameKey (sameKeySuccessors trackId lib)
-    harmonic = mkTransitions Harmonic (keyJumpSuccessors trackId lib)
-    tested = mkTransitions Tested (confirmedSuccessors trackId graph)
+    sameKey = mkTransitions SameKey trackId (sameKeySuccessors trackId lib)
+    harmonic = mkTransitions Harmonic trackId (keyJumpSuccessors trackId lib)
+    tested = mkTransitions Tested trackId (confirmedSuccessors trackId graph)
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
 scoreTransitions ml xs =
@@ -71,6 +72,6 @@ scoreTransitions ml xs =
 
 -- this is where the magic will eventually happen...
 scoreTransition :: MusicLibrary -> Transition -> Score
-scoreTransition _ (Transition Tested _) = 0
-scoreTransition _ (Transition SameKey _) = 1
-scoreTransition _ (Transition Harmonic _) = 2
+scoreTransition _ (Transition Tested _ _) = 0
+scoreTransition _ (Transition SameKey _ _) = 1
+scoreTransition _ (Transition Harmonic _ _) = 2
