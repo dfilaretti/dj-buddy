@@ -2,14 +2,13 @@ module NextTransition
   ( Score,
     TransitionType (..),
     Transition (..),
-    bestTransitions,
-    sortedTransitions,
+    scoredNextTracks,
   )
 where
 
 import Data.List (groupBy, sortOn)
 import MusicLibrary (MusicLibrary (..))
-import Track (TrackId)
+import Track (Track, TrackId)
 import TrackCatalog (keyJumpSuccessors, sameKeySuccessors)
 import TransitionsGraph (confirmedSuccessors)
 
@@ -41,21 +40,16 @@ type Score = Int
 ----- Public functions -----------
 ----------------------------------
 
-sortedTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
-sortedTransitions musicLib =
-  sortOn snd . scoreTransitions musicLib . transitions musicLib
-
-bestTransitions :: MusicLibrary -> TrackId -> [Transition]
-bestTransitions ml x =
-  case sortedTransitions ml x of
-    [] -> []
-    xs -> fmap fst $ head $ groupBy p $ xs
-  where
-    p = \c1 c2 -> snd c1 == snd c2
+scoredNextTracks :: MusicLibrary -> TrackId -> [(Track, Score)]
+scoredNextTracks = undefined
 
 ----------------------------------
 ----- Internal functions ---------
 ----------------------------------
+
+scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
+scoredTransitions musicLib =
+  sortOn snd . scoreTransitions musicLib . transitions musicLib
 
 transitions :: MusicLibrary -> TrackId -> [Transition]
 transitions (MusicLibrary lib graph _) trackId =
