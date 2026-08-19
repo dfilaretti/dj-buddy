@@ -57,9 +57,6 @@ bestTransitions ml x =
 ----- Internal functions ---------
 ----------------------------------
 
-mkTransitions :: TransitionType -> [TrackId] -> [Transition]
-mkTransitions = map . Transition
-
 transitions :: MusicLibrary -> TrackId -> [Transition]
 transitions (MusicLibrary lib graph _) trackId =
   sameKey ++ harmonic ++ tested
@@ -67,6 +64,7 @@ transitions (MusicLibrary lib graph _) trackId =
     sameKey = mkTransitions SameKey (sameKeySuccessors trackId lib)
     harmonic = mkTransitions Harmonic (keyJumpSuccessors trackId lib)
     tested = mkTransitions Tested (confirmedSuccessors trackId graph)
+    mkTransitions = map . Transition
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
 scoreTransitions ml xs =
