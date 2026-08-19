@@ -6,6 +6,7 @@ module TrackCatalog
     harmonicSuccessors,
     emptyCatalog,
     addTrack,
+    getTrackWithId,
   )
 where
 
@@ -68,3 +69,6 @@ getTracksWithKeys ks lib =
 
 trackKey :: TrackId -> TrackCatalog -> Maybe Key
 trackKey n lib = key <$> Map.lookup n lib
+
+getTrackWithId :: TrackId -> TrackCatalog -> Maybe Track
+getTrackWithId tid lib = Map.lookup tid lib
