@@ -29,7 +29,6 @@ library
       Lib
       MusicLibrary
       NextTransition
-      PrettyPrint
       Track
       TrackCatalog
       TransitionsGraph
