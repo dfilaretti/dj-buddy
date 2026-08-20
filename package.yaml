@@ -36,6 +36,10 @@ ghc-options:
 
 library:
   source-dirs: src
+  default-extensions:
+  - OverloadedRecordDot
+  - DuplicateRecordFields
+  - NoFieldSelectors
 
 executables:
   dj-buddy-exe:
