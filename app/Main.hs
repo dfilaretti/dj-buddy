@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Lib
+import Example (library)
 
 main :: IO ()
 main = print library
