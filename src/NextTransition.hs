@@ -9,7 +9,7 @@ where
 import Data.List (groupBy, sortOn)
 import MusicLibrary (MusicLibrary (..))
 import Track (Track, TrackId)
-import TrackCatalog (keyJumpSuccessors, sameKeySuccessors)
+import TrackCatalog (getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
 import TransitionsGraph (confirmedSuccessors)
 
 ----------------------------------
@@ -40,8 +40,12 @@ type Score = Int
 ----- Public functions -----------
 ----------------------------------
 
-scoredNextTracks :: MusicLibrary -> TrackId -> [(Track, Score)]
-scoredNextTracks = undefined
+scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Score)]
+scoredNextTracks mLib tId = fmap f foos
+  where
+    tCat = trackCatalog mLib
+    f (Transition _ toId, s) = (getTrackWithId toId tCat, s)
+    foos = scoredTransitions mLib tId
 
 ----------------------------------
 ----- Internal functions ---------
