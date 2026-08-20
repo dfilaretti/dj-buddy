@@ -1,25 +1,19 @@
 module Main (main) where
 
-import Camelot (KeyNumber (..), KeyType (..))
 import Lib
 import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
-    describe "trackKey" $ do
-        it "gives Nothing if library is empty" $ do
-            trackKey 0 emptyLibrary
-                `shouldBe` Nothing
+  describe "track catalog" $ do
+    it "gives Nothing when a track is not found" $ do
+      getTrackWithId 123 emptyCatalog `shouldBe` Nothing
 
-        it "... or if track is not found" $ do
-            trackKey 123 (addToLibrary 0 (Track "foo" (K_1, A)) emptyLibrary)
-                `shouldBe` Nothing
+    it "returns a track that was added" $ do
+      let track = Track "foo" (Key K_1 D)
+      getTrackWithId 0 (addTrack 0 track emptyCatalog) `shouldBe` Just track
 
-        it "gives you the key if track is found" $ do
-            trackKey 0 (addToLibrary 0 (Track "foo" (K_1, A)) emptyLibrary)
-                `shouldBe` Just (K_1, A)
-
-
-
--- stack test --test-arguments "--match Key"
--- stack test
+    it "finds other tracks with the same key" $ do
+      let catalog = addTrack 1 (Track "bar" (Key K_1 D))
+                  $ addTrack 0 (Track "foo" (Key K_1 D)) emptyCatalog
+      sameKeySuccessors 0 catalog `shouldBe` [1]

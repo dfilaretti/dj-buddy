@@ -25,13 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      Camelot
       Lib
-      MusicLibrary
-      NextTransition
-      Track
-      TrackCatalog
-      TransitionsGraph
   other-modules:
       Paths_dj_buddy
   autogen-modules:
