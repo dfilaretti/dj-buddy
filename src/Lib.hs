@@ -77,13 +77,16 @@ instance Show Key where
   show (Key n t) = show n ++ show t
 
 compatibleKeys :: Key -> [Key]
-compatibleKeys k = [increment k, decrement k, relative k]
+compatibleKeys k =
+  [increment k, decrement k, relative k]
 
 incrementKeyNumber :: Int -> KeyNumber -> KeyNumber
-incrementKeyNumber n k = toEnum ((fromEnum k + n) `mod` 12)
+incrementKeyNumber n k =
+  toEnum ((fromEnum k + n) `mod` 12)
 
 add :: Int -> Key -> Key
-add n (Key number keyType) = Key (incrementKeyNumber n number) keyType
+add n (Key number keyType) =
+  Key (incrementKeyNumber n number) keyType
 
 relative :: Key -> Key
 relative (Key number D) = Key number M
@@ -102,7 +105,8 @@ type TrackId = Int
 data Track = Track {title :: String, key :: Key} deriving (Eq)
 
 instance Show Track where
-  show (Track trackTitle trackKey') = "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+  show (Track trackTitle trackKey') =
+    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 type TrackCatalog = Map.Map TrackId Track
 
@@ -113,10 +117,12 @@ addTrack :: TrackId -> Track -> TrackCatalog -> TrackCatalog
 addTrack = Map.insert
 
 getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
-getTracks predicate = Map.keys . Map.filter predicate
+getTracks predicate =
+  Map.keys . Map.filter predicate
 
 getTracksWithKey :: Key -> TrackCatalog -> [TrackId]
-getTracksWithKey desiredKey = getTracks ((== desiredKey) . (.key))
+getTracksWithKey desiredKey =
+  getTracks ((== desiredKey) . (.key))
 
 sameKeySuccessors :: TrackId -> TrackCatalog -> [TrackId]
 sameKeySuccessors trackId catalog =
@@ -127,13 +133,16 @@ keyJumpSuccessors trackId catalog =
   maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
 
 harmonicSuccessors :: TrackId -> TrackCatalog -> [TrackId]
-harmonicSuccessors trackId catalog = sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
+harmonicSuccessors trackId catalog =
+  sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
 
 getTracksWithKeys :: [Key] -> TrackCatalog -> [TrackId]
-getTracksWithKeys keys catalog = concatMap (`getTracksWithKey` catalog) keys
+getTracksWithKeys keys catalog =
+  concatMap (`getTracksWithKey` catalog) keys
 
 trackKey :: TrackId -> TrackCatalog -> Maybe Key
-trackKey trackId catalog = (.key) <$> Map.lookup trackId catalog
+trackKey trackId catalog =
+  (.key) <$> Map.lookup trackId catalog
 
 getTrackWithId :: TrackId -> TrackCatalog -> Maybe Track
 getTrackWithId = Map.lookup
@@ -150,10 +159,12 @@ emptyGraph :: Graph
 emptyGraph = Map.empty
 
 addEdge :: TrackId -> Edge -> Graph -> Graph
-addEdge trackId edge = Map.insert trackId [edge]
+addEdge trackId edge =
+  Map.insert trackId [edge]
 
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
-confirmedSuccessors trackId graph = map (.to) (Map.findWithDefault [] trackId graph)
+confirmedSuccessors trackId graph =
+  map (.to) (Map.findWithDefault [] trackId graph)
 
 -----------------------------------------
 ----- Music Library ---------------------
@@ -190,15 +201,18 @@ data Transition = Transition
 type Score = Int
 
 scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Score)]
-scoredNextTracks musicLibrary trackId = map resolve (scoredTransitions musicLibrary trackId)
+scoredNextTracks musicLibrary trackId =
+  map resolve (scoredTransitions musicLibrary trackId)
   where
     resolve (Transition _ toId, score) = (getTrackWithId toId (musicLibrary.trackCatalog), score)
 
 scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
-scoredTransitions musicLibrary = sortOn snd . scoreTransitions musicLibrary . transitions musicLibrary
+scoredTransitions musicLibrary =
+  sortOn snd . scoreTransitions musicLibrary . transitions musicLibrary
 
 transitions :: MusicLibrary -> TrackId -> [Transition]
-transitions (MusicLibrary catalog graph _) trackId = sameKey ++ harmonic ++ tested
+transitions (MusicLibrary catalog graph _) trackId =
+  sameKey ++ harmonic ++ tested
   where
     sameKey = makeTransitions SameKey (sameKeySuccessors trackId catalog)
     harmonic = makeTransitions Harmonic (keyJumpSuccessors trackId catalog)
@@ -206,7 +220,8 @@ transitions (MusicLibrary catalog graph _) trackId = sameKey ++ harmonic ++ test
     makeTransitions = map . Transition
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
-scoreTransitions musicLibrary values = zip values (map (scoreTransition musicLibrary) values)
+scoreTransitions musicLibrary values =
+  zip values (map (scoreTransition musicLibrary) values)
 
 scoreTransition :: MusicLibrary -> Transition -> Score
 scoreTransition _ (Transition Tested _) = 0
