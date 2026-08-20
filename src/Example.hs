@@ -24,6 +24,7 @@ tribe_of_the_sun_id = 7
 
 inferno_id = 8
 
+against_the_wind_id :: TrackId
 against_the_wind_id = 9
 
 resilience_id = 10
@@ -82,53 +83,62 @@ library =
       transitionGraph =
         Map.fromList
           [ ( melody_express_id,
-              [Edge another_summer_id]
+              [ Edge
+                  { to = another_summer_id,
+                    rating = Omg,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( thunderfunk_id,
-              [Edge howl_at_the_moon_id]
+              [Edge howl_at_the_moon_id Nice Nothing]
             ),
             ( howl_at_the_moon_id,
-              [Edge colossal_id]
+              [Edge colossal_id Nice Nothing]
             ),
             ( nothing_is_impossible_id,
-              [ Edge mahon_id,
-                Edge falling_id
+              [ Edge mahon_id Nice Nothing,
+                Edge falling_id Nice Nothing
               ]
             ),
             ( aniara_id,
-              [Edge how_could_i_say_it_id]
+              [Edge how_could_i_say_it_id Nice Nothing]
             ),
             ( feels_so_good_id,
-              [Edge polkatorju_id]
+              [Edge polkatorju_id Nice Nothing]
             ),
             ( set_me_free_id,
-              [ Edge spirit_id,
-                Edge sorrento_id
+              [ Edge spirit_id Nice Nothing,
+                Edge sorrento_id Nice Nothing
               ]
             ),
             ( spirit_id,
-              [Edge aniara_id]
+              [Edge aniara_id Nice Nothing]
             ),
             ( colossal_id,
-              [Edge inferno_id]
+              [Edge inferno_id Nice Nothing]
             ),
             ( resilience_id,
-              [Edge falling_id]
+              [Edge falling_id Omg (Just "mashup: play falling vox over resilience!")]
             ),
             ( mahon_id,
-              [Edge spirit_id, Edge feels_so_good_id]
+              [ Edge spirit_id Nice Nothing,
+                Edge feels_so_good_id Nice Nothing
+              ]
             ),
             ( against_the_wind_id,
-              [Edge feels_so_good_id]
+              [Edge feels_so_good_id Nice Nothing]
             ),
             ( sorrento_id,
-              [Edge set_me_free_id, Edge spirit_id]
+              [ Edge set_me_free_id Nice Nothing,
+                Edge spirit_id Nice Nothing
+              ]
             ),
             ( marulio_id,
-              [Edge melody_express_id]
+              [Edge melody_express_id Nice Nothing]
             ),
             ( falling_id,
-              [Edge mahon_id]
+              [Edge mahon_id Nice Nothing]
             )
           ]
     }

@@ -6,6 +6,7 @@
 module Lib
   ( Key (..),
     KeyNumber (..),
+    UserRating (..),
     KeyType (..),
     compatibleKeys,
     TrackId,
@@ -111,7 +112,7 @@ data Track
 
 instance Show Track where
   show (Track trackTitle trackKey') =
-    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")\n"
 
 type TrackCatalog = Map.Map TrackId Track
 
@@ -158,7 +159,17 @@ getTrackWithId = Map.lookup
 
 type Graph = Map.Map TrackId [Edge]
 
-data Edge = Edge {to :: TrackId} deriving (Eq, Show)
+data UserRating
+  = Omg
+  | Nice
+  deriving (Show, Eq, Ord)
+
+data Edge = Edge
+  { to :: TrackId,
+    rating :: UserRating,
+    notes :: Maybe String
+  }
+  deriving (Eq, Show)
 
 emptyGraph :: Graph
 emptyGraph = Map.empty
