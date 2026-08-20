@@ -81,20 +81,54 @@ library =
           ],
       transitionGraph =
         Map.fromList
-          [ (melody_express_id, [Edge another_summer_id]),
-            (thunderfunk_id, [Edge howl_at_the_moon_id]),
-            (howl_at_the_moon_id, [Edge colossal_id]),
-            (nothing_is_impossible_id, [Edge mahon_id, Edge falling_id]),
-            (aniara_id, [Edge how_could_i_say_it_id]),
-            (feels_so_good_id, [Edge polkatorju_id]),
-            (set_me_free_id, [Edge spirit_id, Edge sorrento_id]),
-            (spirit_id, [Edge aniara_id]),
-            (colossal_id, [Edge inferno_id]),
-            (resilience_id, [Edge falling_id]),
-            (mahon_id, [Edge spirit_id, Edge feels_so_good_id]),
-            (against_the_wind_id, [Edge feels_so_good_id]),
-            (sorrento_id, [Edge set_me_free_id, Edge spirit_id]),
-            (marulio_id, [Edge melody_express_id]),
-            (falling_id, [Edge mahon_id])
+          [ ( melody_express_id,
+              [Edge another_summer_id]
+            ),
+            ( thunderfunk_id,
+              [Edge howl_at_the_moon_id]
+            ),
+            ( howl_at_the_moon_id,
+              [Edge colossal_id]
+            ),
+            ( nothing_is_impossible_id,
+              [ Edge mahon_id,
+                Edge falling_id
+              ]
+            ),
+            ( aniara_id,
+              [Edge how_could_i_say_it_id]
+            ),
+            ( feels_so_good_id,
+              [Edge polkatorju_id]
+            ),
+            ( set_me_free_id,
+              [ Edge spirit_id,
+                Edge sorrento_id
+              ]
+            ),
+            ( spirit_id,
+              [Edge aniara_id]
+            ),
+            ( colossal_id,
+              [Edge inferno_id]
+            ),
+            ( resilience_id,
+              [Edge falling_id]
+            ),
+            ( mahon_id,
+              [Edge spirit_id, Edge feels_so_good_id]
+            ),
+            ( against_the_wind_id,
+              [Edge feels_so_good_id]
+            ),
+            ( sorrento_id,
+              [Edge set_me_free_id, Edge spirit_id]
+            ),
+            ( marulio_id,
+              [Edge melody_express_id]
+            ),
+            ( falling_id,
+              [Edge mahon_id]
+            )
           ]
     }
