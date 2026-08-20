@@ -102,7 +102,12 @@ decrement = add (-1)
 
 type TrackId = Int
 
-data Track = Track {title :: String, key :: Key} deriving (Eq)
+data Track
+  = Track
+  { title :: String,
+    key :: Key
+  }
+  deriving (Eq)
 
 instance Show Track where
   show (Track trackTitle trackKey') =
@@ -162,9 +167,11 @@ addEdge :: TrackId -> Edge -> Graph -> Graph
 addEdge trackId edge =
   Map.insert trackId [edge]
 
+getEdges :: TrackId -> Graph -> [Edge]
+getEdges = Map.findWithDefault []
+
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
-confirmedSuccessors trackId graph =
-  map (.to) (Map.findWithDefault [] trackId graph)
+confirmedSuccessors trackId = map (.to) . getEdges trackId
 
 -----------------------------------------
 ----- Music Library ---------------------
@@ -204,7 +211,8 @@ scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Score)]
 scoredNextTracks musicLibrary trackId =
   map resolve (scoredTransitions musicLibrary trackId)
   where
-    resolve (Transition _ toId, score) = (getTrackWithId toId (musicLibrary.trackCatalog), score)
+    resolve (Transition _ toId, score) =
+      (getTrackWithId toId (musicLibrary.trackCatalog), score)
 
 scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
 scoredTransitions musicLibrary =
