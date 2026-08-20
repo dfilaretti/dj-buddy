@@ -91,54 +91,136 @@ library =
               ]
             ),
             ( thunderfunk_id,
-              [Edge howl_at_the_moon_id Nice Nothing]
+              [ Edge
+                  { to = howl_at_the_moon_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( howl_at_the_moon_id,
-              [Edge colossal_id Nice Nothing]
+              [ Edge
+                  { to = colossal_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( nothing_is_impossible_id,
-              [ Edge mahon_id Nice Nothing,
-                Edge falling_id Nice Nothing
+              [ Edge
+                  { to = mahon_id,
+                    rating = Nice,
+                    notes = Nothing
+                  },
+                Edge
+                  { to = falling_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
               ]
             ),
             ( aniara_id,
-              [Edge how_could_i_say_it_id Nice Nothing]
+              [ Edge
+                  { to = how_could_i_say_it_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( feels_so_good_id,
-              [Edge polkatorju_id Nice Nothing]
+              [ Edge
+                  { to = polkatorju_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( set_me_free_id,
-              [ Edge spirit_id Nice Nothing,
-                Edge sorrento_id Nice Nothing
+              [ Edge
+                  { to = spirit_id,
+                    rating = Nice,
+                    notes = Nothing
+                  },
+                Edge
+                  { to = sorrento_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
               ]
             ),
             ( spirit_id,
-              [Edge aniara_id Nice Nothing]
+              [ Edge
+                  { to = aniara_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( colossal_id,
-              [Edge inferno_id Nice Nothing]
+              [ Edge
+                  { to = inferno_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( resilience_id,
-              [Edge falling_id Omg (Just "mashup: play falling vox over resilience!")]
+              [ Edge
+                  { to = falling_id,
+                    rating = Omg,
+                    notes = Just "mashup: play falling vox over resilience!"
+                  }
+              ]
             ),
             ( mahon_id,
-              [ Edge spirit_id Nice Nothing,
-                Edge feels_so_good_id Nice Nothing
+              [ Edge
+                  { to = spirit_id,
+                    rating = Nice,
+                    notes = Nothing
+                  },
+                Edge
+                  { to = feels_so_good_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
               ]
             ),
             ( against_the_wind_id,
-              [Edge feels_so_good_id Nice Nothing]
+              [ Edge
+                  { to = feels_so_good_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( sorrento_id,
-              [ Edge set_me_free_id Nice Nothing,
-                Edge spirit_id Nice Nothing
+              [ Edge
+                  { to = set_me_free_id,
+                    rating = Nice,
+                    notes = Nothing
+                  },
+                Edge
+                  { to = spirit_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
               ]
             ),
             ( marulio_id,
-              [Edge melody_express_id Nice Nothing]
+              [ Edge
+                  { to = melody_express_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             ),
             ( falling_id,
-              [Edge mahon_id Nice Nothing]
+              [ Edge
+                  { to = mahon_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
             )
           ]
     }
