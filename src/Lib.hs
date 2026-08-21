@@ -225,12 +225,15 @@ destTrackId :: Transition -> TrackId
 destTrackId (Tested t) = t
 destTrackId (Harmonic _ t) = t
 
+destTrack :: TrackCatalog -> Transition -> Maybe Track
+destTrack c t = getTrackWithId (destTrackId t) c
+
 scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Cost)]
 scoredNextTracks musicLibrary trackId =
   map getTrack (scoredTransitions musicLibrary trackId)
   where
     getTrack (t, s) =
-      (getTrackWithId (destTrackId t) (musicLibrary.trackCatalog), s)
+      (destTrack musicLibrary.trackCatalog t, s)
 
 scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Cost)]
 scoredTransitions musicLibrary =
@@ -267,3 +270,6 @@ printTrackCatalog =
   where
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track
+
+printCandidateTransitions :: MusicLibrary -> TrackId -> IO ()
+printCandidateTransitions = undefined
