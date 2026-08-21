@@ -6,6 +6,7 @@
 module Lib
   ( Key (..),
     KeyNumber (..),
+    HarmonicTransType (..),
     UserRating (..),
     transitions,
     KeyType (..),
@@ -212,12 +213,12 @@ data MusicLibrary = MusicLibrary
 data HarmonicTransType
   = SameKey
   | CompatibleKeys
-  deriving (Eq, Ord, Show)
+  deriving (Show)
 
 data Transition
   = Tested TrackId
   | Harmonic HarmonicTransType TrackId
-  deriving (Show, Eq, Ord)
+  deriving (Show)
 
 type Score = Int
 
@@ -245,8 +246,10 @@ transitions (MusicLibrary catalog graph _) trackId =
     tested = map Tested (confirmedSuccessors trackId graph)
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
-scoreTransitions musicLibrary values =
-  zip values (map (scoreTransition musicLibrary) values)
+scoreTransitions lib ts =
+  zip ts scores
+  where
+    scores = map (scoreTransition lib) ts
 
 scoreTransition :: MusicLibrary -> Transition -> Score
 scoreTransition _ (Tested _) = 0
