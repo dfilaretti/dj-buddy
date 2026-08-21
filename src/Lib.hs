@@ -27,7 +27,6 @@ module Lib
     addEdge,
     MusicLibrary (..),
     Score,
-    TransitionType (..),
     Transition (..),
     scoredNextTracks,
     printTrackCatalog,
@@ -209,31 +208,27 @@ data MusicLibrary = MusicLibrary
 ----- Transitions -----------------------
 -----------------------------------------
 
-data TransitionType
-  = Tested
-  | SameKey
-  | Harmonic
-  deriving (Eq, Ord)
+data HarmonicTransType
+  = SameKey
+  | CompatibleKeys
+  deriving (Eq, Ord, Show)
 
-instance Show TransitionType where
-  show Tested = "Tested"
-  show SameKey = "Same key"
-  show Harmonic = "Harmonic"
-
-data Transition = Transition
-  { transitionType :: TransitionType,
-    to :: TrackId
-  }
-  deriving (Eq, Show)
+data Transition
+  = Tested TrackId
+  | Harmonic HarmonicTransType TrackId
 
 type Score = Int
 
 scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Score)]
 scoredNextTracks musicLibrary trackId =
-  map resolve (scoredTransitions musicLibrary trackId)
+  map getTrack (scoredTransitions musicLibrary trackId)
   where
-    resolve (Transition _ toId, score) =
-      (getTrackWithId toId (musicLibrary.trackCatalog), score)
+    getTrack (tran, score) =
+      (getTrackWithId (getTrackFromTrans tran) (musicLibrary.trackCatalog), score)
+
+getTrackFromTrans :: Transition -> TrackId
+getTrackFromTrans (Tested tID) = tID
+getTrackFromTrans (Harmonic _ tID) = tID
 
 scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
 scoredTransitions musicLibrary =
@@ -243,19 +238,20 @@ transitions :: MusicLibrary -> TrackId -> [Transition]
 transitions (MusicLibrary catalog graph _) trackId =
   sameKey ++ harmonic ++ tested
   where
-    sameKey = makeTransitions SameKey (sameKeySuccessors trackId catalog)
-    harmonic = makeTransitions Harmonic (keyJumpSuccessors trackId catalog)
-    tested = makeTransitions Tested (confirmedSuccessors trackId graph)
-    makeTransitions = map . Transition
+    sameKey = map (Harmonic SameKey) (sameKeySuccessors trackId catalog)
+    harmonic = map (Harmonic CompatibleKeys) (keyJumpSuccessors trackId catalog)
+    tested = map Tested (confirmedSuccessors trackId graph)
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
 scoreTransitions musicLibrary values =
   zip values (map (scoreTransition musicLibrary) values)
 
 scoreTransition :: MusicLibrary -> Transition -> Score
-scoreTransition _ (Transition Tested _) = 0
-scoreTransition _ (Transition SameKey _) = 1
-scoreTransition _ (Transition Harmonic _) = 2
+scoreTransition _ (Tested _) = 0
+scoreTransition _ (Harmonic t _) = scoreHarmonic t
+  where
+    scoreHarmonic SameKey = 1
+    scoreHarmonic CompatibleKeys = 2
 
 -----------------------------------------
 ----- Pretty Print ----------------------
