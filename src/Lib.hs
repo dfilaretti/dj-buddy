@@ -7,6 +7,7 @@ module Lib
   ( Key (..),
     KeyNumber (..),
     UserRating (..),
+    transitions,
     KeyType (..),
     compatibleKeys,
     TrackId,
@@ -216,6 +217,7 @@ data HarmonicTransType
 data Transition
   = Tested TrackId
   | Harmonic HarmonicTransType TrackId
+  deriving (Show, Eq, Ord)
 
 type Score = Int
 
