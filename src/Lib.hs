@@ -23,7 +23,7 @@ module Lib
     getEdge,
     getTrackWithId,
     Graph,
-    Edge (..),
+    TestedTransition (..),
     confirmedSuccessors,
     emptyGraph,
     addEdge,
@@ -160,14 +160,14 @@ getTrackWithId = Map.lookup
 ----- Confirmed transitions graph -------
 -----------------------------------------
 
-type Graph = Map.Map TrackId [Edge]
+type Graph = Map.Map TrackId [TestedTransition]
 
 data UserRating
   = Omg
   | Nice
   deriving (Show, Eq, Ord)
 
-data Edge = Edge
+data TestedTransition = TestedTransition
   { to :: TrackId,
     rating :: UserRating,
     notes :: Maybe String
@@ -177,14 +177,14 @@ data Edge = Edge
 emptyGraph :: Graph
 emptyGraph = Map.empty
 
-addEdge :: TrackId -> Edge -> Graph -> Graph
+addEdge :: TrackId -> TestedTransition -> Graph -> Graph
 addEdge trackId edge =
   Map.insert trackId [edge]
 
-getEdges :: TrackId -> Graph -> [Edge]
+getEdges :: TrackId -> Graph -> [TestedTransition]
 getEdges = Map.findWithDefault []
 
-getEdge :: TrackId -> TrackId -> Graph -> Maybe Edge
+getEdge :: TrackId -> TrackId -> Graph -> Maybe TestedTransition
 getEdge tFrom tTo g =
   case filter (\e -> e.to == tTo) (getEdges tFrom g) of
     [] -> Nothing
@@ -229,9 +229,9 @@ destTrack :: TrackCatalog -> Transition -> Maybe Track
 destTrack c t =
   getTrackWithId (destTrackId t) c
 
-destEdge :: Graph -> TrackId -> Transition -> Maybe Edge
-destEdge g tFrom (Tested tDest) = getEdge tFrom tDest g
-destEdge _ _ (Harmonic _ _) = Nothing
+-- destEdge :: Graph -> TrackId -> Transition -> Maybe TestedTransition
+-- destEdge g tFrom (Tested tDest) = getEdge tFrom tDest g
+-- destEdge _ _ (Harmonic _ _) = Nothing
 
 scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Cost)]
 scoredNextTracks musicLibrary trackId =

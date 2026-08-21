@@ -83,7 +83,7 @@ library =
       transitionGraph =
         Map.fromList
           [ ( melody_express_id,
-              [ Edge
+              [ TestedTransition
                   { to = another_summer_id,
                     rating = Omg,
                     notes = Nothing
@@ -91,7 +91,7 @@ library =
               ]
             ),
             ( thunderfunk_id,
-              [ Edge
+              [ TestedTransition
                   { to = howl_at_the_moon_id,
                     rating = Nice,
                     notes = Nothing
@@ -99,7 +99,7 @@ library =
               ]
             ),
             ( howl_at_the_moon_id,
-              [ Edge
+              [ TestedTransition
                   { to = colossal_id,
                     rating = Nice,
                     notes = Nothing
@@ -107,12 +107,12 @@ library =
               ]
             ),
             ( nothing_is_impossible_id,
-              [ Edge
+              [ TestedTransition
                   { to = mahon_id,
                     rating = Nice,
                     notes = Nothing
                   },
-                Edge
+                TestedTransition
                   { to = falling_id,
                     rating = Nice,
                     notes = Nothing
@@ -120,7 +120,7 @@ library =
               ]
             ),
             ( aniara_id,
-              [ Edge
+              [ TestedTransition
                   { to = how_could_i_say_it_id,
                     rating = Nice,
                     notes = Nothing
@@ -128,7 +128,7 @@ library =
               ]
             ),
             ( feels_so_good_id,
-              [ Edge
+              [ TestedTransition
                   { to = polkatorju_id,
                     rating = Nice,
                     notes = Nothing
@@ -136,12 +136,12 @@ library =
               ]
             ),
             ( set_me_free_id,
-              [ Edge
+              [ TestedTransition
                   { to = spirit_id,
                     rating = Nice,
                     notes = Nothing
                   },
-                Edge
+                TestedTransition
                   { to = sorrento_id,
                     rating = Nice,
                     notes = Nothing
@@ -149,7 +149,7 @@ library =
               ]
             ),
             ( spirit_id,
-              [ Edge
+              [ TestedTransition
                   { to = aniara_id,
                     rating = Nice,
                     notes = Nothing
@@ -157,7 +157,7 @@ library =
               ]
             ),
             ( colossal_id,
-              [ Edge
+              [ TestedTransition
                   { to = inferno_id,
                     rating = Nice,
                     notes = Nothing
@@ -165,7 +165,7 @@ library =
               ]
             ),
             ( resilience_id,
-              [ Edge
+              [ TestedTransition
                   { to = falling_id,
                     rating = Omg,
                     notes = Just "mashup: play falling vox over resilience!"
@@ -173,12 +173,12 @@ library =
               ]
             ),
             ( mahon_id,
-              [ Edge
+              [ TestedTransition
                   { to = spirit_id,
                     rating = Nice,
                     notes = Nothing
                   },
-                Edge
+                TestedTransition
                   { to = feels_so_good_id,
                     rating = Nice,
                     notes = Nothing
@@ -186,7 +186,7 @@ library =
               ]
             ),
             ( against_the_wind_id,
-              [ Edge
+              [ TestedTransition
                   { to = feels_so_good_id,
                     rating = Nice,
                     notes = Nothing
@@ -194,12 +194,12 @@ library =
               ]
             ),
             ( sorrento_id,
-              [ Edge
+              [ TestedTransition
                   { to = set_me_free_id,
                     rating = Nice,
                     notes = Nothing
                   },
-                Edge
+                TestedTransition
                   { to = spirit_id,
                     rating = Nice,
                     notes = Nothing
@@ -207,7 +207,7 @@ library =
               ]
             ),
             ( marulio_id,
-              [ Edge
+              [ TestedTransition
                   { to = melody_express_id,
                     rating = Nice,
                     notes = Nothing
@@ -215,7 +215,7 @@ library =
               ]
             ),
             ( falling_id,
-              [ Edge
+              [ TestedTransition
                   { to = mahon_id,
                     rating = Nice,
                     notes = Nothing
