@@ -7,6 +7,10 @@ module Lib
   ( Key (..),
     KeyNumber (..),
     HarmonicTransType (..),
+    printTransitions,
+    printStuff,
+    printTransitions',
+    scoredTransitions,
     UserRating (..),
     transitions,
     KeyType (..),
@@ -190,8 +194,8 @@ getEdge tFrom tTo g =
     [x] -> Just x
     _ -> error "multiple edges with same destination - why?"
 
--- confirmedSuccessors :: TrackId -> Graph -> [TrackId]
--- confirmedSuccessors trackId = map (.to) . getEdges trackId
+confirmedSuccessors :: TrackId -> Graph -> [TrackId]
+confirmedSuccessors trackId = map (.to) . getEdges trackId
 
 -----------------------------------------
 ----- Music Library ---------------------
@@ -268,12 +272,53 @@ transitionCost _ (Harmonic t _) = cost t
 ----- Pretty Print ----------------------
 -----------------------------------------
 
+prettyPrintTransition :: MusicLibrary -> Transition -> String
+prettyPrintTransition lib (Tested t) =
+  show t.to ++ ": " ++ title ++ " " ++ key ++ " [" ++ show t ++ "]"
+  where
+    title = case getTrackWithId t.to lib.trackCatalog of
+      Just t -> t.title
+      Nothing -> "ERROR"
+    key = case getTrackWithId t.to lib.trackCatalog of
+      Just t -> show t.key
+      Nothing -> "ERROR"
+prettyPrintTransition lib (Harmonic t tID) =
+  show tID ++ ": " ++ title ++ " " ++ key ++ " [" ++ show t ++ "]"
+  where
+    title = case getTrackWithId tID lib.trackCatalog of
+      Just t -> t.title
+      Nothing -> "ERROR"
+    key = case getTrackWithId tID lib.trackCatalog of
+      Just t -> show t.key
+      Nothing -> "ERROR"
+
+printTransitions :: MusicLibrary -> [Transition] -> IO ()
+printTransitions lib = putStr . unlines . map (prettyPrintTransition lib)
+
+prettyPrintTransition' :: MusicLibrary -> (Transition, Cost) -> String
+prettyPrintTransition' lib (t, c) = prettyPrintTransition lib t ++ " [cost = " ++ show c ++ "]"
+
+printTransitions' :: MusicLibrary -> [(Transition, Cost)] -> IO ()
+printTransitions' lib = putStr . unlines . map (prettyPrintTransition' lib)
+
+printStuff :: MusicLibrary -> TrackId -> String
+printStuff lib tid =
+  decoration ++ heading ++ msg ++ decoration
+  where
+    decorationLen = 100
+    decoration = replicate decorationLen '-' ++ "\n"
+    title = case getTrackWithId tid lib.trackCatalog of
+      Just t -> t.title
+      Nothing -> "ERROR"
+    key = case getTrackWithId tid lib.trackCatalog of
+      Just t -> t.key
+      Nothing -> error "no key"
+    heading = "Good transitions from \"" ++ title ++ "\" (" ++ show key ++ ")\n\n"
+    msg = unlines $ map (prettyPrintTransition' lib) $ scoredTransitions lib tid
+
 printTrackCatalog :: TrackCatalog -> IO ()
 printTrackCatalog =
   putStr . unlines . map formatTrack . Map.toList
   where
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track
-
-printCandidateTransitions :: MusicLibrary -> TrackId -> IO ()
-printCandidateTransitions = undefined
