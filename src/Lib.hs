@@ -28,6 +28,7 @@ module Lib
     TransitionType (..),
     Transition (..),
     scoredNextTracks,
+    printTrackCatalog,
   )
 where
 
@@ -112,7 +113,7 @@ data Track
 
 instance Show Track where
   show (Track trackTitle trackKey') =
-    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")\n"
+    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 type TrackCatalog = Map.Map TrackId Track
 
@@ -246,3 +247,14 @@ scoreTransition :: MusicLibrary -> Transition -> Score
 scoreTransition _ (Transition Tested _) = 0
 scoreTransition _ (Transition SameKey _) = 1
 scoreTransition _ (Transition Harmonic _) = 2
+
+-----------------------------------------
+----- Pretty Print ----------------------
+-----------------------------------------
+
+printTrackCatalog :: TrackCatalog -> IO ()
+printTrackCatalog =
+  putStr . unlines . map formatTrack . Map.toList
+  where
+    formatTrack (trackId, track) =
+      show trackId ++ ": " ++ show track
