@@ -24,7 +24,6 @@ module Lib
     getTrackWithId,
     Graph,
     TestedTransition (..),
-    confirmedSuccessors,
     emptyGraph,
     addEdge,
     MusicLibrary (..),
@@ -191,8 +190,8 @@ getEdge tFrom tTo g =
     [x] -> Just x
     _ -> error "multiple edges with same destination - why?"
 
-confirmedSuccessors :: TrackId -> Graph -> [TrackId]
-confirmedSuccessors trackId = map (.to) . getEdges trackId
+-- confirmedSuccessors :: TrackId -> Graph -> [TrackId]
+-- confirmedSuccessors trackId = map (.to) . getEdges trackId
 
 -----------------------------------------
 ----- Music Library ---------------------
@@ -215,14 +214,14 @@ data HarmonicTransType
   deriving (Show)
 
 data Transition
-  = Tested TrackId
+  = Tested TestedTransition
   | Harmonic HarmonicTransType TrackId
   deriving (Show)
 
 type Cost = Int
 
 destTrackId :: Transition -> TrackId
-destTrackId (Tested t) = t
+destTrackId (Tested t) = t.to
 destTrackId (Harmonic _ t) = t
 
 destTrack :: TrackCatalog -> Transition -> Maybe Track
@@ -250,7 +249,7 @@ transitions (MusicLibrary catalog graph _) trackId =
   where
     sameKey = map (Harmonic SameKey) (sameKeySuccessors trackId catalog)
     harmonic = map (Harmonic CompatibleKeys) (keyJumpSuccessors trackId catalog)
-    tested = map Tested (confirmedSuccessors trackId graph)
+    tested = map Tested (getEdges trackId graph)
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Cost)]
 scoreTransitions lib ts =
