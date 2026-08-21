@@ -5,6 +5,20 @@ module Example (library) where
 import qualified Data.Map.Strict as Map
 import Lib
 
+-----------------------------------------
+----- Basic CLI -------------------------
+-----------------------------------------
+
+printLib :: IO ()
+printLib = printTrackCatalog library.trackCatalog
+
+nextTracks :: TrackId -> IO ()
+nextTracks tid = putStr $ printStuff library tid
+
+-----------------------------------------
+----- Example data ----------------------
+-----------------------------------------
+
 -- Built-in data
 another_summer_id = 0
 
