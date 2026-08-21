@@ -226,7 +226,12 @@ destTrackId (Tested t) = t
 destTrackId (Harmonic _ t) = t
 
 destTrack :: TrackCatalog -> Transition -> Maybe Track
-destTrack c t = getTrackWithId (destTrackId t) c
+destTrack c t =
+  getTrackWithId (destTrackId t) c
+
+destEdge :: Graph -> TrackId -> Transition -> Maybe Edge
+destEdge g tFrom (Tested tDest) = getEdge tFrom tDest g
+destEdge _ _ (Harmonic _ _) = Nothing
 
 scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Cost)]
 scoredNextTracks musicLibrary trackId =
