@@ -28,7 +28,6 @@ module Lib
     emptyGraph,
     addEdge,
     MusicLibrary (..),
-    Score,
     Transition (..),
     scoredNextTracks,
     printTrackCatalog,
@@ -220,20 +219,20 @@ data Transition
   | Harmonic HarmonicTransType TrackId
   deriving (Show)
 
-type Score = Int
+type Cost = Int
 
-scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Score)]
+destTrackId :: Transition -> TrackId
+destTrackId (Tested t) = t
+destTrackId (Harmonic _ t) = t
+
+scoredNextTracks :: MusicLibrary -> TrackId -> [(Maybe Track, Cost)]
 scoredNextTracks musicLibrary trackId =
   map getTrack (scoredTransitions musicLibrary trackId)
   where
-    getTrack (tran, score) =
-      (getTrackWithId (getTrackFromTrans tran) (musicLibrary.trackCatalog), score)
+    getTrack (t, s) =
+      (getTrackWithId (destTrackId t) (musicLibrary.trackCatalog), s)
 
-getTrackFromTrans :: Transition -> TrackId
-getTrackFromTrans (Tested tID) = tID
-getTrackFromTrans (Harmonic _ tID) = tID
-
-scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Score)]
+scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Cost)]
 scoredTransitions musicLibrary =
   sortOn snd . scoreTransitions musicLibrary . transitions musicLibrary
 
@@ -245,18 +244,18 @@ transitions (MusicLibrary catalog graph _) trackId =
     harmonic = map (Harmonic CompatibleKeys) (keyJumpSuccessors trackId catalog)
     tested = map Tested (confirmedSuccessors trackId graph)
 
-scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Score)]
+scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Cost)]
 scoreTransitions lib ts =
   zip ts scores
   where
-    scores = map (scoreTransition lib) ts
+    scores = map (transitionCost lib) ts
 
-scoreTransition :: MusicLibrary -> Transition -> Score
-scoreTransition _ (Tested _) = 0
-scoreTransition _ (Harmonic t _) = scoreHarmonic t
+transitionCost :: MusicLibrary -> Transition -> Cost
+transitionCost _ (Tested _) = 0
+transitionCost _ (Harmonic t _) = cost t
   where
-    scoreHarmonic SameKey = 1
-    scoreHarmonic CompatibleKeys = 2
+    cost SameKey = 1
+    cost CompatibleKeys = 2
 
 -----------------------------------------
 ----- Pretty Print ----------------------
