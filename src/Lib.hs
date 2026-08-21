@@ -13,10 +13,12 @@ module Lib
     Track (..),
     TrackCatalog,
     sameKeySuccessors,
+    getEdges,
     keyJumpSuccessors,
     harmonicSuccessors,
     emptyCatalog,
     addTrack,
+    getEdge,
     getTrackWithId,
     Graph,
     Edge (..),
@@ -181,6 +183,13 @@ addEdge trackId edge =
 
 getEdges :: TrackId -> Graph -> [Edge]
 getEdges = Map.findWithDefault []
+
+getEdge :: TrackId -> TrackId -> Graph -> Maybe Edge
+getEdge tFrom tTo g =
+  case filter (\e -> e.to == tTo) (getEdges tFrom g) of
+    [] -> Nothing
+    [x] -> Just x
+    _ -> error "multiple edges with same destination - why?"
 
 confirmedSuccessors :: TrackId -> Graph -> [TrackId]
 confirmedSuccessors trackId = map (.to) . getEdges trackId
