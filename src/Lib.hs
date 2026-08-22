@@ -166,8 +166,8 @@ getTrackWithId = Map.lookup
 type Graph = Map.Map TrackId [TestedTransition]
 
 data UserRating
-  = Omg
-  | Nice
+  = Nice
+  | Omg
   deriving (Show, Eq, Ord)
 
 data TestedTransition = TestedTransition
@@ -215,12 +215,23 @@ data MusicLibrary = MusicLibrary
 data HarmonicTransType
   = SameKey
   | CompatibleKeys
-  deriving (Show)
+  deriving (Show, Eq, Ord)
 
 data Transition
   = Tested TestedTransition
   | Harmonic HarmonicTransType TrackId
   deriving (Show)
+
+instance Eq Transition where
+  Tested trans1 == Tested trans2 = trans1.rating == trans2.rating
+  Harmonic type1 _ == Harmonic type2 _ = type1 == type2
+  _ == _ = False
+
+instance Ord Transition where
+  Tested trans1 <= Tested trans2 = trans1.rating <= trans2.rating
+  Harmonic t1 _ <= Harmonic t2 _ = t1 <= t2
+  Tested _ <= Harmonic _ _ = False
+  Harmonic _ _ <= Tested _ = True
 
 type Cost = Int
 
