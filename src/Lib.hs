@@ -254,18 +254,20 @@ scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Cost)]
 scoredTransitions musicLibrary =
   sortOn snd . scoreTransitions musicLibrary . transitions musicLibrary
 
+-- TODO: why this function is so long? refactor!
 transitions :: MusicLibrary -> TrackId -> [Transition]
-transitions (MusicLibrary catalog graph _) trackId =
-  sameKeyTrans ++ harmonicTrans ++ testedTrans
+transitions lib trackId = sameKey ++ harmonic ++ tested
   where
-    pred = \t -> not (elem t testedTrackIds)
-    sameKeyTids = filter pred (sameKeySuccessors trackId catalog)
-    harmonicTids = filter pred (keyJumpSuccessors trackId catalog)
-    sameKeyTrans = map (Harmonic SameKey) sameKeyTids
-    harmonicTrans = map (Harmonic CompatibleKeys) harmonicTids
-    testedTrans = map Tested testedTransitions
+    catalog = lib.trackCatalog
+    graph = lib.transitionGraph
+    isUntested tid = not $ elem tid testedTIds
+    sameKeyTids = filter isUntested (sameKeySuccessors trackId catalog)
+    harmonicTids = filter isUntested (keyJumpSuccessors trackId catalog)
+    sameKey = map (Harmonic SameKey) sameKeyTids
+    harmonic = map (Harmonic CompatibleKeys) harmonicTids
+    tested = map Tested testedTransitions
     testedTransitions = getEdges trackId graph
-    testedTrackIds = map (.to) testedTransitions
+    testedTIds = map (.to) testedTransitions
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Cost)]
 scoreTransitions lib ts =
