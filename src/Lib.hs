@@ -256,11 +256,16 @@ scoredTransitions musicLibrary =
 
 transitions :: MusicLibrary -> TrackId -> [Transition]
 transitions (MusicLibrary catalog graph _) trackId =
-  sameKey ++ harmonic ++ tested
+  sameKeyTrans ++ harmonicTrans ++ testedTrans
   where
-    sameKey = map (Harmonic SameKey) (sameKeySuccessors trackId catalog)
-    harmonic = map (Harmonic CompatibleKeys) (keyJumpSuccessors trackId catalog)
-    tested = map Tested (getEdges trackId graph)
+    pred = \t -> not (elem t testedTrackIds)
+    sameKeyTids = filter pred (sameKeySuccessors trackId catalog)
+    harmonicTids = filter pred (keyJumpSuccessors trackId catalog)
+    sameKeyTrans = map (Harmonic SameKey) sameKeyTids
+    harmonicTrans = map (Harmonic CompatibleKeys) harmonicTids
+    testedTrans = map Tested testedTransitions
+    testedTransitions = getEdges trackId graph
+    testedTrackIds = map (.to) testedTransitions
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Cost)]
 scoreTransitions lib ts =
