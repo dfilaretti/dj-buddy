@@ -65,6 +65,22 @@ marulio_id = 20
 
 sorrento_id = 21
 
+dan_stone_feel_so_good_id = 22
+
+doubt_and_fear_id = 23
+
+okinawa_id = 24
+
+united_in_love_id = 25
+
+ode_to_autumn_id = 26
+
+breath_easy_id = 27
+
+without_u_id = 28
+
+lost_dimension = 29
+
 library :: MusicLibrary
 library =
   MusicLibrary
@@ -92,7 +108,16 @@ library =
             (colossal_id, Track "Colossal" (Key K_4 M)),
             (aniara_id, Track "Aniara" (Key K_9 D)),
             (marulio_id, Track "Marulio" (Key K_1 D)),
-            (sorrento_id, Track "Sorrento" (Key K_9 M))
+            (sorrento_id, Track "Sorrento" (Key K_9 M)),
+            -- batch 2
+            (dan_stone_feel_so_good_id, Track "Feel So Good (Dan Stone)" (Key K_2 M)),
+            (doubt_and_fear_id, Track "Doubt And Fear" (Key K_8 D)),
+            (okinawa_id, Track "Okinawa" (Key K_11 D)),
+            (united_in_love_id, Track "United In Love" (Key K_12 D)),
+            (ode_to_autumn_id, Track "Ode to Autumn" (Key K_8 M)),
+            (breath_easy_id, Track "Breath Easy" (Key K_11 M)),
+            (without_u_id, Track "Without U (Steve RMX)" (Key K_2 D)),
+            (lost_dimension, Track "Lost Dimnsion" (Key K_2 M))
           ],
       transitionGraph =
         Map.fromList
@@ -196,6 +221,11 @@ library =
                   { to = feels_so_good_id,
                     rating = Nice,
                     notes = Nothing
+                  },
+                TestedTransition
+                  { to = ode_to_autumn_id,
+                    rating = Omg,
+                    notes = Nothing
                   }
               ]
             ),
@@ -231,6 +261,22 @@ library =
             ( falling_id,
               [ TestedTransition
                   { to = mahon_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
+            ),
+            ( lost_dimension,
+              [ TestedTransition
+                  { to = without_u_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
+            ),
+            ( without_u_id,
+              [ TestedTransition
+                  { to = aeterna_id,
                     rating = Nice,
                     notes = Nothing
                   }
