@@ -228,6 +228,9 @@ destTrackId :: Transition -> TrackId
 destTrackId (Tested t) = t.to
 destTrackId (Harmonic _ t) = t
 
+destTrackIds :: [Transition] -> [TrackId]
+destTrackIds ts = map destTrackId ts
+
 destTrack :: TrackCatalog -> Transition -> Maybe Track
 destTrack c t =
   getTrackWithId (destTrackId t) c
@@ -243,20 +246,28 @@ scoredTransitions :: MusicLibrary -> TrackId -> [(Transition, Cost)]
 scoredTransitions musicLibrary =
   sortOn snd . scoreTransitions musicLibrary . transitions musicLibrary
 
--- TODO: why this function is so long? refactor!
-transitions :: MusicLibrary -> TrackId -> [Transition]
-transitions lib trackId = sameKey ++ harmonic ++ tested
+sameKeyTransitions :: TrackCatalog -> TrackId -> [Transition]
+sameKeyTransitions cat tid = map (Harmonic SameKey) (sameKeySuccessors tid cat)
+
+compatibleKeysTransitions :: TrackCatalog -> TrackId -> [Transition]
+compatibleKeysTransitions cat tid = map (Harmonic CompatibleKeys) (keyJumpSuccessors tid cat)
+
+harmonicTransitions :: TrackCatalog -> TrackId -> [Transition]
+harmonicTransitions cat tid =
+  sameKey ++ compatibleKeys
   where
-    catalog = lib.trackCatalog
-    graph = lib.transitionGraph
-    isUntested tid = not $ elem tid testedTIds
-    sameKeyTids = filter isUntested (sameKeySuccessors trackId catalog)
-    harmonicTids = filter isUntested (keyJumpSuccessors trackId catalog)
-    sameKey = map (Harmonic SameKey) sameKeyTids
-    harmonic = map (Harmonic CompatibleKeys) harmonicTids
-    tested = map Tested testedTransitions
-    testedTransitions = getEdges trackId graph
-    testedTIds = map (.to) testedTransitions
+    sameKey = sameKeyTransitions cat tid
+    compatibleKeys = compatibleKeysTransitions cat tid
+
+testedTransitions :: Graph -> TrackId -> [Transition]
+testedTransitions g tid = map Tested (getEdges tid g)
+
+transitions :: MusicLibrary -> TrackId -> [Transition]
+transitions lib tid = tested ++ (filter isNotTested harmonic)
+  where
+    isNotTested t = not $ elem (destTrackId t) (destTrackIds tested)
+    harmonic = harmonicTransitions lib.trackCatalog tid
+    tested = testedTransitions lib.transitionGraph tid
 
 scoreTransitions :: MusicLibrary -> [Transition] -> [(Transition, Cost)]
 scoreTransitions lib ts =
