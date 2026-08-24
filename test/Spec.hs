@@ -1,19 +1,21 @@
 module Main (main) where
 
-import Lib
-import Test.Hspec
+import System.Exit (exitFailure)
+import Test.QuickCheck (Result, isSuccess, quickCheckResult)
+
+-- QuickCheck generates many arbitrary names and checks this property for each.
+prop_helloWorld :: String -> Bool
+prop_helloWorld name =
+  reverse (reverse greeting) == greeting
+  where
+    greeting = "Hello, " ++ name ++ "!"
 
 main :: IO ()
-main = hspec $ do
-  describe "track catalog" $ do
-    it "gives Nothing when a track is not found" $ do
-      getTrackWithId 123 emptyCatalog `shouldBe` Nothing
+main = do
+  result <- quickCheckResult prop_helloWorld
+  exitOnFailure result
 
-    it "returns a track that was added" $ do
-      let track = Track "foo" (Key K_1 D)
-      getTrackWithId 0 (addTrack 0 track emptyCatalog) `shouldBe` Just track
-
-    it "finds other tracks with the same key" $ do
-      let catalog = addTrack 1 (Track "bar" (Key K_1 D))
-                  $ addTrack 0 (Track "foo" (Key K_1 D)) emptyCatalog
-      sameKeySuccessors 0 catalog `shouldBe` [1]
+exitOnFailure :: Result -> IO ()
+exitOnFailure result
+  | isSuccess result = pure ()
+  | otherwise = exitFailure

@@ -62,4 +62,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - dj-buddy
-    - hspec
+    - QuickCheck
