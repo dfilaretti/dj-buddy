@@ -208,6 +208,14 @@ data MusicLibrary = MusicLibrary
   }
   deriving (Show)
 
+emptyMusicLibrary :: MusicLibrary
+emptyMusicLibrary =
+  MusicLibrary
+    { trackCatalog = emptyCatalog,
+      transitionGraph = emptyGraph,
+      nextTrackId = 0
+    }
+
 -----------------------------------------
 ----- Transitions -----------------------
 -----------------------------------------
@@ -220,7 +228,7 @@ data HarmonicTransType
 data Transition
   = Tested TestedTransition
   | Harmonic HarmonicTransType TrackId
-  deriving (Show)
+  deriving (Show, Eq)
 
 type Cost = Int
 
