@@ -5,7 +5,7 @@ module Main (main) where
 import qualified Data.Map.Strict as Map
 import Lib
 import System.Exit (exitFailure)
-import Test.QuickCheck (Arbitrary (arbitrary), Result, elements, isSuccess, quickCheckResult)
+import Test.QuickCheck (Arbitrary (arbitrary), Result, Testable (property), elements, isSuccess, property, quickCheckResult)
 
 instance Arbitrary Track where
   arbitrary =
@@ -59,10 +59,12 @@ prop_testedTransitionWins tid1 tid2 t1 =
 -----------------------------------------
 
 tests =
-  [ quickCheckResult prop_emptyTrackCatalog,
-    quickCheckResult prop_trackInTrackOut,
-    quickCheckResult prop_testedTransitionWins
+  [ property prop_emptyTrackCatalog,
+    property prop_trackInTrackOut,
+    property prop_testedTransitionWins
   ]
 
 main :: IO ()
-main = sequence_ tests
+main =
+  sequence_
+    (map quickCheckResult tests)
