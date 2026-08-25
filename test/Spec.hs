@@ -58,12 +58,11 @@ prop_testedTransitionWins tid1 tid2 t1 =
 ----- Test Runner (main) ----------------
 -----------------------------------------
 
-propDummy :: Int -> Int -> Bool
-propDummy x y = x + y == (x - 1) + y + 2
+tests =
+  [ quickCheckResult prop_emptyTrackCatalog,
+    quickCheckResult prop_trackInTrackOut,
+    quickCheckResult prop_testedTransitionWins
+  ]
 
 main :: IO ()
-main = do
-  _ <- quickCheckResult prop_emptyTrackCatalog
-  _ <- quickCheckResult prop_trackInTrackOut
-  _ <- quickCheckResult prop_testedTransitionWins
-  return ()
+main = sequence_ tests
