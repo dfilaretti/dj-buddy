@@ -174,6 +174,14 @@ library =
                   }
               ]
             ),
+            ( polkatorju_id,
+              [ TestedTransition
+                  { to = resilience_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
+            ),
             ( set_me_free_id,
               [ TestedTransition
                   { to = spirit_id,
@@ -255,12 +263,22 @@ library =
                   { to = melody_express_id,
                     rating = Nice,
                     notes = Nothing
+                  },
+                TestedTransition
+                  { to = without_u_id,
+                    rating = Nice,
+                    notes = Nothing
                   }
               ]
             ),
             ( falling_id,
               [ TestedTransition
                   { to = mahon_id,
+                    rating = Nice,
+                    notes = Nothing
+                  },
+                TestedTransition
+                  { to = marulio_id,
                     rating = Nice,
                     notes = Nothing
                   }
@@ -271,12 +289,25 @@ library =
                   { to = without_u_id,
                     rating = Nice,
                     notes = Nothing
+                  },
+                TestedTransition
+                  { to = colossal_id,
+                    rating = Nice,
+                    notes = Nothing
                   }
               ]
             ),
             ( without_u_id,
               [ TestedTransition
                   { to = aeterna_id,
+                    rating = Nice,
+                    notes = Nothing
+                  }
+              ]
+            ),
+            ( okinawa_id,
+              [ TestedTransition
+                  { to = against_the_wind_id,
                     rating = Nice,
                     notes = Nothing
                   }
