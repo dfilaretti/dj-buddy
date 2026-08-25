@@ -34,6 +34,7 @@ module Lib
     Transition (..),
     scoredNextTracks,
     printTrackCatalog,
+    relative,
   )
 where
 

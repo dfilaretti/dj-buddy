@@ -58,6 +58,9 @@ prop_testedTransitionWins tid1 tid2 t1 =
 ----- Test Runner (main) ----------------
 -----------------------------------------
 
+propDummy :: Int -> Int -> Bool
+propDummy x y = x + y == (x - 1) + y + 2
+
 main :: IO ()
 main = do
   _ <- quickCheckResult prop_emptyTrackCatalog
