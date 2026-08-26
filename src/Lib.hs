@@ -295,12 +295,18 @@ transitionCost _ (Harmonic t _) = cost t
 -----------------------------------------
 ----- Playlist gen ----------------------
 -----------------------------------------
+
 mkPlayList ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
   [Transition]
-mkPlayList _ _ _ = undefined
+mkPlayList _ _ 0 = []
+mkPlayList lib tid n =
+  trans : mkPlayList lib tid' (n - 1)
+  where
+    trans = undefined -- pick best transition from tid
+    tid' = undefined -- this is just trans.to
 
 -----------------------------------------
 ----- Pretty Print ----------------------
