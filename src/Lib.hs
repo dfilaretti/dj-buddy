@@ -8,6 +8,7 @@ module Lib
     KeyNumber (..),
     HarmonicTransType (..),
     printTransitions,
+    mkPlayList,
     printStuff,
     destTrackId,
     printTransitions',
@@ -301,12 +302,20 @@ mkPlayList ::
   TrackId -> -- starting track
   Int -> -- number of tracks
   [Transition]
-mkPlayList _ _ 0 = []
-mkPlayList lib tid n =
-  trans : mkPlayList lib tid' (n - 1)
+mkPlayList lib tid n = mkPlayList_ lib tid (n - 1) []
+
+mkPlayList_ ::
+  MusicLibrary ->
+  TrackId -> -- starting track
+  Int -> -- number of tracks
+  [Transition] -> -- accumulated result
+  [Transition]
+mkPlayList_ lib tid n ts
+  | length ts == n = ts
+  | otherwise = mkPlayList_ lib tid' n (ts ++ [trans])
   where
-    trans = undefined -- pick best transition from tid
-    tid' = undefined -- this is just trans.to
+    tid' = destTrackId trans
+    trans = head (transitions lib tid)
 
 -----------------------------------------
 ----- Pretty Print ----------------------
