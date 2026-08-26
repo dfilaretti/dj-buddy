@@ -9,6 +9,7 @@ module Lib
     HarmonicTransType (..),
     printTransitions,
     printStuff,
+    destTrackId,
     printTransitions',
     scoredTransitions,
     UserRating (..),
@@ -290,6 +291,16 @@ transitionCost _ (Harmonic t _) = cost t
   where
     cost SameKey = 1
     cost CompatibleKeys = 2
+
+-----------------------------------------
+----- Playlist gen ----------------------
+-----------------------------------------
+mkPlayList ::
+  MusicLibrary ->
+  TrackId -> -- starting track
+  Int -> -- number of tracks
+  [Transition]
+mkPlayList _ _ _ = undefined
 
 -----------------------------------------
 ----- Pretty Print ----------------------
