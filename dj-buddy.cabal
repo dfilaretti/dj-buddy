@@ -67,7 +67,9 @@ executable dj-buddy
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    containers ^>=0.8, base ^>=4.22.0.0
+    build-depends:
+        containers ^>=0.8,
+        base >=4.20
 
     -- Directories containing source files.
     hs-source-dirs:   app
