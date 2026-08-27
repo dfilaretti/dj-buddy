@@ -1,7 +1,7 @@
-module Example (library) where
+module Example where
 
-import MyLib
 import Data.Map.Strict qualified as Map
+import MyLib
 
 printLib :: IO ()
 printLib = printTrackCatalog library.trackCatalog
