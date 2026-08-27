@@ -12,6 +12,7 @@ module Lib
     printStuff,
     destTrackId,
     printTransitions',
+    pickBest,
     scoredTransitions,
     UserRating (..),
     transitions,
@@ -40,7 +41,7 @@ module Lib
   )
 where
 
-import Data.List (sortOn)
+import Data.List (groupBy, sortOn)
 import qualified Data.Map.Strict as Map
 
 -----------------------------------------
@@ -327,13 +328,18 @@ mkPlayList_ lib tid n ts
   | length ts == n = ts
   | otherwise = mkPlayList_ lib tid' n (ts ++ [MiddleTrack trans])
   where
-    trans = fst $ pickBest $ filter notUsedYet $ scoredTransitions lib tid
+    trans = fst $ pickBest $ filter notUsed $ scoredTransitions lib tid
     tid' = destTrackId trans
     usedTracks = getTraskIds_ ts
-    notUsedYet (t, _) = not $ destTrackId t `elem` usedTracks
-    pickBest = head -- TODO: this should chose at random among same scored ones!!
+    notUsed (t, _) = not $ destTrackId t `elem` usedTracks
 
--- pred = const True
+-- TODO: evantually this shoould return a random choice among same-rating ones
+pickBest :: [(Transition, Cost)] -> (Transition, Cost)
+pickBest ts =
+  pickOne $ head $ groupBy sameScore ts
+  where
+    pickOne = head -- TODO: eventually pic
+    sameScore a b = snd a == snd b
 
 -----------------------------------------
 ----- Pretty Print ----------------------
