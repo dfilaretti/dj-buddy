@@ -297,25 +297,43 @@ transitionCost _ (Harmonic t _) = cost t
 ----- Playlist gen ----------------------
 -----------------------------------------
 
+data PlaylistMember
+  = StartingTrack TrackId
+  | MiddleTrack Transition
+  deriving (Show)
+
+getTrackId_ :: PlaylistMember -> TrackId
+getTrackId_ (StartingTrack tid) = tid
+getTrackId_ (MiddleTrack t) = destTrackId t
+
+getTraskIds_ :: [PlaylistMember] -> [TrackId]
+getTraskIds_ = fmap getTrackId_
+
 mkPlayList ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
-  [Transition]
-mkPlayList lib tid n = mkPlayList_ lib tid (n - 1) []
+  [PlaylistMember]
+mkPlayList lib tid n =
+  mkPlayList_ lib tid n [StartingTrack tid]
 
 mkPlayList_ ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
-  [Transition] -> -- accumulated result
-  [Transition]
+  [PlaylistMember] -> -- accumulated result
+  [PlaylistMember]
 mkPlayList_ lib tid n ts
   | length ts == n = ts
-  | otherwise = mkPlayList_ lib tid' n (ts ++ [trans])
+  | otherwise = mkPlayList_ lib tid' n (ts ++ [MiddleTrack trans])
   where
+    trans = fst $ pickBest $ filter notUsedYet $ scoredTransitions lib tid
     tid' = destTrackId trans
-    trans = head (transitions lib tid)
+    usedTracks = getTraskIds_ ts
+    notUsedYet (t, _) = not $ destTrackId t `elem` usedTracks
+    pickBest = head -- TODO: this should chose at random among same scored ones!!
+
+-- pred = const True
 
 -----------------------------------------
 ----- Pretty Print ----------------------
