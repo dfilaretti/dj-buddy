@@ -2,6 +2,7 @@ module MyLib where
 
 import Data.List (groupBy, sortOn)
 import Data.Map.Strict qualified as Map
+import System.Random (randomRIO)
 
 {---------------------------------------------------------------------------
   Camelot wheel
@@ -355,6 +356,12 @@ printTrackCatalog =
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track
 
------------------------------------------
------ Basic CLI -------------------------
------------------------------------------
+{---------------------------------------------------------------------------
+  Randomness
+----------------------------------------------------------------------------}
+
+randomElement :: [a] -> IO (Maybe a)
+randomElement [] = pure Nothing
+randomElement xs = do
+  i <- randomRIO (0, length xs - 1)
+  pure (Just (xs !! i))
