@@ -86,7 +86,9 @@ library
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    containers ^>=0.7, base ^>=4.20.2.0
+    build-depends:
+        containers ^>=0.7,
+        base >= 4.20 && < 4.23
 
     -- Directories containing source files.
     hs-source-dirs:   src
@@ -115,7 +117,7 @@ executable dj-buddy
 
     -- Other library packages from which modules are imported.
     build-depends:
-        base ^>=4.20.2.0,
+        base >= 4.20 && < 4.23,
         dj-buddy
 
     -- Directories containing source files.
@@ -154,5 +156,5 @@ test-suite dj-buddy-test
 
     -- Test dependencies.
     build-depends:
-        base ^>=4.20.2.0,
+        base >= 4.20 && < 4.23,
         dj-buddy
