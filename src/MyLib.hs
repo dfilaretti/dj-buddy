@@ -284,22 +284,26 @@ mkPlayList_ ::
   Int -> -- number of tracks
   [PlaylistMember] -> -- accumulated result
   [PlaylistMember]
-mkPlayList_ lib tid n ts
-  | length ts == n = ts
-  | otherwise = mkPlayList_ lib tid' n (ts ++ [MiddleTrack trans])
-  where
-    trans = fst $ pickBest $ filter notUsed $ scoredTransitions lib tid
-    tid' = destTrackId trans
-    usedTracks = getTraskIds_ ts
-    notUsed (t, _) = not $ destTrackId t `elem` usedTracks
+--mkPlayList_ lib tid n ts
+--  | length ts == n = ts
+--  | otherwise = mkPlayList_ lib tid' n (ts ++ [MiddleTrack trans])
+--  where
+--    trans = fst $ pickBest $ filter notUsed $ scoredTransitions lib tid
+--    tid' = destTrackId trans
+--    usedTracks = getTraskIds_ ts
+--    notUsed (t, _) = not $ destTrackId t `elem` usedTracks
+
+mkPlayList_ = undefined
 
 -- TODO: evantually this shoould return a random choice among same-rating ones
-pickBest :: [(Transition, Cost)] -> (Transition, Cost)
+pickBest :: [(Transition, Cost)] -> Maybe (Transition, Cost)
 pickBest ts =
-  pickOne $ head $ groupBy sameScore ts
-  where
-    pickOne = head -- TODO: eventually pic
-    sameScore a b = snd a == snd b
+    case groupBy sameScore ts of
+        []          -> Nothing
+        (tsGroup:_) -> Just (pickOne tsGroup)
+        where
+            pickOne = head
+            sameScore a b = snd a == snd b
 
 -----------------------------------------
 ----- Pretty Print ----------------------
