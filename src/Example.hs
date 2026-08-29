@@ -9,6 +9,11 @@ printLib = printTrackCatalog library.trackCatalog
 nextTracks :: TrackId -> IO ()
 nextTracks tid = putStr $ printStuff library tid
 
+playlist :: TrackId -> Int -> IO ()
+playlist tid n = do
+  p <- mkPlayList library tid n
+  putStr (printPlaylist library p)
+
 -----------------------------------------
 ----- Example data ----------------------
 -----------------------------------------

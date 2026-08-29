@@ -274,7 +274,7 @@ mkPlayList ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
-  [PlaylistMember]
+  IO [PlaylistMember]
 mkPlayList lib tid n =
   mkPlayList_ lib tid n [StartingTrack tid]
 
@@ -283,19 +283,21 @@ mkPlayList_ ::
   TrackId -> -- starting track
   Int -> -- number of tracks
   [PlaylistMember] -> -- accumulated result
-  [PlaylistMember]
--- mkPlayList_ lib tid n ts
---  | length ts == n = ts
---  | otherwise = mkPlayList_ lib tid' n (ts ++ [MiddleTrack trans])
---  where
---    trans = fst $ pickBest $ filter notUsed $ scoredTransitions lib tid
---    tid' = destTrackId trans
---    usedTracks = getTraskIds_ ts
---    notUsed (t, _) = not $ destTrackId t `elem` usedTracks
+  IO [PlaylistMember]
+mkPlayList_ lib tid n ts
+  | length ts == n = return ts
+  | otherwise =
+      do
+        trans <- pickBest allTrans
+        case trans of
+          Nothing -> return ts
+          Just ((trans_, _)) ->
+            mkPlayList_ lib (destTrackId trans_) n (ts ++ [MiddleTrack trans_])
+  where
+    allTrans = filter notUsed $ scoredTransitions lib tid
+    usedTracks = getTraskIds_ ts
+    notUsed (t, _) = not $ destTrackId t `elem` usedTracks
 
-mkPlayList_ = undefined
-
--- TODO: evantually this shoould return a random choice among same-rating ones
 pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
 pickBest ts =
   case groupBy sameScore ts of
@@ -340,6 +342,19 @@ prettyPrintTransition' lib (t, c) = prettyPrintTransition lib t ++ " [cost = " +
 
 printTransitions' :: MusicLibrary -> [(Transition, Cost)] -> IO ()
 printTransitions' lib = putStr . unlines . map (prettyPrintTransition' lib)
+
+printPlaylist :: MusicLibrary -> [PlaylistMember] -> String
+printPlaylist lib = unlines . map prettyPrintMember
+  where
+    prettyPrintMember (StartingTrack tid) =
+      show tid ++ ": " ++ trackDescription tid
+    prettyPrintMember (MiddleTrack transition) =
+      prettyPrintTransition lib transition
+
+    trackDescription tid =
+      case getTrackWithId tid lib.trackCatalog of
+        Just track -> track.title ++ " " ++ show track.key
+        Nothing -> "ERROR"
 
 printStuff :: MusicLibrary -> TrackId -> String
 printStuff lib tid =
