@@ -284,7 +284,7 @@ mkPlayList_ ::
   Int -> -- number of tracks
   [PlaylistMember] -> -- accumulated result
   [PlaylistMember]
---mkPlayList_ lib tid n ts
+-- mkPlayList_ lib tid n ts
 --  | length ts == n = ts
 --  | otherwise = mkPlayList_ lib tid' n (ts ++ [MiddleTrack trans])
 --  where
@@ -296,14 +296,17 @@ mkPlayList_ ::
 mkPlayList_ = undefined
 
 -- TODO: evantually this shoould return a random choice among same-rating ones
-pickBest :: [(Transition, Cost)] -> Maybe (Transition, Cost)
+pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
 pickBest ts =
-    case groupBy sameScore ts of
-        []          -> Nothing
-        (tsGroup:_) -> Just (pickOne tsGroup)
-        where
-            pickOne = head
-            sameScore a b = snd a == snd b
+  case groupBy sameScore ts of
+    [] -> return Nothing
+    (tsGroup : _) -> do
+      pick <- randomElement tsGroup
+      case pick of
+        Nothing -> return Nothing
+        Just pick -> return (Just pick)
+  where
+    sameScore a b = snd a == snd b
 
 -----------------------------------------
 ----- Pretty Print ----------------------
