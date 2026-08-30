@@ -4,13 +4,19 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
 
+instance Arbitrary KeyNumber where
+  arbitrary = elements [minBound .. maxBound]
+
+instance Arbitrary KeyType where
+  arbitrary = elements [minBound .. maxBound]
+
 main = defaultMain tests
 
 tests :: TestTree
 tests =
   testGroup
     "Tests"
-    [camelotTests, transitionTests]
+    [camelotTests, transitionTests, propertyTests]
 
 camelotTests :: TestTree
 camelotTests =
@@ -48,4 +54,14 @@ transitionTests =
         let lib = emptyMusicLibrary
             transition = Harmonic CompatibleKeys 42
         transitionCost lib transition @?= 2
+    ]
+
+propertyTests :: TestTree
+propertyTests =
+  testGroup
+    "Properties"
+    [ QC.testProperty "increment 12 gives same key" $
+        \k -> incrementKeyNumber 12 k == k,
+      QC.testProperty "relative is involution" $
+        \n t -> relative (relative (Key n t)) == Key n t
     ]
