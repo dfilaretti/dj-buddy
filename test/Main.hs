@@ -16,7 +16,7 @@ tests :: TestTree
 tests =
   testGroup
     "Tests"
-    [camelotTests, transitionTests, propertyTests]
+    [camelotTests, transitionTests, propertyTests, miscTests]
 
 camelotTests :: TestTree
 camelotTests =
@@ -64,4 +64,15 @@ propertyTests =
         \k -> incrementKeyNumber 12 k == k,
       QC.testProperty "relative is involution" $
         \n t -> relative (relative (Key n t)) == Key n t
+    ]
+
+miscTests :: TestTree
+miscTests =
+  testGroup
+    "Misc"
+    [ testCase "randomElement picks an element from the list" $ do
+        result <- randomElement [1, 2, 3]
+        assertBool
+          "result must be an element of the input"
+          (result `elem` map Just [1, 2, 3])
     ]
