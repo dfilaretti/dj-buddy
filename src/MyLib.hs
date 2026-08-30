@@ -298,17 +298,16 @@ mkPlayList_ lib tid n ts
     usedTracks = getTraskIds_ ts
     notUsed (t, _) = not $ destTrackId t `elem` usedTracks
 
-pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
-pickBest ts =
-  case groupBy sameScore ts of
-    [] -> return Nothing
-    (tsGroup : _) -> do
-      pick <- randomElement tsGroup
-      case pick of
-        Nothing -> return Nothing
-        Just pick -> return (Just pick)
+bestTransitions :: [(Transition, Cost)] -> [(Transition, Cost)]
+bestTransitions ts =
+  case groupBy sameScore (sortOn snd ts) of
+    [] -> []
+    (xs : _) -> xs
   where
     sameScore a b = snd a == snd b
+
+pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
+pickBest ts = randomElement (bestTransitions ts)
 
 -----------------------------------------
 ----- Pretty Print ----------------------
