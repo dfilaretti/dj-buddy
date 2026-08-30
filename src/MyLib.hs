@@ -300,11 +300,10 @@ mkPlayList_ lib tid n ts
 
 bestTransitions :: [(Transition, Cost)] -> [(Transition, Cost)]
 bestTransitions ts =
-  case groupBy sameScore sorted of
+  case groupBy sameScore (sortOn snd ts) of
     [] -> []
     (xs : _) -> xs
   where
-    sorted = sortOn snd ts
     sameScore a b = snd a == snd b
 
 pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
