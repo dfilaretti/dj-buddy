@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
+
 module Example where
 
 import Data.Map.Strict qualified as Map

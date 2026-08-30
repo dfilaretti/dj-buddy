@@ -158,4 +158,9 @@ test-suite dj-buddy-test
     -- Test dependencies.
     build-depends:
         base >= 4.20 && < 4.23,
-        dj-buddy
+        dj-buddy,
+        tasty,
+        tasty-hunit,
+        QuickCheck,
+        tasty-quickcheck,
+        tasty-smallcheck,
