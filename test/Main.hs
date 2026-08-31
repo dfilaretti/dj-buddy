@@ -66,10 +66,10 @@ transitionTests =
                         (1, Track "B" (Key K_1 D))],
                     nextTrackId = 0 }
             allTransitions = transitions lib 0
-            justHarmonicTransitions = harmonicTransitions lib.trackCatalog 0
-            justTestedTransitions = testedTransitions lib.transitionGraph 0
-        length justHarmonicTransitions @?= 1
-        length justTestedTransitions @?= 1
+            harmonic = harmonicTransitions lib.trackCatalog 0
+            tested = testedTransitions lib.transitionGraph 0
+        length harmonic @?= 1
+        length tested @?= 1
         length allTransitions @?= 1 -- the harmonic transition was filtered out!
     ]
 
