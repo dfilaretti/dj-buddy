@@ -157,6 +157,7 @@ test-suite dj-buddy-test
 
     -- Test dependencies.
     build-depends:
+        containers ^>=0.7,
         base >= 4.20 && < 4.23,
         dj-buddy,
         tasty,

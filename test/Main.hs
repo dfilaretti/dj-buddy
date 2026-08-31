@@ -3,6 +3,7 @@ import MyLib
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
+import Data.Map.Strict qualified as Map
 
 instance Arbitrary KeyNumber where
   arbitrary = elements [minBound .. maxBound]
@@ -53,7 +54,23 @@ transitionTests =
       testCase "compatible-key transitions cost 2" $ do
         let lib = emptyMusicLibrary
             transition = Harmonic CompatibleKeys 42
-        transitionCost lib transition @?= 2
+        transitionCost lib transition @?= 2,
+      testCase "tested transitions do not appear as harmonic transitions" $ do
+        let lib =
+                MusicLibrary {
+                    transitionGraph = Map.fromList [
+                        (0, [TestedTransition {to=1, rating=Omg, notes=Nothing}])
+                    ],
+                    trackCatalog = Map.fromList[
+                        (0, Track "A" (Key K_1 M)),
+                        (1, Track "B" (Key K_1 D))],
+                    nextTrackId = 0 }
+            allTransitions = transitions lib 0
+            justHarmonicTransitions = harmonicTransitions lib.trackCatalog 0
+            justTestedTransitions = testedTransitions lib.transitionGraph 0
+        length justHarmonicTransitions @?= 1
+        length justTestedTransitions @?= 1
+        length allTransitions @?= 1 -- the harmonic transition was filtered out!
     ]
 
 propertyTests :: TestTree
