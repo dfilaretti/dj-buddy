@@ -386,3 +386,10 @@ randomElement [] = pure Nothing
 randomElement xs = do
   i <- randomRIO (0, length xs - 1)
   pure (Just (xs !! i))
+
+
+{---------------------------------------------------------------------------
+  File ops
+----------------------------------------------------------------------------}
+
+-- content <- readFile "myFile.txt"
