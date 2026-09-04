@@ -471,8 +471,6 @@ makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =
   (t.from, TestedTransition {to = t.to, notes = t.notes})
 
--- TODO: this isn't actyally very useful since it will not check that track IDs exist
--- we need something similar that takes a full MusicLibrary instead
 makeTransitionGraph :: [Transition_raw] -> MusicLibrary -> MusicLibrary
 makeTransitionGraph ts lib = foldr insertRawTransition lib ts
 
@@ -482,7 +480,6 @@ insertRawTransition tx lib =
   where
     (from, t) = makeTransitionGraphEntry tx
 
--- TODO: check that IDs in transactions actually correspond to track
 makeMusicLibrary :: Lib_raw -> MusicLibrary
 makeMusicLibrary l =
   makeTransitionGraph l.transitions intial
