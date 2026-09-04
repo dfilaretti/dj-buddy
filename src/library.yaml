@@ -1,0 +1,24 @@
+tracks:
+  - id: 0
+    title: "A"
+    author: "Foo"
+    key: "5D"
+
+  - id: 1
+    title: "B"
+    author: "Bar"
+    key: "11M"
+
+  - id: 2
+    title: "C"
+    author: "Baz"
+    key: "11D"
+
+
+transitions:
+  - from: 0
+    to: 1
+    notes: "Wow I love it"
+
+  - from: 0
+    to: 2

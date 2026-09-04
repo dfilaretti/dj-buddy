@@ -60,6 +60,8 @@ common extensions
         OverloadedRecordDot
         DuplicateRecordFields
         NoFieldSelectors
+        DeriveGeneric
+        OverloadedStrings
 
 common ghc-options
     ghc-options:
@@ -89,7 +91,10 @@ library
     build-depends:
         containers ^>=0.7,
         base >= 4.20 && < 4.23,
-        random
+        random,
+        yaml,
+        aeson,
+        text
 
     -- Directories containing source files.
     hs-source-dirs:   src

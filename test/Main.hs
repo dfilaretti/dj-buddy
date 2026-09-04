@@ -31,6 +31,12 @@ camelotTests =
         relative (Key K_1 D) @?= Key K_1 M,
       testCase "relative M -> D" $
         relative (Key K_1 M) @?= Key K_1 D,
+      testCase "read key number" $
+        (read "12" :: KeyNumber) @?= K_12,
+      testCase "read key type" $
+        (read "M" :: KeyType) @?= M,
+      testCase "read key" $
+        (read "12M" :: Key) @?= Key K_12 M,
       testCase "compatible keys" $
         compatibleKeys (Key K_1 D)
           @?= [ Key K_2 D,

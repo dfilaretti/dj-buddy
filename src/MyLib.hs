@@ -1,14 +1,21 @@
 module MyLib where
 
+import Data.Aeson qualified as Aeson
 import Data.List (groupBy, sortOn)
 import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Data.Text qualified as Text
+import Data.Yaml (FromJSON, decodeFileThrow)
+import GHC.Generics (Generic)
 import System.Random (randomRIO)
+import Text.Read (readMaybe)
 
 {---------------------------------------------------------------------------
   Camelot wheel
 ----------------------------------------------------------------------------}
 
-data Key = Key KeyNumber KeyType deriving (Eq)
+data Key = Key KeyNumber KeyType
+  deriving (Eq)
 
 data KeyNumber
   = K_1
@@ -44,8 +51,37 @@ instance Show KeyNumber where
   show K_11 = "11"
   show K_12 = "12"
 
+instance Read KeyNumber where
+  readsPrec precedence input =
+    [ (toEnum (number - 1), rest)
+    | (number, rest) <- (readsPrec precedence input :: [(Int, String)]),
+      number >= 1,
+      number <= 12
+    ]
+
+instance Read KeyType where
+  readsPrec _ input =
+    [(D, rest) | ("D", rest) <- lex input]
+      ++ [(M, rest) | ("M", rest) <- lex input]
+
 instance Show Key where
   show (Key n t) = show n ++ show t
+
+instance Read Key where
+  readsPrec _ input =
+    [ (Key number keyType, rest)
+    | (number, keyTypeInput) <- reads input,
+      (keyType, rest) <- reads keyTypeInput
+    ]
+
+instance FromJSON Key where
+  parseJSON = Aeson.withText "Key" $ \s ->
+    case parseKey s of
+      Just key -> pure key
+      Nothing -> fail $ "Invalid key: " ++ show s
+
+parseKey :: Text -> Maybe Key
+parseKey = readMaybe . Text.unpack
 
 compatibleKeys :: Key -> [Key]
 compatibleKeys k =
@@ -387,9 +423,43 @@ randomElement xs = do
   i <- randomRIO (0, length xs - 1)
   pure (Just (xs !! i))
 
-
 {---------------------------------------------------------------------------
   File ops
 ----------------------------------------------------------------------------}
 
 -- content <- readFile "myFile.txt"
+
+data Track_raw = Track_raw
+  { id :: Int,
+    title :: String,
+    author :: String,
+    key :: Key
+  }
+  deriving (Show, Generic)
+
+instance FromJSON Track_raw
+
+data Transition_raw = Transition_raw
+  { from :: Int,
+    to :: Int,
+    notes :: String
+  }
+  deriving (Show, Generic)
+
+instance FromJSON Transition_raw
+
+data Lib_raw = Lib_raw
+  { tracks :: [Track_raw],
+    transitions :: [Transition_raw]
+  }
+  deriving (Show, Generic)
+
+instance FromJSON Lib_raw
+
+-- c <- decodeFileThrow "config.yaml" :: IO TestType
+
+-- a :: Track_raw -> (TrackId, Track)
+-- b :: [Track_raw] -> TrackCatalog
+-- c :: Transition_raw -> (TrackId, TestedTransition)
+-- d :: [Transition_raw] -> Graph
+-- e :: Lib_raw -> MusicLibrary

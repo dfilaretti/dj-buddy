@@ -106,7 +106,7 @@ library =
             (polkatorju_id, Track "Polkatorju" (Key K_10 D)),
             (falling_id, Track "Falling" (Key K_6 D)),
             (feels_so_good_id, Track "Feels So Good" (Key K_10 D)),
-            (colossal_id, Track "Colossal" (Key K_4 M)),
+            (colossal_id, Track "Colossal" (read "4M")),
             (aniara_id, Track "Aniara" (Key K_9 D)),
             (marulio_id, Track "Marulio" (Key K_1 D)),
             (sorrento_id, Track "Sorrento" (Key K_9 M)),
