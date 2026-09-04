@@ -85,8 +85,7 @@ lost_dimension = 29
 library :: MusicLibrary
 library =
   MusicLibrary
-    { nextTrackId = 100,
-      trackCatalog =
+    { trackCatalog =
         Map.fromList
           [ (another_summer_id, Track "Another Summer" (Key K_3 D)),
             (how_could_i_say_it_id, Track "How Could I say It" (Key K_10 D)),

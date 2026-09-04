@@ -202,8 +202,7 @@ confirmedSuccessors trackId = map (.to) . getEdges trackId
 
 data MusicLibrary = MusicLibrary
   { trackCatalog :: TrackCatalog,
-    transitionGraph :: Graph,
-    nextTrackId :: Int
+    transitionGraph :: Graph
   }
   deriving (Show)
 
@@ -211,9 +210,12 @@ emptyMusicLibrary :: MusicLibrary
 emptyMusicLibrary =
   MusicLibrary
     { trackCatalog = emptyCatalog,
-      transitionGraph = emptyGraph,
-      nextTrackId = 0
+      transitionGraph = emptyGraph
     }
+
+-- throws if TrackIds don't exist in track catalog
+insertTransition :: TrackId -> TestedTransition -> MusicLibrary -> MusicLibrary
+insertTransition = undefined
 
 -----------------------------------------
 ----- Transitions -----------------------
@@ -469,21 +471,24 @@ makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =
   (t.from, TestedTransition {to = t.to, notes = t.notes})
 
-makeTransitionGraph :: [Transition_raw] -> Graph
-makeTransitionGraph = foldr insertRawTransition emptyGraph
+-- TODO: this isn't actyally very useful since it will not check that track IDs exist
+-- we need something similar that takes a full MusicLibrary instead
+makeTransitionGraph :: [Transition_raw] -> MusicLibrary -> MusicLibrary
+makeTransitionGraph ts lib = foldr insertRawTransition lib ts
 
-insertRawTransition :: Transition_raw -> Graph -> Graph
-insertRawTransition = undefined
+insertRawTransition :: Transition_raw -> MusicLibrary -> MusicLibrary
+insertRawTransition tx lib =
+  insertTransition from t lib
+  where
+    (from, t) = makeTransitionGraphEntry tx
 
--- TODO: check that IDs in transactions actually correspond to tracks!!
+-- TODO: check that IDs in transactions actually correspond to track
 makeMusicLibrary :: Lib_raw -> MusicLibrary
 makeMusicLibrary l =
-  MusicLibrary
-    { trackCatalog = c,
-      transitionGraph = t,
-      nextTrackId = i
-    }
+  makeTransitionGraph l.transitions intial
   where
-    c = makeTrackCatalog l.tracks
-    t = makeTransitionGraph l.transitions
-    i = 1
+    intial =
+      MusicLibrary
+        { trackCatalog = makeTrackCatalog l.tracks,
+          transitionGraph = emptyGraph
+        }
