@@ -172,7 +172,6 @@ data UserRating
 
 data TestedTransition = TestedTransition
   { to :: TrackId,
-    rating :: UserRating,
     notes :: Maybe String
   }
   deriving (Eq, Show)
@@ -424,13 +423,14 @@ randomElement xs = do
   pure (Just (xs !! i))
 
 {---------------------------------------------------------------------------
-  File ops
+  Music Library parsing from YAML
 ----------------------------------------------------------------------------}
 
--- content <- readFile "myFile.txt"
+readLibFromFile :: FilePath -> IO Lib_raw
+readLibFromFile p = decodeFileThrow p :: IO Lib_raw
 
 data Track_raw = Track_raw
-  { id :: Int,
+  { id :: TrackId,
     title :: String,
     author :: String,
     key :: Key
@@ -442,7 +442,7 @@ instance FromJSON Track_raw
 data Transition_raw = Transition_raw
   { from :: Int,
     to :: Int,
-    notes :: String
+    notes :: Maybe String
   }
   deriving (Show, Generic)
 
@@ -456,10 +456,34 @@ data Lib_raw = Lib_raw
 
 instance FromJSON Lib_raw
 
--- c <- decodeFileThrow "config.yaml" :: IO TestType
+makeTrackCatalogEntry :: Track_raw -> (TrackId, Track)
+makeTrackCatalogEntry t_raw =
+  (t_raw.id, Track {title = t_raw.title, key = t_raw.key})
 
--- a :: Track_raw -> (TrackId, Track)
--- b :: [Track_raw] -> TrackCatalog
--- c :: Transition_raw -> (TrackId, TestedTransition)
--- d :: [Transition_raw] -> Graph
--- e :: Lib_raw -> MusicLibrary
+-- TODO: this should make sure tracks all have distinct IDs and throw otherwise
+makeTrackCatalog :: [Track_raw] -> TrackCatalog
+makeTrackCatalog ts =
+  Map.fromList (map makeTrackCatalogEntry ts)
+
+makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
+makeTransitionGraphEntry t =
+  (t.from, TestedTransition {to = t.to, notes = t.notes})
+
+makeTransitionGraph :: [Transition_raw] -> Graph
+makeTransitionGraph = foldr insertRawTransition emptyGraph
+
+insertRawTransition :: Transition_raw -> Graph -> Graph
+insertRawTransition = undefined
+
+-- TODO: check that IDs in transactions actually correspond to tracks!!
+makeMusicLibrary :: Lib_raw -> MusicLibrary
+makeMusicLibrary l =
+  MusicLibrary
+    { trackCatalog = c,
+      transitionGraph = t,
+      nextTrackId = i
+    }
+  where
+    c = makeTrackCatalog l.tracks
+    t = makeTransitionGraph l.transitions
+    i = 1

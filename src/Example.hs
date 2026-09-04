@@ -125,7 +125,6 @@ library =
           [ ( melody_express_id,
               [ TestedTransition
                   { to = another_summer_id,
-                    rating = Omg,
                     notes = Nothing
                   }
               ]
@@ -133,7 +132,6 @@ library =
             ( thunderfunk_id,
               [ TestedTransition
                   { to = howl_at_the_moon_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -141,7 +139,6 @@ library =
             ( howl_at_the_moon_id,
               [ TestedTransition
                   { to = colossal_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -149,12 +146,10 @@ library =
             ( nothing_is_impossible_id,
               [ TestedTransition
                   { to = mahon_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = falling_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -162,7 +157,6 @@ library =
             ( aniara_id,
               [ TestedTransition
                   { to = how_could_i_say_it_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -170,7 +164,6 @@ library =
             ( feels_so_good_id,
               [ TestedTransition
                   { to = polkatorju_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -178,7 +171,6 @@ library =
             ( polkatorju_id,
               [ TestedTransition
                   { to = resilience_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -186,12 +178,10 @@ library =
             ( set_me_free_id,
               [ TestedTransition
                   { to = spirit_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = sorrento_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -199,7 +189,6 @@ library =
             ( spirit_id,
               [ TestedTransition
                   { to = aniara_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -207,7 +196,6 @@ library =
             ( colossal_id,
               [ TestedTransition
                   { to = inferno_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -215,7 +203,6 @@ library =
             ( resilience_id,
               [ TestedTransition
                   { to = falling_id,
-                    rating = Omg,
                     notes = Just "mashup: play falling vox over resilience!"
                   }
               ]
@@ -223,17 +210,14 @@ library =
             ( mahon_id,
               [ TestedTransition
                   { to = spirit_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = feels_so_good_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = ode_to_autumn_id,
-                    rating = Omg,
                     notes = Nothing
                   }
               ]
@@ -241,7 +225,6 @@ library =
             ( against_the_wind_id,
               [ TestedTransition
                   { to = feels_so_good_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -249,12 +232,10 @@ library =
             ( sorrento_id,
               [ TestedTransition
                   { to = set_me_free_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = spirit_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -262,12 +243,10 @@ library =
             ( marulio_id,
               [ TestedTransition
                   { to = melody_express_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = without_u_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -275,12 +254,10 @@ library =
             ( falling_id,
               [ TestedTransition
                   { to = mahon_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = marulio_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -288,12 +265,10 @@ library =
             ( lost_dimension,
               [ TestedTransition
                   { to = without_u_id,
-                    rating = Nice,
                     notes = Nothing
                   },
                 TestedTransition
                   { to = colossal_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -301,7 +276,6 @@ library =
             ( without_u_id,
               [ TestedTransition
                   { to = aeterna_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
@@ -309,7 +283,6 @@ library =
             ( okinawa_id,
               [ TestedTransition
                   { to = against_the_wind_id,
-                    rating = Nice,
                     notes = Nothing
                   }
               ]
