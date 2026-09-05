@@ -128,9 +128,10 @@ graphTests =
           addEdge 0 t2 g @?= Map.fromList [(0, [t2, t1])],
       testCase "inserting the same transition twice should throw" $
         do
-          let g = Map.fromList [(0, [TestedTransition 1 Nothing])]
-              t = TestedTransition 1 (Just "wow!!!")
-          result <- try (evaluate (addEdge 0 t g)) :: IO (Either SomeException Graph)
+          let g = emptyGraph
+              t1 = TestedTransition 1 Nothing
+              t2 = TestedTransition 1 (Just "same song, different transition")
+          result <- try (evaluate (addEdge 0 t1 $ addEdge 0 t2 g)) :: IO (Either SomeException Graph)
           case result of
             Left _ -> pure ()
             Right _ -> assertFailure "expected addEdge to throw"

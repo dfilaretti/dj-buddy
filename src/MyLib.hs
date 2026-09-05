@@ -2,7 +2,7 @@ module MyLib where
 
 import Data.Aeson qualified as Aeson
 import Data.List (groupBy, sortOn)
-import Data.Map.Lazy qualified as Map
+import Data.Map.Strict qualified as Map
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Yaml (FromJSON, decodeFileThrow)
@@ -177,10 +177,22 @@ data TestedTransition = TestedTransition
   { to :: TrackId,
     notes :: Maybe String
   }
-  deriving (Eq, Show)
+  deriving (Show)
+
+-- TODO: is this "correct"? Should it obey certain laws?
+instance Eq TestedTransition where
+  t1 == t2 = t1.to == t2.to
 
 emptyGraph :: Graph
 emptyGraph = Map.empty
+
+safecons :: TestedTransition -> [TestedTransition] -> [TestedTransition]
+safecons x xs =
+  if x `elem` xs
+    then
+      error "foo"
+    else
+      x : xs
 
 addEdge :: TrackId -> TestedTransition -> Graph -> Graph
 addEdge tid t g =
@@ -188,7 +200,7 @@ addEdge tid t g =
   where
     f x = case x of
       Nothing -> Just [t]
-      Just ts -> Just (t : ts)
+      Just ts -> Just (safecons t ts)
 
 getEdges :: TrackId -> Graph -> [TestedTransition]
 getEdges = Map.findWithDefault []
