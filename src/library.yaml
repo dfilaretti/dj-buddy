@@ -23,6 +23,11 @@ transitions:
   - from: 0
     to: 2
 
+  # this should not be inserted twice!!
+  - from: 0
+    to: 2
+    notes: "ouch"
+
   - from: 2
     to: 1
     notes: "yes baby"
