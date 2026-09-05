@@ -125,8 +125,11 @@ type TrackCatalog = Map.Map TrackId Track
 emptyCatalog :: TrackCatalog
 emptyCatalog = Map.empty
 
-addTrack :: TrackId -> Track -> TrackCatalog -> TrackCatalog
-addTrack = Map.insert
+addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
+addTrack (tid, t) ts =
+  case Map.lookup tid ts of
+    Nothing -> Map.insert tid t ts
+    Just _ -> error "track was inserted wtice"
 
 getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
 getTracks predicate =

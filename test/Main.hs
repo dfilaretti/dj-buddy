@@ -1,3 +1,4 @@
+import Control.Exception (SomeException, evaluate, try)
 import Data.List
 import Data.Map.Strict qualified as Map
 import MyLib
@@ -19,6 +20,7 @@ tests =
     "Tests"
     [ camelotTests,
       graphTests,
+      trackCatalogTests,
       transitionTests,
       propertyTests,
       miscTests
@@ -124,4 +126,24 @@ graphTests =
               t1 = TestedTransition 1 Nothing
               t2 = TestedTransition 2 Nothing
           addEdge 0 t2 g @?= Map.fromList [(0, [t2, t1])]
+    ]
+
+trackCatalogTests :: TestTree
+trackCatalogTests =
+  testGroup
+    "Track Catalog"
+    [ testCase "basic insert works as expected" $
+        do
+          let c = emptyCatalog
+              t = Track "A" (read "5D")
+          addTrack (0, t) c
+            @?= Map.fromList [(0, t)],
+      testCase "inserting twice should throw" $
+        do
+          let c = Map.fromList [(0, t)]
+              t = Track "A" (read "5D")
+          result <- try (evaluate (addTrack (0, t) c)) :: IO (Either SomeException TrackCatalog)
+          case result of
+            Left _ -> pure ()
+            Right _ -> assertFailure "expected addTrack to throw"
     ]
