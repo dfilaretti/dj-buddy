@@ -129,7 +129,7 @@ addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
 addTrack (tid, t) ts =
   case Map.lookup tid ts of
     Nothing -> Map.insert tid t ts
-    Just _ -> error "track was inserted wtice"
+    Just _ -> error "track was inserted twice"
 
 getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
 getTracks predicate =
