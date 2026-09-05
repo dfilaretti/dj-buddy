@@ -23,9 +23,14 @@ transitions:
   - from: 0
     to: 2
 
-  # this should not be inserted twice!!
+  # this should throw error
   - from: 0
-    to: 2
+    to: 99
+    notes: "ouch"
+
+    # this should throw error too!
+  - from: 99
+    to: 0
     notes: "ouch"
 
   - from: 2

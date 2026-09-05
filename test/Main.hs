@@ -126,7 +126,7 @@ graphTests =
               t1 = TestedTransition 1 Nothing
               t2 = TestedTransition 2 Nothing
           addEdge 0 t2 g @?= Map.fromList [(0, [t2, t1])],
-      testCase "inserting the same transition twice should throw" $
+      testCase "inserting the 'same' transition twice should throw" $
         do
           let g = emptyGraph
               t1 = TestedTransition 1 Nothing
@@ -147,7 +147,7 @@ trackCatalogTests =
               t = Track "A" (read "5D")
           addTrack (0, t) c
             @?= Map.fromList [(0, t)],
-      testCase "inserting twice should throw" $
+      testCase "inserting same track twice should throw" $
         do
           let c = Map.fromList [(0, t)]
               t = Track "A" (read "5D")
