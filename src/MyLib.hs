@@ -190,7 +190,7 @@ safecons :: TestedTransition -> [TestedTransition] -> [TestedTransition]
 safecons x xs =
   if x `elem` xs
     then
-      error "foo"
+      error "Do not insert same transition twice!!"
     else
       x : xs
 
