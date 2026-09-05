@@ -2,7 +2,7 @@ module MyLib where
 
 import Data.Aeson qualified as Aeson
 import Data.List (groupBy, sortOn)
-import Data.Map.Strict qualified as Map
+import Data.Map.Lazy qualified as Map
 import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Yaml (FromJSON, decodeFileThrow)
@@ -180,8 +180,12 @@ emptyGraph :: Graph
 emptyGraph = Map.empty
 
 addEdge :: TrackId -> TestedTransition -> Graph -> Graph
-addEdge trackId edge =
-  Map.insert trackId [edge]
+addEdge tid t g =
+  Map.alter f tid g
+  where
+    f x = case x of
+      Nothing -> Just [t]
+      Just ts -> Just (t : ts)
 
 getEdges :: TrackId -> Graph -> [TestedTransition]
 getEdges = Map.findWithDefault []

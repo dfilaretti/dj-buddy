@@ -17,7 +17,12 @@ tests :: TestTree
 tests =
   testGroup
     "Tests"
-    [camelotTests, transitionTests, propertyTests, miscTests]
+    [ camelotTests,
+      graphTests,
+      transitionTests,
+      propertyTests,
+      miscTests
+    ]
 
 camelotTests :: TestTree
 camelotTests =
@@ -101,4 +106,22 @@ miscTests =
         assertBool
           "result must be an element of the input"
           (result `elem` map Just [1, 2, 3])
+    ]
+
+graphTests :: TestTree
+graphTests =
+  testGroup
+    "Graph"
+    [ testCase "inserting the first transition" $
+        do
+          let g = emptyGraph
+              t = TestedTransition {to = 1, notes = Nothing}
+          addEdge 0 t g
+            @?= Map.fromList [(0, [t])],
+      testCase "inserting the nth transition" $
+        do
+          let g = Map.fromList [(0, [t1])]
+              t1 = TestedTransition 1 Nothing
+              t2 = TestedTransition 2 Nothing
+          addEdge 0 t2 g @?= Map.fromList [(0, [t2, t1])]
     ]
