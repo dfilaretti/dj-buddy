@@ -485,10 +485,11 @@ makeTrackCatalogEntry :: Track_raw -> (TrackId, Track)
 makeTrackCatalogEntry t_raw =
   (t_raw.id, Track {title = t_raw.title, key = t_raw.key})
 
--- TODO: this should make sure tracks all have distinct IDs and throw otherwise
 makeTrackCatalog :: [Track_raw] -> TrackCatalog
-makeTrackCatalog ts =
-  Map.fromList (map makeTrackCatalogEntry ts)
+makeTrackCatalog = foldr insertTrack emptyCatalog
+
+insertTrack :: Track_raw -> TrackCatalog -> TrackCatalog
+insertTrack tr c = addTrack (makeTrackCatalogEntry tr) c
 
 makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =
