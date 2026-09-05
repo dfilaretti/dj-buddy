@@ -217,9 +217,13 @@ emptyMusicLibrary =
       transitionGraph = emptyGraph
     }
 
--- throws if TrackIds don't exist in track catalog
+-- TODO: throws if TrackIds don't exist in track catalog
 insertTransition :: TrackId -> TestedTransition -> MusicLibrary -> MusicLibrary
-insertTransition = undefined
+insertTransition tid t lib =
+  MusicLibrary {trackCatalog = c', transitionGraph = g'}
+  where
+    c' = lib.trackCatalog
+    g' = addEdge tid t lib.transitionGraph
 
 -----------------------------------------
 ----- Transitions -----------------------
