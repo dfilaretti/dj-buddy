@@ -488,7 +488,6 @@ readLibFromFile p = decodeFileThrow p :: IO Lib_raw
 data Track_raw = Track_raw
   { id :: TrackId,
     title :: String,
-    author :: String,
     key :: Key
   }
   deriving (Show, Generic)
