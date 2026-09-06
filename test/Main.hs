@@ -23,6 +23,7 @@ tests =
       trackCatalogTests,
       transitionTests,
       propertyTests,
+      musicLibraryTests,
       miscTests
     ]
 
@@ -135,6 +136,24 @@ graphTests =
           case result of
             Left _ -> pure ()
             Right _ -> assertFailure "expected addEdge to throw"
+    ]
+
+musicLibraryTests :: TestTree
+musicLibraryTests =
+  testGroup
+    "MusicLibrary"
+    [testCase "to insert a transition in the music library, the to/fromIDs must exist, and must not be the same" $
+        do
+          let lib =
+                Map.fromList
+                  [ (0, Track "A" (read "5D")),
+                    (1, Track "B" (read "6D"))
+                  ]
+              starting = MusicLibrary lib emptyGraph
+          isValidTransition (0, TestedTransition 1 Nothing) starting @?= True
+          isValidTransition (0, TestedTransition 0 Nothing) starting @?= False
+          isValidTransition (99, TestedTransition 0 Nothing) starting @?= False
+          isValidTransition (0, TestedTransition 99 Nothing) starting @?= False
     ]
 
 trackCatalogTests :: TestTree

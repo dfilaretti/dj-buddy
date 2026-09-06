@@ -29,13 +29,8 @@ transitions:
     to: 2
 
   # this should throw error
-  - from: 0
-    to: 99
-    notes: "ouch"
-
-    # this should throw error too!
-  - from: 99
-    to: 0
+  - from: 100
+    to: 4
     notes: "ouch"
 
   - from: 2
