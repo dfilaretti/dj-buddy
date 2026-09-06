@@ -59,32 +59,32 @@ transitionTests =
     "Transitions"
     [ testCase "tested transitions have zero cost" $ do
         let lib = emptyMusicLibrary
-            transition = Tested (TestedTransition 42 Nothing)
+            transition = Tested (TestedTransition "42" Nothing)
         transitionCost lib transition @?= 0,
       testCase "same key transitions cost 1" $ do
         let lib = emptyMusicLibrary
-            transition = Harmonic SameKey 42
+            transition = Harmonic SameKey "42"
         transitionCost lib transition @?= 1,
       testCase "compatible-key transitions cost 2" $ do
         let lib = emptyMusicLibrary
-            transition = Harmonic CompatibleKeys 42
+            transition = Harmonic CompatibleKeys "42"
         transitionCost lib transition @?= 2,
       testCase "tested transitions do not appear as harmonic transitions" $ do
         let lib =
               MusicLibrary
                 { transitionGraph =
                     Map.fromList
-                      [ (0, [TestedTransition {to = 1, notes = Nothing}])
+                      [ ("0", [TestedTransition {to = "1", notes = Nothing}])
                       ],
                   trackCatalog =
                     Map.fromList
-                      [ (0, Track "A" (Key K_1 M)),
-                        (1, Track "B" (Key K_1 D))
+                      [ ("0", Track "A" (Key K_1 M)),
+                        ("1", Track "B" (Key K_1 D))
                       ]
                 }
-            allTransitions = transitions lib 0
-            harmonic = harmonicTransitions lib.trackCatalog 0
-            tested = testedTransitions lib.transitionGraph 0
+            allTransitions = transitions lib "0"
+            harmonic = harmonicTransitions lib.trackCatalog "0"
+            tested = testedTransitions lib.transitionGraph "0"
         length harmonic @?= 1
         length tested @?= 1
         length allTransitions @?= 1 -- the harmonic transition was filtered out!
@@ -118,21 +118,21 @@ graphTests =
     [ testCase "inserting the first transition" $
         do
           let g = emptyGraph
-              t = TestedTransition {to = 1, notes = Nothing}
-          addEdge 0 t g
-            @?= Map.fromList [(0, [t])],
+              t = TestedTransition {to = "1", notes = Nothing}
+          addEdge "0" t g
+            @?= Map.fromList [("0", [t])],
       testCase "inserting the nth transition" $
         do
-          let g = Map.fromList [(0, [t1])]
-              t1 = TestedTransition 1 Nothing
-              t2 = TestedTransition 2 Nothing
-          addEdge 0 t2 g @?= Map.fromList [(0, [t2, t1])],
+          let g = Map.fromList [("0", [t1])]
+              t1 = TestedTransition "1" Nothing
+              t2 = TestedTransition "2" Nothing
+          addEdge "0" t2 g @?= Map.fromList [("0", [t2, t1])],
       testCase "inserting the 'same' transition twice should throw" $
         do
           let g = emptyGraph
-              t1 = TestedTransition 1 Nothing
-              t2 = TestedTransition 1 (Just "same song, different transition")
-          result <- try (evaluate (addEdge 0 t1 $ addEdge 0 t2 g)) :: IO (Either SomeException Graph)
+              t1 = TestedTransition "1" Nothing
+              t2 = TestedTransition "1" (Just "same song, different transition")
+          result <- try (evaluate (addEdge "0" t1 $ addEdge "0" t2 g)) :: IO (Either SomeException Graph)
           case result of
             Left _ -> pure ()
             Right _ -> assertFailure "expected addEdge to throw"
@@ -146,14 +146,14 @@ musicLibraryTests =
         do
           let lib =
                 Map.fromList
-                  [ (0, Track "A" (read "5D")),
-                    (1, Track "B" (read "6D"))
+                  [ ("0", Track "A" (read "5D")),
+                    ("1", Track "B" (read "6D"))
                   ]
               starting = MusicLibrary lib emptyGraph
-          isValidTransition (0, TestedTransition 1 Nothing) starting @?= True
-          isValidTransition (0, TestedTransition 0 Nothing) starting @?= False
-          isValidTransition (99, TestedTransition 0 Nothing) starting @?= False
-          isValidTransition (0, TestedTransition 99 Nothing) starting @?= False
+          isValidTransition ("0", TestedTransition "1" Nothing) starting @?= True
+          isValidTransition ("0", TestedTransition "0" Nothing) starting @?= False
+          isValidTransition ("99", TestedTransition "0" Nothing) starting @?= False
+          isValidTransition ("0", TestedTransition "99" Nothing) starting @?= False
     ]
 
 trackCatalogTests :: TestTree
@@ -164,13 +164,13 @@ trackCatalogTests =
         do
           let c = emptyCatalog
               t = Track "A" (read "5D")
-          addTrack (0, t) c
-            @?= Map.fromList [(0, t)],
+          addTrack ("0", t) c
+            @?= Map.fromList [("0", t)],
       testCase "inserting same track twice should throw" $
         do
-          let c = Map.fromList [(0, t)]
+          let c = Map.fromList [("0", t)]
               t = Track "A" (read "5D")
-          result <- try (evaluate (addTrack (0, t) c)) :: IO (Either SomeException TrackCatalog)
+          result <- try (evaluate (addTrack ("0", t) c)) :: IO (Either SomeException TrackCatalog)
           case result of
             Left _ -> pure ()
             Right _ -> assertFailure "expected addTrack to throw"

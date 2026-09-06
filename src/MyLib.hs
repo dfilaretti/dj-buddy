@@ -107,7 +107,7 @@ decrement = add (-1)
 ----- Tracks & Catalog  -----------------
 -----------------------------------------
 
-type TrackId = Int
+type TrackId = String
 
 data Track
   = Track
@@ -495,8 +495,8 @@ data Track_raw = Track_raw
 instance FromJSON Track_raw
 
 data Transition_raw = Transition_raw
-  { from :: Int,
-    to :: Int,
+  { from :: TrackId,
+    to :: TrackId,
     notes :: Maybe String
   }
   deriving (Show, Generic)

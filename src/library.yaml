@@ -1,148 +1,148 @@
 tracks:
-  - id: 0
+  - id: "another_summer"
     title: "Another Summer"
     key: "3D"
-  - id: 1
+  - id: "how_could_I_say_it"
     title: "How Could I say It"
     key: "10D"
-  - id: 2
+  - id: "nothing_is_impossible"
     title: "Nothing Is Impossible"
     key: "7D"
-  - id: 3
+  - id: "spirit"
     title: "Spirit"
     key: "9D"
-  - id: 4
+  - id: "mahon"
     title: "Mahon"
     key: "8D"
-  - id: 5
+  - id: "howl_at_the_moon"
     title: "Howl At The Moon"
     key: "1M"
-  - id: 6
+  - id: "melody_express"
     title: "Melody Express"
     key: "3D"
-  - id: 7
+  - id: "tribe_of_the_sun"
     title: "Tribe Of The Sun"
     key: "4D"
-  - id: 8
+  - id: "inferno"
     title: "Inferno"
     key: "4D"
-  - id: 9
+  - id: "against_the_wind"
     title: "Against The Wind"
     key: "10D"
-  - id: 10
+  - id: "resilience"
     title: "Resilience"
     key: "5D"
-  - id: 11
+  - id: "too_much_rain"
     title: "Too Much Rain"
     key: "1D"
-  - id: 12
+  - id: "aeterna"
     title: "Aeterna"
     key: "2D"
-  - id: 13
+  - id: "set_me_free"
     title: "Set Me Free"
     key: "9M"
-  - id: 14
+  - id: "thunderfunk"
     title: "Thunderfunk"
     key: "1M"
-  - id: 15
+  - id: "polkatorju"
     title: "Polkatorju"
     key: "10D"
-  - id: 16
+  - id: "falling"
     title: "Falling"
     key: "6D"
-  - id: 17
+  - id: "feels_so_good"
     title: "Feels So Good"
     key: "10D"
-  - id: 18
+  - id: "colossal"
     title: "Colossal"
     key: "4M"
-  - id: 19
+  - id: "aniara"
     title: "Aniara"
     key: "9D"
-  - id: 20
+  - id: "marulio"
     title: "Marulio"
     key: "1D"
-  - id: 21
+  - id: "sorrento"
     title: "Sorrento"
     key: "9M"
-  - id: 22
+  - id: "feel_so_good_(dan_stone)"
     title: "Feel So Good (Dan Stone)"
     key: "2M"
-  - id: 23
+  - id: "doubt_and_fear"
     title: "Doubt And Fear"
     key: "8D"
-  - id: 24
+  - id: "okinawa"
     title: "Okinawa"
     key: "11D"
-  - id: 25
+  - id: "united_in_love"
     title: "United In Love"
     key: "12D"
-  - id: 26
+  - id: "ode_to_autumn"
     title: "Ode to Autumn"
     key: "8M"
-  - id: 27
+  - id: "breath_easy"
     title: "Breath Easy"
     key: "11M"
-  - id: 28
+  - id: "without_u_(steve_rmx)"
     title: "Without U (Steve RMX)"
     key: "2D"
-  - id: 29
+  - id: "lost_dimnsion"
     title: "Lost Dimnsion"
     key: "2M"
 
 transitions:
-  - from: 6
-    to: 0
-  - from: 14
-    to: 5
-  - from: 5
-    to: 18
-  - from: 2
-    to: 4
-  - from: 2
-    to: 16
-  - from: 19
-    to: 1
-  - from: 17
-    to: 15
-  - from: 15
-    to: 10
-  - from: 13
-    to: 3
-  - from: 13
-    to: 21
-  - from: 3
-    to: 19
-  - from: 18
-    to: 8
-  - from: 10
-    to: 16
+  - from: "melody_express"
+    to: "another_summer"
+  - from: "thunderfunk"
+    to: "howl_at_the_moon"
+  - from: "howl_at_the_moon"
+    to: "colossal"
+  - from: "nothing_is_impossible"
+    to: "mahon"
+  - from: "nothing_is_impossible"
+    to: "falling"
+  - from: "aniara"
+    to: "how_could_I_say_it"
+  - from: "feels_so_good"
+    to: "polkatorju"
+  - from: "polkatorju"
+    to: "resilience"
+  - from: "set_me_free"
+    to: "spirit"
+  - from: "set_me_free"
+    to: "sorrento"
+  - from: "spirit"
+    to: "aniara"
+  - from: "colossal"
+    to: "inferno"
+  - from: "resilience"
+    to: "falling"
     notes: "mashup: play falling vox over resilience!"
-  - from: 4
-    to: 3
-  - from: 4
-    to: 17
-  - from: 4
-    to: 26
-  - from: 9
-    to: 17
-  - from: 21
-    to: 13
-  - from: 21
-    to: 3
-  - from: 20
-    to: 6
-  - from: 20
-    to: 28
-  - from: 16
-    to: 4
-  - from: 16
-    to: 20
-  - from: 29
-    to: 28
-  - from: 29
-    to: 18
-  - from: 28
-    to: 12
-  - from: 24
-    to: 9
+  - from: "mahon"
+    to: "spirit"
+  - from: "mahon"
+    to: "feels_so_good"
+  - from: "mahon"
+    to: "ode_to_autumn"
+  - from: "against_the_wind"
+    to: "feels_so_good"
+  - from: "sorrento"
+    to: "set_me_free"
+  - from: "sorrento"
+    to: "spirit"
+  - from: "marulio"
+    to: "melody_express"
+  - from: "marulio"
+    to: "without_u_(steve_rmx)"
+  - from: "falling"
+    to: "mahon"
+  - from: "falling"
+    to: "marulio"
+  - from: "lost_dimnsion"
+    to: "without_u_(steve_rmx)"
+  - from: "lost_dimnsion"
+    to: "colossal"
+  - from: "without_u_(steve_rmx)"
+    to: "aeterna"
+  - from: "okinawa"
+    to: "against_the_wind"
