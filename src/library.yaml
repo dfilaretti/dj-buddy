@@ -202,5 +202,5 @@ transitions:
   - from: "okinawa"
     to: "against_the_wind"
 
-  # - from: "tribe_of_the_sun"
-  #   to: "against_the_wind"
+  - from: "aeterna"
+    to: "too_much_rain"

@@ -361,6 +361,17 @@ getTrackId_ (MiddleTrack t) = destTrackId t
 getTraskIds_ :: [PlaylistMember] -> [TrackId]
 getTraskIds_ = fmap getTrackId_
 
+mkPlayListRand ::
+  MusicLibrary ->
+  Int -> -- number of tracks
+  IO [PlaylistMember]
+mkPlayListRand lib n =
+  do
+    tid <- randomElement (Map.keys lib.trackCatalog)
+    case tid of
+      Just xoxo -> mkPlayList lib xoxo n
+      Nothing -> error "ouch"
+
 mkPlayList ::
   MusicLibrary ->
   TrackId -> -- starting track
