@@ -129,7 +129,7 @@ addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
 addTrack (tid, t) ts =
   case Map.lookup tid ts of
     Nothing -> Map.insert tid t ts
-    Just _ -> error "track was inserted twice"
+    Just _ -> error $ "track id '" ++ tid ++ "' already exists in track catalog!"
 
 getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
 getTracks predicate =
@@ -193,7 +193,7 @@ safecons :: TestedTransition -> [TestedTransition] -> [TestedTransition]
 safecons x xs =
   if x `elem` xs
     then
-      error "Do not insert same transition twice!!"
+      error $ "Transition " ++ show x ++ " already exists!"
     else
       x : xs
 
@@ -269,7 +269,7 @@ insertTransition tid t lib =
     then
       insertTransition_ tid t lib
     else
-      error "insertTransition: to/from IDs must exist and not being the same!"
+      error $ "insertTransition: track IDs '" ++ tid ++ "' and '" ++ t.to ++ "' must exist in track catalog, and can't be the same!"
 
 -----------------------------------------
 ----- Transitions -----------------------

@@ -27,9 +27,9 @@ tracks:
     title: "Melody Express"
     key: "3D"
 
-  - id: "tribe_of_the_sun"
-    title: "Tribe Of The Sun"
-    key: "4D"
+  # - id: "tribe_of_the_sun"
+  #   title: "Tribe Of The Sun"
+  #   key: "4D"
 
   - id: "inferno"
     title: "Inferno"
@@ -201,3 +201,6 @@ transitions:
 
   - from: "okinawa"
     to: "against_the_wind"
+
+  # - from: "tribe_of_the_sun"
+  #   to: "against_the_wind"
