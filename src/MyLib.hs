@@ -554,3 +554,15 @@ makeMusicLibrary l =
         { trackCatalog = makeTrackCatalog l.tracks,
           transitionGraph = emptyGraph
         }
+
+{---------------------------------------------------------------------------
+  Sample IO actions
+----------------------------------------------------------------------------}
+
+mkRandomPlaylist :: Int -> IO ()
+mkRandomPlaylist size =
+  do
+    rawData <- readLibFromFile "src/library.yaml"
+    let lib = makeMusicLibrary rawData
+    playlist <- mkPlayListRand lib size
+    putStr $ printPlaylist lib playlist
