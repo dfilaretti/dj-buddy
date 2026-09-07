@@ -1,0 +1,85 @@
+module TrackCatalog
+  ( Track (..),
+    TrackCatalog,
+    TrackId,
+    addTrack,
+    emptyCatalog,
+    getAllTrackIds,
+    getTrackWithId,
+    keyJumpSuccessors,
+    sameKeySuccessors,
+  )
+where
+
+import Camelot (Key, compatibleKeys)
+import Data.Map.Strict qualified as Map
+
+{---------------------------------------------------------------------------
+  Data
+----------------------------------------------------------------------------}
+
+type TrackId = String
+
+type TrackCatalog = Map.Map TrackId Track
+
+data Track
+  = Track
+  { title :: String,
+    key :: Key
+  }
+  deriving (Eq)
+
+{---------------------------------------------------------------------------
+  Instances
+----------------------------------------------------------------------------}
+
+instance Show Track where
+  show (Track trackTitle trackKey') =
+    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+
+{---------------------------------------------------------------------------
+  Functions
+----------------------------------------------------------------------------}
+
+emptyCatalog :: TrackCatalog
+emptyCatalog = Map.empty
+
+addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
+addTrack (tid, t) ts =
+  case Map.lookup tid ts of
+    Nothing -> Map.insert tid t ts
+    Just _ -> error $ "track id '" ++ tid ++ "' already exists in track catalog!"
+
+getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
+getTracks predicate =
+  Map.keys . Map.filter predicate
+
+getTracksWithKey :: Key -> TrackCatalog -> [TrackId]
+getTracksWithKey desiredKey =
+  getTracks ((== desiredKey) . (.key))
+
+sameKeySuccessors :: TrackId -> TrackCatalog -> [TrackId]
+sameKeySuccessors trackId catalog =
+  maybe [] (filter (/= trackId) . (`getTracksWithKey` catalog)) (trackKey trackId catalog)
+
+keyJumpSuccessors :: TrackId -> TrackCatalog -> [TrackId]
+keyJumpSuccessors trackId catalog =
+  maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
+
+harmonicSuccessors :: TrackId -> TrackCatalog -> [TrackId]
+harmonicSuccessors trackId catalog =
+  sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
+
+getTracksWithKeys :: [Key] -> TrackCatalog -> [TrackId]
+getTracksWithKeys keys catalog =
+  concatMap (`getTracksWithKey` catalog) keys
+
+trackKey :: TrackId -> TrackCatalog -> Maybe Key
+trackKey trackId catalog =
+  (.key) <$> Map.lookup trackId catalog
+
+getTrackWithId :: TrackId -> TrackCatalog -> Maybe Track
+getTrackWithId = Map.lookup
+
+getAllTrackIds :: TrackCatalog -> [TrackId]
+getAllTrackIds = Map.keys

@@ -6,72 +6,17 @@ import Data.Map.Strict qualified as Map
 import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
 import System.Random (randomRIO)
-
------------------------------------------
------ Tracks & Catalog  -----------------
------------------------------------------
-
-type TrackId = String
-
-data Track
-  = Track
-  { title :: String,
-    key :: Key
-  }
-  deriving (Eq)
-
-instance Show Track where
-  show (Track trackTitle trackKey') =
-    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
-
-type TrackCatalog = Map.Map TrackId Track
-
-emptyCatalog :: TrackCatalog
-emptyCatalog = Map.empty
-
-addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
-addTrack (tid, t) ts =
-  case Map.lookup tid ts of
-    Nothing -> Map.insert tid t ts
-    Just _ -> error $ "track id '" ++ tid ++ "' already exists in track catalog!"
-
-getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
-getTracks predicate =
-  Map.keys . Map.filter predicate
-
-getTracksWithKey :: Key -> TrackCatalog -> [TrackId]
-getTracksWithKey desiredKey =
-  getTracks ((== desiredKey) . (.key))
-
-sameKeySuccessors :: TrackId -> TrackCatalog -> [TrackId]
-sameKeySuccessors trackId catalog =
-  maybe [] (filter (/= trackId) . (`getTracksWithKey` catalog)) (trackKey trackId catalog)
-
-keyJumpSuccessors :: TrackId -> TrackCatalog -> [TrackId]
-keyJumpSuccessors trackId catalog =
-  maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
-
-harmonicSuccessors :: TrackId -> TrackCatalog -> [TrackId]
-harmonicSuccessors trackId catalog =
-  sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
-
-getTracksWithKeys :: [Key] -> TrackCatalog -> [TrackId]
-getTracksWithKeys keys catalog =
-  concatMap (`getTracksWithKey` catalog) keys
-
-trackKey :: TrackId -> TrackCatalog -> Maybe Key
-trackKey trackId catalog =
-  (.key) <$> Map.lookup trackId catalog
-
-getTrackWithId :: TrackId -> TrackCatalog -> Maybe Track
-getTrackWithId = Map.lookup
-
-getAllTrackIds :: TrackCatalog -> [TrackId]
-getAllTrackIds = Map.keys
-
------------------------------------------
------ Confirmed transitions graph -------
------------------------------------------
+import TrackCatalog
+  ( Track (..),
+    TrackCatalog,
+    TrackId,
+    addTrack,
+    emptyCatalog,
+    getAllTrackIds,
+    getTrackWithId,
+    keyJumpSuccessors,
+    sameKeySuccessors,
+  )
 
 type Graph = Map.Map TrackId [TestedTransition]
 
