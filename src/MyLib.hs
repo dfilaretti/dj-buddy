@@ -1,6 +1,6 @@
 module MyLib where
 
-import Camelot (Key, compatibleKeys)
+import Camelot (Key)
 import Data.List (groupBy, sortOn)
 import Data.Map.Strict qualified as Map
 import Data.Yaml (FromJSON, decodeFileThrow)
