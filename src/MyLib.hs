@@ -20,19 +20,11 @@ import TrackCatalog
 import Transitions
   ( Cost,
     Transition (..),
-    bestTransitions,
     destTrackId,
+    pickBest,
     scoredTransitions,
   )
 import Utils (randomElement)
-
------------------------------------------
------ Transitions -----------------------
------------------------------------------
-
------------------------------------------
------ Playlist gen ----------------------
------------------------------------------
 
 data PlaylistMember
   = StartingTrack TrackId
@@ -86,9 +78,6 @@ mkPlayList_ lib tid n ts
     allTrans = filter notUsed $ scoredTransitions lib tid
     usedTracks = getTraskIds_ ts
     notUsed (t, _) = not $ destTrackId t `elem` usedTracks
-
-pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
-pickBest ts = randomElement (bestTransitions ts)
 
 -----------------------------------------
 ----- Pretty Print ----------------------

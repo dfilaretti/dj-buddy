@@ -4,6 +4,7 @@ import Data.List (groupBy, sortOn)
 import MusicLibrary (MusicLibrary (..))
 import TestedTransitions (TestedTransition (..), TestedTransitionsGraph, getEdges)
 import TrackCatalog (Track, TrackCatalog, TrackId, getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
+import Utils (randomElement)
 
 data HarmonicTransType
   = SameKey
@@ -82,3 +83,6 @@ transitionCost _ (Harmonic t _) = cost t
   where
     cost SameKey = 1
     cost CompatibleKeys = 2
+
+pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
+pickBest ts = randomElement (bestTransitions ts)
