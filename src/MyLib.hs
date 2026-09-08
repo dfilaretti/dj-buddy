@@ -5,7 +5,6 @@ import Data.Map.Strict qualified as Map
 import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
 import MusicLibrary (MusicLibrary (..), insertTransition)
-import System.Random (randomRIO)
 import TestedTransitions
   ( TestedTransition (..),
     emptyGraph,
@@ -25,6 +24,7 @@ import Transitions
     destTrackId,
     scoredTransitions,
   )
+import Utils (randomElement)
 
 -----------------------------------------
 ----- Transitions -----------------------
@@ -161,12 +161,6 @@ printTrackCatalog =
 {---------------------------------------------------------------------------
   Randomness
 ----------------------------------------------------------------------------}
-
-randomElement :: [a] -> IO (Maybe a)
-randomElement [] = pure Nothing
-randomElement xs = do
-  i <- randomRIO (0, length xs - 1)
-  pure (Just (xs !! i))
 
 {---------------------------------------------------------------------------
   Music Library parsing from YAML
