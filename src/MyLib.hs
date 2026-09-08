@@ -7,8 +7,8 @@ import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
 import System.Random (randomRIO)
 import TestedTransitions
-  ( Graph,
-    TestedTransition (..),
+  ( TestedTransition (..),
+    TestedTransitionsGraph,
     addEdge,
     emptyGraph,
     getEdges,
@@ -31,7 +31,7 @@ import TrackCatalog
 
 data MusicLibrary = MusicLibrary
   { trackCatalog :: TrackCatalog,
-    transitionGraph :: Graph
+    transitionGraph :: TestedTransitionsGraph
   }
   deriving (Show)
 
@@ -129,7 +129,7 @@ harmonicTransitions cat tid =
     sameKey = sameKeyTransitions cat tid
     compatibleKeys = compatibleKeysTransitions cat tid
 
-testedTransitions :: Graph -> TrackId -> [Transition]
+testedTransitions :: TestedTransitionsGraph -> TrackId -> [Transition]
 testedTransitions g tid = map Tested (getEdges tid g)
 
 transitions :: MusicLibrary -> TrackId -> [Transition]

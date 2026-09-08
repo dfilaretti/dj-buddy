@@ -1,6 +1,6 @@
 module TestedTransitions
   ( TestedTransition (..),
-    Graph,
+    TestedTransitionsGraph,
     emptyGraph,
     getEdges,
     addEdge,
@@ -10,7 +10,7 @@ where
 import Data.Map.Strict qualified as Map
 import TrackCatalog (TrackId)
 
-type Graph = Map.Map TrackId [TestedTransition]
+type TestedTransitionsGraph = Map.Map TrackId [TestedTransition]
 
 data UserRating
   = Nice
@@ -27,10 +27,14 @@ data TestedTransition = TestedTransition
 instance Eq TestedTransition where
   t1 == t2 = t1.to == t2.to
 
-emptyGraph :: Graph
+emptyGraph :: TestedTransitionsGraph
 emptyGraph = Map.empty
 
-safecons :: TestedTransition -> [TestedTransition] -> [TestedTransition]
+-- TODO: can generalize this and move into a utils file maybe?
+safecons ::
+  TestedTransition ->
+  [TestedTransition] ->
+  [TestedTransition]
 safecons x xs =
   if x `elem` xs
     then
@@ -38,7 +42,11 @@ safecons x xs =
     else
       x : xs
 
-addEdge :: TrackId -> TestedTransition -> Graph -> Graph
+addEdge ::
+  TrackId ->
+  TestedTransition ->
+  TestedTransitionsGraph ->
+  TestedTransitionsGraph
 addEdge tid t g =
   Map.alter f tid g
   where
@@ -46,15 +54,18 @@ addEdge tid t g =
       Nothing -> Just [t]
       Just ts -> Just (safecons t ts)
 
-getEdges :: TrackId -> Graph -> [TestedTransition]
+getEdges ::
+  TrackId ->
+  TestedTransitionsGraph ->
+  [TestedTransition]
 getEdges = Map.findWithDefault []
 
-getEdge :: TrackId -> TrackId -> Graph -> Maybe TestedTransition
-getEdge tFrom tTo g =
-  case filter (\e -> e.to == tTo) (getEdges tFrom g) of
-    [] -> Nothing
-    [x] -> Just x
-    _ -> error "multiple edges with same destination - why?"
+-- getEdge :: TrackId -> TrackId -> Graph -> Maybe TestedTransition
+-- getEdge tFrom tTo g =
+--  case filter (\e -> e.to == tTo) (getEdges tFrom g) of
+--    [] -> Nothing
+--    [x] -> Just x
+--    _ -> error "multiple edges with same destination - why?"
 
-confirmedSuccessors :: TrackId -> Graph -> [TrackId]
-confirmedSuccessors trackId = map (.to) . getEdges trackId
+-- confirmedSuccessors :: TrackId -> Graph -> [TrackId]
+-- confirmedSuccessors trackId = map (.to) . getEdges trackId
