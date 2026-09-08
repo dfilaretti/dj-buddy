@@ -8,7 +8,7 @@ module TestedTransitions
 where
 
 import Data.Map.Strict qualified as Map
-import TrackCatalog
+import TrackCatalog (TrackId)
 
 type Graph = Map.Map TrackId [TestedTransition]
 
