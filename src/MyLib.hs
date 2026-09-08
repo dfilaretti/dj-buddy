@@ -5,7 +5,7 @@ import Data.Map.Strict qualified as Map
 import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
 import MusicLibrary (MusicLibrary (..), insertTransition)
-import Playlist (PlaylistMember (..), mkPlayListRand)
+import Playlist (Playlist, PlaylistMember (..), mkPlayListRand)
 import TestedTransitions
   ( TestedTransition (..),
     emptyGraph,
@@ -93,10 +93,6 @@ printTrackCatalog =
       show trackId ++ ": " ++ show track
 
 {---------------------------------------------------------------------------
-  Randomness
-----------------------------------------------------------------------------}
-
-{---------------------------------------------------------------------------
   Music Library parsing from YAML
 ----------------------------------------------------------------------------}
 
@@ -173,3 +169,19 @@ mkRandomPlaylist size =
     let lib = makeMusicLibrary rawData
     playlist <- mkPlayListRand lib size
     putStr $ printPlaylist lib playlist
+
+{---------------------------------------------------------------------------
+  TODO
+----------------------------------------------------------------------------}
+
+bestTransitions ::
+  TrackId -> -- optional starting track
+  Int -> -- number of transitions
+  IO [Transition] -- we may want to shuffle "same score" items here
+bestTransitions = undefined
+
+gimmePlaylist ::
+  Maybe TrackId ->
+  Int ->
+  IO Playlist
+gimmePlaylist = undefined

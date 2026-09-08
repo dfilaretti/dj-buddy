@@ -1,4 +1,4 @@
-module Playlist (mkPlayListRand, PlaylistMember (..)) where
+module Playlist (mkPlayListRand, PlaylistMember (..), Playlist) where
 
 import Data.Map.Strict qualified as Map
 import MusicLibrary
