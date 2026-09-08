@@ -1,7 +1,6 @@
 module MyLib where
 
 import Camelot (Key)
-import Data.List (groupBy, sortOn)
 import Data.Map.Strict qualified as Map
 import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
@@ -22,6 +21,7 @@ import TrackCatalog
 import Transitions
   ( Cost,
     Transition (..),
+    bestTransitions,
     destTrackId,
     scoredTransitions,
   )
@@ -39,17 +39,19 @@ data PlaylistMember
   | MiddleTrack Transition
   deriving (Show)
 
+type Playlist = [PlaylistMember]
+
 getTrackId_ :: PlaylistMember -> TrackId
 getTrackId_ (StartingTrack tid) = tid
 getTrackId_ (MiddleTrack t) = destTrackId t
 
-getTraskIds_ :: [PlaylistMember] -> [TrackId]
+getTraskIds_ :: Playlist -> [TrackId]
 getTraskIds_ = fmap getTrackId_
 
 mkPlayListRand ::
   MusicLibrary ->
   Int -> -- number of tracks
-  IO [PlaylistMember]
+  IO Playlist
 mkPlayListRand lib n =
   do
     tid <- randomElement (Map.keys lib.trackCatalog)
@@ -61,7 +63,7 @@ mkPlayList ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
-  IO [PlaylistMember]
+  IO Playlist
 mkPlayList lib tid n =
   mkPlayList_ lib tid n [StartingTrack tid]
 
@@ -69,8 +71,8 @@ mkPlayList_ ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
-  [PlaylistMember] -> -- accumulated result
-  IO [PlaylistMember]
+  Playlist -> -- accumulated result
+  IO Playlist
 mkPlayList_ lib tid n ts
   | length ts == n = return ts
   | otherwise =
@@ -84,14 +86,6 @@ mkPlayList_ lib tid n ts
     allTrans = filter notUsed $ scoredTransitions lib tid
     usedTracks = getTraskIds_ ts
     notUsed (t, _) = not $ destTrackId t `elem` usedTracks
-
-bestTransitions :: [(Transition, Cost)] -> [(Transition, Cost)]
-bestTransitions ts =
-  case groupBy sameScore (sortOn snd ts) of
-    [] -> []
-    (xs : _) -> xs
-  where
-    sameScore a b = snd a == snd b
 
 pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
 pickBest ts = randomElement (bestTransitions ts)

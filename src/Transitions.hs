@@ -1,6 +1,6 @@
 module Transitions where
 
-import Data.List (sortOn)
+import Data.List (groupBy, sortOn)
 import MusicLibrary (MusicLibrary (..))
 import TestedTransitions (TestedTransition (..), TestedTransitionsGraph, getEdges)
 import TrackCatalog (Track, TrackCatalog, TrackId, getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
@@ -16,6 +16,14 @@ data Transition
   deriving (Show, Eq)
 
 type Cost = Int
+
+bestTransitions :: [(Transition, Cost)] -> [(Transition, Cost)]
+bestTransitions ts =
+  case groupBy sameScore (sortOn snd ts) of
+    [] -> []
+    (xs : _) -> xs
+  where
+    sameScore a b = snd a == snd b
 
 destTrackId :: Transition -> TrackId
 destTrackId (Tested t) = t.to
