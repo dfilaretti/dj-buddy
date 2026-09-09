@@ -14,10 +14,12 @@ import Transitions (Transition (..))
   have a proper CLI implemented.
 ----------------------------------------------------------------------------}
 
+-- TODO: in theory this should only use the "application level" functions exposed by the lib... plus the pretty printing stuff (which eventually will live in the CLI)
 showTrackCatalog :: TrackCatalog -> IO ()
 showTrackCatalog =
   putStr . prettyPrintTrackCatalog
 
+-- TODO: this should call mkPlaylist below and basically just prety print the rrsult
 showRandomPlaylist :: Int -> IO ()
 showRandomPlaylist size =
   do
