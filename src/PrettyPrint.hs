@@ -1,10 +1,21 @@
 module PrettyPrint where
 
+import Data.Map.Strict qualified as Map
 import MusicLibrary
 import Playlist
 import TestedTransitions (TestedTransition (to))
 import TrackCatalog
 import Transitions (Cost, Transition (..), scoredTransitions)
+
+prettyPrintTrackCatalog :: TrackCatalog -> String
+prettyPrintTrackCatalog =
+  unlines . map formatTrack . Map.toList
+  where
+    formatTrack (trackId, track) =
+      show trackId ++ ": " ++ show track
+
+prettyPrintTransitions :: MusicLibrary -> [Transition] -> String
+prettyPrintTransitions lib = unlines . map (prettyPrintTransition lib)
 
 prettyPrintTransition :: MusicLibrary -> Transition -> String
 prettyPrintTransition lib (Tested t) =

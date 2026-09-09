@@ -1,37 +1,18 @@
 module MyLib where
 
-import Data.Map.Strict qualified as Map
 import FromYaml (makeMusicLibrary, readLibFromFile)
 import MusicLibrary (MusicLibrary (..))
 import Playlist (Playlist, mkPlayListRand)
 import PrettyPrint
-import TrackCatalog (TrackCatalog, TrackId)
+import TrackCatalog (Track, TrackCatalog, TrackId)
 import Transitions (Transition (..))
 
------------------------------------------
------ Pretty Print ----------------------
------------------------------------------
+showTrackCatalog :: TrackCatalog -> IO ()
+showTrackCatalog =
+  putStr . prettyPrintTrackCatalog
 
-printTransitions :: MusicLibrary -> [Transition] -> IO ()
-printTransitions lib = putStr . unlines . map (prettyPrintTransition lib)
-
-printTrackCatalog :: TrackCatalog -> IO ()
-printTrackCatalog =
-  putStr . unlines . map formatTrack . Map.toList
-  where
-    formatTrack (trackId, track) =
-      show trackId ++ ": " ++ show track
-
-{---------------------------------------------------------------------------
-  Music Library parsing from YAML
-----------------------------------------------------------------------------}
-
-{---------------------------------------------------------------------------
-  Sample IO actions
-----------------------------------------------------------------------------}
-
-mkRandomPlaylist :: Int -> IO ()
-mkRandomPlaylist size =
+showRandomPlaylist :: Int -> IO ()
+showRandomPlaylist size =
   do
     rawData <- readLibFromFile "src/library.yaml"
     let lib = makeMusicLibrary rawData
@@ -42,14 +23,21 @@ mkRandomPlaylist size =
   TODO
 ----------------------------------------------------------------------------}
 
-bestTransitions ::
-  TrackId -> -- optional starting track
-  Int -> -- number of transitions
-  IO [Transition] -- we may want to shuffle "same score" items here
-bestTransitions = undefined
+getTracks ::
+  MusicLibrary ->
+  [(TrackId, Track)] -- TODO: sure we want this? maybe add the ID into track and have a simple list instead?
+getTracks = undefined
 
-gimmePlaylist ::
-  Maybe TrackId ->
-  Int ->
+getTransitions ::
+  MusicLibrary ->
+  TrackId -> -- origin track
+  Int -> -- desired number of alternative transitions
+  IO [Transition] -- IO coz we may want to shuffle same-score items here
+getTransitions = undefined
+
+mkPlaylist ::
+  MusicLibrary ->
+  Maybe TrackId -> -- optional starting track (random if not provided)
+  Int -> -- number of tracks
   IO Playlist
-gimmePlaylist = undefined
+mkPlaylist = undefined
