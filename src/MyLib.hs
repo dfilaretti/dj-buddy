@@ -7,6 +7,13 @@ import PrettyPrint
 import TrackCatalog (Track, TrackCatalog, TrackId)
 import Transitions (Transition (..))
 
+{---------------------------------------------------------------------------
+  Draft CLI tools; mode to CLI when we do it.
+
+  Those can be use to quicly try things out on the REPL while we don't
+  have a proper CLI implemented.
+----------------------------------------------------------------------------}
+
 showTrackCatalog :: TrackCatalog -> IO ()
 showTrackCatalog =
   putStr . prettyPrintTrackCatalog
@@ -20,7 +27,7 @@ showRandomPlaylist size =
     putStr $ printPlaylist lib playlist
 
 {---------------------------------------------------------------------------
-  TODO
+  TODO: Application level; this is what CLI and web UI will use
 ----------------------------------------------------------------------------}
 
 getTracks ::
