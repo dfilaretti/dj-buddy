@@ -18,7 +18,10 @@ data Transition
 
 type Cost = Int
 
-bestTransitions :: [(Transition, Cost)] -> [(Transition, Cost)]
+-- TODO: should be able to use takeWhile here
+bestTransitions
+    :: [(Transition, Cost)]
+    -> [(Transition, Cost)]
 bestTransitions ts =
   case groupBy sameScore (sortOn snd ts) of
     [] -> []
@@ -84,5 +87,7 @@ transitionCost _ (Harmonic t _) = cost t
     cost SameKey = 1
     cost CompatibleKeys = 2
 
-pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
+pickBest
+    :: [(Transition, Cost)]
+    -> IO (Maybe (Transition, Cost))
 pickBest = randomElement . bestTransitions
