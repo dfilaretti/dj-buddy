@@ -12,7 +12,7 @@ data MusicLibrary = MusicLibrary
 emptyMusicLibrary :: MusicLibrary
 emptyMusicLibrary =
   MusicLibrary
-    { trackCatalog = [],
+    { trackCatalog = emptyCatalog,
       transitionGraph = emptyGraph
     }
 

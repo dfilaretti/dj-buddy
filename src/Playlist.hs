@@ -26,7 +26,7 @@ mkPlayListRand ::
   IO Playlist
 mkPlayListRand lib n =
   do
-    tid <- randomElement (getAllTrackIds lib.trackCatalog)
+    tid <- randomElement (Map.keys lib.trackCatalog)
     case tid of
       Just xoxo -> mkPlayList lib xoxo n
       Nothing -> error "ouch"

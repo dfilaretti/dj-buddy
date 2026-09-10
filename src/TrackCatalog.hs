@@ -3,6 +3,7 @@ module TrackCatalog
     TrackCatalog,
     TrackId,
     addTrack,
+    emptyCatalog,
     getAllTrackIds,
     getTrackWithId,
     keyJumpSuccessors,
@@ -11,8 +12,7 @@ module TrackCatalog
 where
 
 import Camelot (Key, compatibleKeys)
-import GHC.Generics (Generic)
-import Data.Yaml (FromJSON)
+import Data.Map.Strict qualified as Map
 
 {---------------------------------------------------------------------------
   Data
@@ -20,48 +20,39 @@ import Data.Yaml (FromJSON)
 
 type TrackId = String
 
-type TrackCatalog = [Track]
+type TrackCatalog = Map.Map TrackId Track
 
 data Track
   = Track
-  { id :: TrackId,
-    title :: String,
+  { title :: String,
     key :: Key
   }
-  deriving (Eq, Generic)
+  deriving (Eq)
 
 {---------------------------------------------------------------------------
   Instances
 ----------------------------------------------------------------------------}
 
-instance FromJSON Track
-
--- TODO: revise this; what is it doing exactly?
 instance Show Track where
-  show (Track id trackTitle trackKey') =
-    "\"" ++ id ++ ": " ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+  show (Track trackTitle trackKey') =
+    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 {---------------------------------------------------------------------------
   Functions
 ----------------------------------------------------------------------------}
 
-lookupById :: TrackId -> TrackCatalog -> [Track]
-lookupById id_ = filter (\t -> t.id == id_)
+emptyCatalog :: TrackCatalog
+emptyCatalog = Map.empty
 
-hasTrack :: Track -> TrackCatalog -> Bool
-hasTrack t ts =
-    case lookupById t.id ts of
-        [] -> False
-        _  -> True
-
-addTrack :: Track -> TrackCatalog -> TrackCatalog
-addTrack t ts
-    | hasTrack t ts = error $ "track id '" ++ t.id ++ "' already exists in track catalog!"
-    | otherwise     = t:ts
+addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
+addTrack (tid, t) ts =
+  case Map.lookup tid ts of
+    Nothing -> Map.insert tid t ts
+    Just _ -> error $ "track id '" ++ tid ++ "' already exists in track catalog!"
 
 getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
-getTracks predicate ts =
-  map (.id) $ filter predicate ts
+getTracks predicate =
+  Map.keys . Map.filter predicate
 
 getTracksWithKey :: Key -> TrackCatalog -> [TrackId]
 getTracksWithKey desiredKey =
@@ -75,22 +66,20 @@ keyJumpSuccessors :: TrackId -> TrackCatalog -> [TrackId]
 keyJumpSuccessors trackId catalog =
   maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
 
+harmonicSuccessors :: TrackId -> TrackCatalog -> [TrackId]
+harmonicSuccessors trackId catalog =
+  sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
+
 getTracksWithKeys :: [Key] -> TrackCatalog -> [TrackId]
 getTracksWithKeys keys catalog =
   concatMap (`getTracksWithKey` catalog) keys
 
 trackKey :: TrackId -> TrackCatalog -> Maybe Key
-trackKey trackId catalog = case lookupById trackId catalog of
-    [] -> Nothing
-    [t] -> Just (t.key)
-    _ -> error "more than 1 track with same ID"
+trackKey trackId catalog =
+  (.key) <$> Map.lookup trackId catalog
 
 getTrackWithId :: TrackId -> TrackCatalog -> Maybe Track
-getTrackWithId tid ts =
-    case lookupById tid ts of
-        [] -> Nothing
-        [t] -> Just t
-        _ -> error "more than 1 track with same ID!"
+getTrackWithId = Map.lookup
 
 getAllTrackIds :: TrackCatalog -> [TrackId]
-getAllTrackIds = map (.id)
+getAllTrackIds = Map.keys

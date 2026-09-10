@@ -16,7 +16,11 @@ Similarly, the Web app will be responsible for producing JSON etc.
 -}
 
 prettyPrintTrackCatalog :: TrackCatalog -> String
-prettyPrintTrackCatalog = unlines . map show
+prettyPrintTrackCatalog =
+  unlines . map formatTrack . Map.toList
+  where
+    formatTrack (trackId, track) =
+      show trackId ++ ": " ++ show track
 
 prettyPrintTransitions :: MusicLibrary -> [Transition] -> String
 prettyPrintTransitions lib = unlines . map (prettyPrintTransition lib)
