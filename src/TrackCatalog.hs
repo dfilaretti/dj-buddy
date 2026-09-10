@@ -50,13 +50,17 @@ addTrack (tid, t) ts =
     Nothing -> Map.insert tid t ts
     Just _ -> error $ "track id '" ++ tid ++ "' already exists in track catalog!"
 
-getTracks :: (Track -> Bool) -> TrackCatalog -> [TrackId]
-getTracks predicate =
-  Map.keys . Map.filter predicate
+getTracks :: (Track -> Bool) -> TrackCatalog -> [Track]
+getTracks p =
+  Map.elems . Map.filter p
+
+getTrackIds :: (Track -> Bool) -> TrackCatalog -> [TrackId]
+getTrackIds p =
+  Map.keys . Map.filter p
 
 getTracksWithKey :: Key -> TrackCatalog -> [TrackId]
 getTracksWithKey desiredKey =
-  getTracks ((== desiredKey) . (.key))
+  getTrackIds ((== desiredKey) . (.key))
 
 sameKeySuccessors :: TrackId -> TrackCatalog -> [TrackId]
 sameKeySuccessors trackId catalog =
