@@ -1,4 +1,4 @@
-module MusicLibrary (MusicLibrary (..), insertTransition) where
+module MusicLibrary (MusicLibrary (..), insertTransition, isValidTransition, emptyMusicLibrary) where
 
 import TestedTransitions
 import TrackCatalog

@@ -1,4 +1,11 @@
-module Camelot (Key, compatibleKeys) where
+module Camelot (
+    Key(..),
+    KeyNumber(..),
+    KeyType(..),
+    compatibleKeys,
+    increment,
+    relative,
+    incrementKeyNumber) where
 
 import Data.Aeson qualified as Aeson
 import Data.Text (Text)

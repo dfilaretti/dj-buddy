@@ -1,10 +1,15 @@
 import Control.Exception (SomeException, evaluate, try)
 import Data.List
 import Data.Map.Strict qualified as Map
-import MyLib
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
+import Camelot
+import TrackCatalog
+import TestedTransitions
+import MusicLibrary
+import Transitions
+import Utils
 
 instance Arbitrary KeyNumber where
   arbitrary = elements [minBound .. maxBound]
@@ -132,7 +137,7 @@ graphTests =
           let g = emptyGraph
               t1 = TestedTransition "1" Nothing
               t2 = TestedTransition "1" (Just "same song, different transition")
-          result <- try (evaluate (addEdge "0" t1 $ addEdge "0" t2 g)) :: IO (Either SomeException Graph)
+          result <- try (evaluate (addEdge "0" t1 $ addEdge "0" t2 g)) :: IO (Either SomeException TestedTransitionsGraph)
           case result of
             Left _ -> pure ()
             Right _ -> assertFailure "expected addEdge to throw"
