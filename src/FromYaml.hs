@@ -5,19 +5,10 @@ import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
 import MusicLibrary
 import TestedTransitions
-import TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack, emptyCatalog)
+import TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack)
 
 readLibFromFile :: FilePath -> IO Lib_raw
 readLibFromFile p = decodeFileThrow p :: IO Lib_raw
-
-data Track_raw = Track_raw
-  { id :: TrackId,
-    title :: String,
-    key :: Key
-  }
-  deriving (Show, Generic)
-
-instance FromJSON Track_raw
 
 data Transition_raw = Transition_raw
   { from :: TrackId,
@@ -29,22 +20,18 @@ data Transition_raw = Transition_raw
 instance FromJSON Transition_raw
 
 data Lib_raw = Lib_raw
-  { tracks :: [Track_raw],
+  { tracks :: [Track],
     transitions :: [Transition_raw]
   }
   deriving (Show, Generic)
 
 instance FromJSON Lib_raw
 
-makeTrackCatalogEntry :: Track_raw -> (TrackId, Track)
-makeTrackCatalogEntry t_raw =
-  (t_raw.id, Track {title = t_raw.title, key = t_raw.key})
+makeTrackCatalog :: [Track] -> TrackCatalog
+makeTrackCatalog = foldr insertTrack []
 
-makeTrackCatalog :: [Track_raw] -> TrackCatalog
-makeTrackCatalog = foldr insertTrack emptyCatalog
-
-insertTrack :: Track_raw -> TrackCatalog -> TrackCatalog
-insertTrack tr c = addTrack (makeTrackCatalogEntry tr) c
+insertTrack :: Track -> TrackCatalog -> TrackCatalog
+insertTrack tr c = addTrack tr c
 
 makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =

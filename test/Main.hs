@@ -1,5 +1,4 @@
 import Control.Exception (SomeException, evaluate, try)
-import Data.List
 import Data.Map.Strict qualified as Map
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -82,9 +81,8 @@ transitionTests =
                       [ ("0", [TestedTransition {to = "1", notes = Nothing}])
                       ],
                   trackCatalog =
-                    Map.fromList
-                      [ ("0", Track "A" (Key K_1 M)),
-                        ("1", Track "B" (Key K_1 D))
+                      [ Track "0" "A" (Key K_1 M),
+                        Track "1" "B" (Key K_1 D)
                       ]
                 }
             allTransitions = transitions lib "0"
@@ -150,9 +148,8 @@ musicLibraryTests =
     [testCase "to insert a transition in the music library, the to/fromIDs must exist, and must not be the same" $
         do
           let lib =
-                Map.fromList
-                  [ ("0", Track "A" (read "5D")),
-                    ("1", Track "B" (read "6D"))
+                  [ Track "0" "A" (read "5D"),
+                    Track "1" "B" (read "6D")
                   ]
               starting = MusicLibrary lib emptyGraph
           isValidTransition ("0", TestedTransition "1" Nothing) starting @?= True
@@ -167,15 +164,15 @@ trackCatalogTests =
     "Track Catalog"
     [ testCase "basic insert works as expected" $
         do
-          let c = emptyCatalog
-              t = Track "A" (read "5D")
-          addTrack ("0", t) c
-            @?= Map.fromList [("0", t)],
+          let c = []
+              t = Track "0" "A" (read "5D")
+          addTrack t c
+            @?= [t],
       testCase "inserting same track twice should throw" $
         do
-          let c = Map.fromList [("0", t)]
-              t = Track "A" (read "5D")
-          result <- try (evaluate (addTrack ("0", t) c)) :: IO (Either SomeException TrackCatalog)
+          let c = [t]
+              t = Track "0" "A" (read "5D")
+          result <- try (evaluate (addTrack t c)) :: IO (Either SomeException TrackCatalog)
           case result of
             Left _ -> pure ()
             Right _ -> assertFailure "expected addTrack to throw"
