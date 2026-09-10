@@ -3,7 +3,6 @@ module CLIHelpers where
 import TrackCatalog
 import Playlist
 import PrettyPrint
-import MusicLibrary
 import FromYaml
 
 {---------------------------------------------------------------------------
