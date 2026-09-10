@@ -85,4 +85,4 @@ transitionCost _ (Harmonic t _) = cost t
     cost CompatibleKeys = 2
 
 pickBest :: [(Transition, Cost)] -> IO (Maybe (Transition, Cost))
-pickBest ts = randomElement (bestTransitions ts)
+pickBest = randomElement . bestTransitions
