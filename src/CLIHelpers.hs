@@ -9,8 +9,10 @@ import Transitions (Cost, Transition (..), scoredTransitions)
 import FromYaml
 
 {-
-TODO: ideally the functions in here will eventually go into the CLI.
-therefore, they should only use the "application level" functins exposed by MyLib
+TODO: The stuff in here should eventually go into the CLI app.
+The lib returns things like Playlist and Transition; the CLI app is
+responsible for the "pretty printing" and stuff like that.
+Similarly, the Web app will be responsible for producing JSON etc.
 -}
 
 prettyPrintTrackCatalog :: TrackCatalog -> String
@@ -73,16 +75,6 @@ printStuff lib tid =
       Nothing -> error "no key"
     heading = "Good transitions from \"" ++ title ++ "\" (" ++ show key ++ ")\n\n"
     msg = unlines $ map (prettyPrintTransition' lib) $ scoredTransitions lib tid
-
-{---------------------------------------------------------------------------
-  TODO: move to CLI app/module...
-
-  Then, those should only use the "top level" functions exposed by the
-  library...
-
-  Those can be use to quicly try things out on the REPL while we don't
-  have a proper CLI implemented.
-----------------------------------------------------------------------------}
 
 -- TODO: in theory this should only use the "application level" functions exposed by the lib... plus the pretty printing stuff (which eventually will live in the CLI)
 showTrackCatalog :: TrackCatalog -> IO ()
