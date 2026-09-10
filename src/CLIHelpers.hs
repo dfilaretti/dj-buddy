@@ -6,7 +6,10 @@ import PrettyPrint
 import FromYaml
 
 {---------------------------------------------------------------------------
-  Draft CLI tools; mode to CLI when we do it.
+  TODO: move to CLI app/module...
+
+  Then, those should only use the "top level" functions exposed by the
+  library...
 
   Those can be use to quicly try things out on the REPL while we don't
   have a proper CLI implemented.
@@ -17,7 +20,7 @@ showTrackCatalog :: TrackCatalog -> IO ()
 showTrackCatalog =
   putStr . prettyPrintTrackCatalog
 
--- TODO: this should call mkPlaylist below and basically just prety print the rrsult
+-- TODO: this should call mkPlaylist (or appropriate function) from "application layer"
 showRandomPlaylist :: Int -> IO ()
 showRandomPlaylist size =
   do
