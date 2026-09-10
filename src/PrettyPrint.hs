@@ -7,6 +7,11 @@ import TestedTransitions (TestedTransition (to))
 import TrackCatalog
 import Transitions (Cost, Transition (..), scoredTransitions)
 
+{-
+TODO: ideally the functions in here will eventually go into the CLI.
+therefore, they should only use the "application level" functins exposed by MyLib
+-}
+
 prettyPrintTrackCatalog :: TrackCatalog -> String
 prettyPrintTrackCatalog =
   unlines . map formatTrack . Map.toList
