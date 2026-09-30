@@ -134,6 +134,7 @@ executable dj-buddy
     build-depends:
         base >= 4.20 && < 4.23,
         containers ^>=0.7,
+        optparse-applicative,
         dj-buddy
 
     -- Directories containing source files.
