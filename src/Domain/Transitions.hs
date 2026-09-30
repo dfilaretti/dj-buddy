@@ -1,10 +1,10 @@
-module Transitions where
+module Domain.Transitions where
 
 import Data.List (groupBy, sortOn)
-import MusicLibrary (MusicLibrary (..))
-import TestedTransitions (TestedTransition (..), TestedTransitionsGraph, getEdges)
-import TrackCatalog (Track, TrackCatalog, TrackId, getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
-import Utils (randomElement)
+import Domain.MusicLibrary (MusicLibrary (..))
+import Domain.TestedTransitions (TestedTransition (..), TestedTransitionsGraph, getEdges)
+import Domain.TrackCatalog (Track, TrackCatalog, TrackId, getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
+import Domain.Utils (randomElement)
 
 data HarmonicTransType
   = SameKey

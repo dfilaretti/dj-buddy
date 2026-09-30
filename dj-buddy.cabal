@@ -79,7 +79,16 @@ library
     import:           ghc-options
 
     -- Modules exported by the library.
-    exposed-modules:  MyLib Camelot TrackCatalog TestedTransitions MusicLibrary Transitions Utils Playlist FromYaml CLIHelpers
+    exposed-modules:
+        App
+        Domain.Camelot
+        Domain.TrackCatalog
+        Domain.TestedTransitions
+        Domain.MusicLibrary
+        Domain.Transitions
+        Domain.Utils
+        Domain.Playlist
+        Persistence.Yaml
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -116,7 +125,7 @@ executable dj-buddy
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
+    other-modules:     CLI.Render
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -124,6 +133,7 @@ executable dj-buddy
     -- Other library packages from which modules are imported.
     build-depends:
         base >= 4.20 && < 4.23,
+        containers ^>=0.7,
         dj-buddy
 
     -- Directories containing source files.

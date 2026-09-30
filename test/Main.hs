@@ -4,12 +4,12 @@ import Data.Map.Strict qualified as Map
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC
-import Camelot
-import TrackCatalog
-import TestedTransitions
-import MusicLibrary
-import Transitions
-import Utils
+import Domain.Camelot
+import Domain.TrackCatalog
+import Domain.TestedTransitions
+import Domain.MusicLibrary
+import Domain.Transitions
+import Domain.Utils
 
 instance Arbitrary KeyNumber where
   arbitrary = elements [minBound .. maxBound]

@@ -1,11 +1,11 @@
-module FromYaml where
+module Persistence.Yaml where
 
-import Camelot
+import Domain.Camelot
 import Data.Yaml (FromJSON, decodeFileThrow)
 import GHC.Generics (Generic)
-import MusicLibrary
-import TestedTransitions
-import TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack, emptyCatalog)
+import Domain.MusicLibrary
+import Domain.TestedTransitions
+import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack, emptyCatalog)
 
 readLibFromFile :: FilePath -> IO Lib_raw
 readLibFromFile p = decodeFileThrow p :: IO Lib_raw

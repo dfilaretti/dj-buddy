@@ -1,4 +1,4 @@
-module TrackCatalog
+module Domain.TrackCatalog
   ( Track (..),
     TrackCatalog,
     TrackId,
@@ -11,7 +11,7 @@ module TrackCatalog
   )
 where
 
-import Camelot (Key, compatibleKeys)
+import Domain.Camelot (Key, compatibleKeys)
 import Data.Map.Strict qualified as Map
 
 {---------------------------------------------------------------------------

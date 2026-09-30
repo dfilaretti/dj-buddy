@@ -1,4 +1,4 @@
-module Utils where
+module Domain.Utils where
 
 import System.Random (randomRIO)
 

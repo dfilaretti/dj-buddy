@@ -1,9 +1,9 @@
-module MyLib where
+module App where
 
-import MusicLibrary (MusicLibrary (..))
-import Playlist (Playlist)
-import TrackCatalog (Track, TrackId)
-import Transitions (Transition (..))
+import Domain.MusicLibrary (MusicLibrary (..))
+import Domain.Playlist (Playlist)
+import Domain.TrackCatalog (Track, TrackId)
+import Domain.Transitions (Transition (..))
 
 {---------------------------------------------------------------------------
   TODO: Application level; this is what CLI and web UI will use

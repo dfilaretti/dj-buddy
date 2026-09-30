@@ -1,4 +1,4 @@
-module TestedTransitions
+module Domain.TestedTransitions
   ( TestedTransition (..),
     TestedTransitionsGraph,
     emptyGraph,
@@ -8,7 +8,7 @@ module TestedTransitions
 where
 
 import Data.Map.Strict qualified as Map
-import TrackCatalog (TrackId)
+import Domain.TrackCatalog (TrackId)
 
 type TestedTransitionsGraph = Map.Map TrackId [TestedTransition]
 

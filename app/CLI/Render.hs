@@ -1,12 +1,12 @@
-module CLIHelpers where
+module CLI.Render where
 
 import Data.Map.Strict qualified as Map
-import MusicLibrary
-import Playlist
-import TestedTransitions (TestedTransition (to))
-import TrackCatalog
-import Transitions (Cost, Transition (..), scoredTransitions)
-import FromYaml
+import Domain.MusicLibrary
+import Domain.Playlist
+import Domain.TestedTransitions (TestedTransition (to))
+import Domain.TrackCatalog
+import Domain.Transitions (Cost, Transition (..), scoredTransitions)
+import Persistence.Yaml
 
 {-
 TODO: The stuff in here should eventually go into the CLI app.

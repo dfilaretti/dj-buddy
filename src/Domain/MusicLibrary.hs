@@ -1,7 +1,7 @@
-module MusicLibrary (MusicLibrary (..), insertTransition, isValidTransition, emptyMusicLibrary) where
+module Domain.MusicLibrary (MusicLibrary (..), insertTransition, isValidTransition, emptyMusicLibrary) where
 
-import TestedTransitions
-import TrackCatalog
+import Domain.TestedTransitions
+import Domain.TrackCatalog
 
 data MusicLibrary = MusicLibrary
   { trackCatalog :: TrackCatalog,

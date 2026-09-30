@@ -1,10 +1,10 @@
-module Playlist (mkPlayListRand, mkPlayList, PlaylistMember (..), Playlist) where
+module Domain.Playlist (mkPlayListRand, mkPlayList, PlaylistMember (..), Playlist) where
 
 import Data.Map.Strict qualified as Map
-import MusicLibrary
-import TrackCatalog
-import Transitions
-import Utils (randomElement)
+import Domain.MusicLibrary
+import Domain.TrackCatalog
+import Domain.Transitions
+import Domain.Utils (randomElement)
 
 data PlaylistMember
   = StartingTrack TrackId

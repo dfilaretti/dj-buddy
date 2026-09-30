@@ -1,4 +1,4 @@
-module Camelot (
+module Domain.Camelot (
     Key(..),
     KeyNumber(..),
     KeyType(..),
