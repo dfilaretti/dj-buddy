@@ -66,10 +66,14 @@ handleMakePlaylist _ = showRandomPlaylist 10
 
 -- handleMakePlaylist opts = print opts
 
-main :: IO ()
-main = do
-  selectedCommand <- djBuddyOptions
-  case selectedCommand of
+runCommand :: Command -> IO ()
+runCommand c =
+  case c of
     MakePlaylist o -> handleMakePlaylist o
     SuggestNextTracks _ -> undefined
     ShowLibrary _ -> undefined
+
+main :: IO ()
+main = do
+  selectedCommand <- djBuddyOptions
+  runCommand selectedCommand
