@@ -7,8 +7,24 @@ import Domain.TrackCatalog (Track, TrackId)
 import Domain.Transitions (Transition (..))
 
 {---------------------------------------------------------------------------
-  TODO: Application level; this is what CLI and web UI will use
+  Data
 ----------------------------------------------------------------------------}
+
+data PlaylistEntry = PlaylistEntry
+  { trackId :: TrackId,
+    track :: Track,
+    arrivedVia :: Maybe Transition
+  }
+  deriving (Show, Eq)
+
+newtype PlaylistResult = PlaylistResult [PlaylistEntry]
+
+{---------------------------------------------------------------------------
+  Functions
+----------------------------------------------------------------------------}
+
+f :: MusicLibrary -> Playlist -> PlaylistResult
+f = undefined
 
 getTracks ::
   MusicLibrary ->

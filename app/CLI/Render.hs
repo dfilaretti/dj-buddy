@@ -22,8 +22,8 @@ prettyPrintTrackCatalog =
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track
 
-prettyPrintTransitions :: MusicLibrary -> [Transition] -> String
-prettyPrintTransitions lib = unlines . map (prettyPrintTransition lib)
+-- prettyPrintTransitions :: MusicLibrary -> [Transition] -> String
+-- prettyPrintTransitions lib = unlines . map (prettyPrintTransition lib)
 
 prettyPrintTransition :: MusicLibrary -> Transition -> String
 prettyPrintTransition lib (Tested t) =
@@ -48,7 +48,7 @@ prettyPrintTransition lib (Harmonic t tID) =
 prettyPrintTransition' :: MusicLibrary -> (Transition, Cost) -> String
 prettyPrintTransition' lib (t, c) = prettyPrintTransition lib t ++ " [cost = " ++ show c ++ "]"
 
-printPlaylist :: MusicLibrary -> [PlaylistMember] -> String
+printPlaylist :: MusicLibrary -> Playlist -> String
 printPlaylist lib = unlines . map prettyPrintMember
   where
     prettyPrintMember (StartingTrack tid) =
@@ -61,6 +61,7 @@ printPlaylist lib = unlines . map prettyPrintMember
         Just track -> track.title ++ " " ++ show track.key
         Nothing -> "ERROR"
 
+{-
 printStuff :: MusicLibrary -> TrackId -> String
 printStuff lib tid =
   decoration ++ heading ++ msg ++ decoration
@@ -75,6 +76,7 @@ printStuff lib tid =
       Nothing -> error "no key"
     heading = "Good transitions from \"" ++ title ++ "\" (" ++ show key ++ ")\n\n"
     msg = unlines $ map (prettyPrintTransition' lib) $ scoredTransitions lib tid
+-}
 
 -- TODO: in theory this should only use the "application level" functions exposed by the lib... plus the pretty printing stuff (which eventually will live in the CLI)
 showTrackCatalog :: TrackCatalog -> IO ()
@@ -82,10 +84,10 @@ showTrackCatalog =
   putStr . prettyPrintTrackCatalog
 
 -- TODO: this should call mkPlaylist (or appropriate function) from "application layer"
-showRandomPlaylist :: Int -> IO ()
-showRandomPlaylist size =
-  do
-    rawData <- readLibFromFile "src/library.yaml"
-    let lib = makeMusicLibrary rawData
-    playlist <- mkPlayListRand lib size
-    putStr $ printPlaylist lib playlist
+-- showRandomPlaylist :: Int -> IO ()
+-- showRandomPlaylist size =
+--   do
+--     rawData <- readLibFromFile "src/library.yaml"
+--     let lib = makeMusicLibrary rawData
+--     playlist <- mkPlayListRand lib size
+--     putStr $ printPlaylist lib playlist
