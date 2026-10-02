@@ -1,7 +1,8 @@
-module App where
+module App (mkPlaylist) where
 
 import Domain.MusicLibrary (MusicLibrary (..))
 import Domain.Playlist (Playlist)
+import Domain.Playlist qualified as P
 import Domain.TrackCatalog (Track, TrackId)
 import Domain.Transitions (Transition (..))
 
@@ -24,6 +25,13 @@ getTransitions = undefined
 mkPlaylist ::
   MusicLibrary ->
   Maybe TrackId -> -- optional starting track (random if not provided)
-  Int -> -- number of tracks
+  Maybe Int -> -- number of tracks (default = 10)
   IO Playlist
-mkPlaylist = undefined
+mkPlaylist lib mtid mn =
+  case mtid of
+    Nothing -> P.mkPlayListRand lib n
+    Just tid -> P.mkPlayList lib tid n
+  where
+    n = case mn of
+      Nothing -> 10
+      Just n_ -> n_
