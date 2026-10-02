@@ -6,7 +6,8 @@ import Domain.TrackCatalog (TrackId)
 import Options.Applicative
 
 data MakePlaylistOptions = MakePlaylistOptions
-  { firstTrack :: Maybe TrackId,
+  { libraryPath :: Maybe String,
+    firstTrack :: Maybe TrackId,
     maxTracks :: Maybe Int
   }
   deriving (Show)
@@ -30,10 +31,41 @@ data Command
   | ShowLibrary ShowLibraryOptions
   deriving (Show)
 
-playlistParser :: ParserInfo Command
+playlistParser :: Parser Command
 playlistParser =
+  pure MakePlaylist
+    <*> ( pure MakePlaylistOptions
+            <*> optional
+              ( strOption
+                  ( long "lib"
+                      <> short 'l'
+                      <> metavar "FILE"
+                      <> help "Path to the music library YAML file"
+                  )
+              )
+            <*> optional
+              ( strOption -- technically, this should be TrackID
+                  ( long "startTrack"
+                      <> short 's'
+                      <> metavar "TRACK_ID"
+                      <> help "Track ID to use as the first track"
+                  )
+              )
+            <*> optional
+              ( option
+                  auto
+                  ( long "numTracks"
+                      <> short 'n'
+                      <> metavar "COUNT"
+                      <> help "Maximum number of tracks to include"
+                  )
+              )
+        )
+
+playlistParserInfo :: ParserInfo Command
+playlistParserInfo =
   info
-    (pure $ MakePlaylist (MakePlaylistOptions Nothing (Just 10)))
+    playlistParser
     (progDesc "Generate a sample playlist")
 
 suggestParser :: ParserInfo Command
@@ -51,7 +83,7 @@ showLibraryParser =
 commandParser :: Parser Command
 commandParser =
   subparser $
-    (command "playlist" playlistParser)
+    (command "playlist" playlistParserInfo)
       <> (command "suggest" suggestParser)
       <> (command "show" showLibraryParser)
 
@@ -62,7 +94,8 @@ djBuddyOptions =
       (progDesc "Helps you become a big DJ")
 
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
-handleMakePlaylist _ = showRandomPlaylist 10
+handleMakePlaylist (MakePlaylistOptions lib firstTrack maxTracks) =
+  showRandomPlaylist 10
 
 -- handleMakePlaylist opts = print opts
 
