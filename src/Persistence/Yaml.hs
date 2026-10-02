@@ -12,9 +12,7 @@ readLibFromFile p = decodeFileThrow p :: IO Lib_raw
 
 readLibFromFile_ :: FilePath -> IO MusicLibrary
 readLibFromFile_ p =
-  do
-    parsedYamlLib <- readLibFromFile p
-    return (makeMusicLibrary parsedYamlLib)
+  fmap makeMusicLibrary (readLibFromFile p)
 
 data Track_raw = Track_raw
   { id :: TrackId,
