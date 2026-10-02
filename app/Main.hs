@@ -5,7 +5,7 @@ import CLI.Render
 import Domain.Camelot (Key)
 import Domain.TrackCatalog (TrackId)
 import Options.Applicative
-import Persistence.Yaml (makeMusicLibrary, readLibFromFile)
+import Persistence.Yaml (readLibFromFile_)
 
 data MakePlaylistOptions = MakePlaylistOptions
   { libraryPath :: Maybe String,
@@ -98,10 +98,9 @@ djBuddyOptions =
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   do
-    parsedYamlLib <- readLibFromFile libFilename
-    let lib = makeMusicLibrary parsedYamlLib
-    newPlaylist <- mkPlaylist lib opts.firstTrack opts.maxTracks
-    putStr $ printPlaylist lib newPlaylist
+    lib <- readLibFromFile_ libFilename
+    plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
+    putStr $ printPlaylist lib plist
   where
     libFilename = case opts.libraryPath of
       Nothing -> "src/library.yaml"

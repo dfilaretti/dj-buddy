@@ -1,14 +1,20 @@
 module Persistence.Yaml where
 
-import Domain.Camelot
 import Data.Yaml (FromJSON, decodeFileThrow)
-import GHC.Generics (Generic)
+import Domain.Camelot
 import Domain.MusicLibrary
 import Domain.TestedTransitions
 import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack, emptyCatalog)
+import GHC.Generics (Generic)
 
 readLibFromFile :: FilePath -> IO Lib_raw
 readLibFromFile p = decodeFileThrow p :: IO Lib_raw
+
+readLibFromFile_ :: FilePath -> IO MusicLibrary
+readLibFromFile_ p =
+  do
+    parsedYamlLib <- readLibFromFile p
+    return (makeMusicLibrary parsedYamlLib)
 
 data Track_raw = Track_raw
   { id :: TrackId,
