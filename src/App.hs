@@ -1,4 +1,4 @@
-module App (mkPlaylist) where
+module App (mkResolvedPlaylist, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
 
 import Domain.MusicLibrary (MusicLibrary (..))
 import Domain.MusicLibrary qualified as L
@@ -69,3 +69,15 @@ mkPlaylist lib mtid mn =
     n = case mn of
       Nothing -> 10
       Just n_ -> n_
+
+mkResolvedPlaylist ::
+  MusicLibrary ->
+  Maybe TrackId -> -- optional starting track (random if not provided)
+  Maybe Int -> -- number of tracks (default = 10)
+  IO ResolvedPlaylist
+mkResolvedPlaylist lib mtid mn =
+  do
+    p <- mkPlaylist lib mtid mn
+    case resolvePlaylist lib p of
+      Just resolvedPlaylist -> return resolvedPlaylist
+      Nothing -> error "unable to resolve playlist; this shouldn't happen"

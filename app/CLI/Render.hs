@@ -1,9 +1,10 @@
 module CLI.Render where
 
+import App (ResolvedPlaylist, ResolvedPlaylistMember (..))
 import Data.Map.Strict qualified as Map
 import Domain.MusicLibrary
 import Domain.Playlist
-import Domain.TestedTransitions (TestedTransition (to))
+import Domain.TestedTransitions (TestedTransition (..))
 import Domain.TrackCatalog
 import Domain.Transitions (Cost, Transition (..), scoredTransitions)
 import Persistence.Yaml
@@ -47,6 +48,25 @@ prettyPrintTransition lib (Harmonic t tID) =
 
 prettyPrintTransition' :: MusicLibrary -> (Transition, Cost) -> String
 prettyPrintTransition' lib (t, c) = prettyPrintTransition lib t ++ " [cost = " ++ show c ++ "]"
+
+printTransitionType :: Transition -> String
+printTransitionType (Tested i) = "Tested (notes: " ++ notes ++ ")"
+  where
+    notes = case i.notes of
+      Nothing -> "NA"
+      Just msg -> msg
+printTransitionType (Harmonic t _) = "Harmonic: " ++ show t
+
+printPlaylistMember :: PlaylistMember -> String
+printPlaylistMember (StartingTrack _) = "start"
+printPlaylistMember (MiddleTrack t) = printTransitionType t
+
+printResolvedPlaylistMember :: ResolvedPlaylistMember -> String
+printResolvedPlaylistMember pm = show (pm.track) ++ " - " ++ printPlaylistMember (pm.playlistMember)
+
+printResolvedPlaylist :: ResolvedPlaylist -> String
+printResolvedPlaylist =
+  unlines . map printResolvedPlaylistMember
 
 printPlaylist :: MusicLibrary -> Playlist -> String
 printPlaylist lib = unlines . map prettyPrintMember
