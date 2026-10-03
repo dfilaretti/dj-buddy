@@ -1,4 +1,4 @@
-module Domain.MusicLibrary (MusicLibrary (..), insertTransition, isValidTransition, emptyMusicLibrary) where
+module Domain.MusicLibrary (MusicLibrary (..), insertTransition, isValidTransition, emptyMusicLibrary, getTrack) where
 
 import Domain.TestedTransitions
 import Domain.TrackCatalog
@@ -51,3 +51,6 @@ insertTransition tid t lib =
       insertTransition_ tid t lib
     else
       error $ "insertTransition: track IDs '" ++ tid ++ "' and '" ++ t.to ++ "' must exist in track catalog, and can't be the same!"
+
+getTrack :: TrackId -> MusicLibrary -> Maybe Track
+getTrack tid lib = getTrackWithId tid lib.trackCatalog

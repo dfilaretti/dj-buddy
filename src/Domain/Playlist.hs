@@ -1,4 +1,4 @@
-module Domain.Playlist (mkPlayListRand, mkPlayList, PlaylistMember (..), Playlist) where
+module Domain.Playlist (mkPlayListRand, mkPlayList, getTrackId_, getTrack_, PlaylistMember (..), Playlist) where
 
 import Data.Map.Strict qualified as Map
 import Domain.MusicLibrary
@@ -16,6 +16,9 @@ type Playlist = [PlaylistMember]
 getTrackId_ :: PlaylistMember -> TrackId
 getTrackId_ (StartingTrack tid) = tid
 getTrackId_ (MiddleTrack t) = destTrackId t
+
+getTrack_ :: MusicLibrary -> PlaylistMember -> Maybe Track
+getTrack_ lib pm = getTrack (getTrackId_ pm) lib
 
 getTraskIds_ :: Playlist -> [TrackId]
 getTraskIds_ = fmap getTrackId_

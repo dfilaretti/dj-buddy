@@ -1,6 +1,8 @@
 module App (mkPlaylist) where
 
 import Domain.MusicLibrary (MusicLibrary (..))
+import Domain.MusicLibrary qualified as L
+import Domain.MusicLibrary qualified as P
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
 import Domain.TrackCatalog (Track, TrackId)
@@ -10,21 +12,37 @@ import Domain.Transitions (Transition (..))
   Data
 ----------------------------------------------------------------------------}
 
-data PlaylistEntry = PlaylistEntry
-  { trackId :: TrackId,
-    track :: Track,
-    arrivedVia :: Maybe Transition
+data ResolvedPlaylistMember = ResolvedPlaylistMember
+  { playlistMember :: P.PlaylistMember,
+    track :: Track
   }
-  deriving (Show, Eq)
+  deriving (Show)
 
-newtype PlaylistResult = PlaylistResult [PlaylistEntry]
+type ResolvedPlaylist = [ResolvedPlaylistMember]
 
 {---------------------------------------------------------------------------
   Functions
 ----------------------------------------------------------------------------}
 
-f :: MusicLibrary -> Playlist -> PlaylistResult
-f = undefined
+-- TODO: refactor this! I'm sure it can be simplified using fmap etc.
+resolvePlaylistMember ::
+  MusicLibrary ->
+  P.PlaylistMember ->
+  Maybe ResolvedPlaylistMember
+resolvePlaylistMember lib pm =
+  case P.getTrack_ lib pm of
+    Just t -> Just (ResolvedPlaylistMember pm t)
+    Nothing -> Nothing
+
+resolvePlaylist ::
+  MusicLibrary ->
+  P.Playlist ->
+  Maybe ResolvedPlaylist
+resolvePlaylist lib p = sequence $ fmap (resolvePlaylistMember lib) p
+
+{---------------------------------------------------------------------------
+  Functions
+----------------------------------------------------------------------------}
 
 getTracks ::
   MusicLibrary ->
