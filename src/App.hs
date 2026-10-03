@@ -1,8 +1,6 @@
-module App (mkResolvedPlaylist, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
+module App (mkPlaylist, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
 
 import Domain.MusicLibrary (MusicLibrary (..))
-import Domain.MusicLibrary qualified as L
-import Domain.MusicLibrary qualified as P
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
 import Domain.TrackCatalog (Track, TrackId)
@@ -21,7 +19,7 @@ data ResolvedPlaylistMember = ResolvedPlaylistMember
 type ResolvedPlaylist = [ResolvedPlaylistMember]
 
 {---------------------------------------------------------------------------
-  Functions
+  Helper Functions
 ----------------------------------------------------------------------------}
 
 -- TODO: refactor this! I'm sure it can be simplified using fmap etc.
@@ -40,8 +38,22 @@ resolvePlaylist ::
   Maybe ResolvedPlaylist
 resolvePlaylist lib p = sequence $ fmap (resolvePlaylistMember lib) p
 
+mkPlaylist_ ::
+  MusicLibrary ->
+  Maybe TrackId -> -- optional starting track (random if not provided)
+  Maybe Int -> -- number of tracks (default = 10)
+  IO Playlist
+mkPlaylist_ lib mtid mn =
+  case mtid of
+    Nothing -> P.mkPlayListRand lib n
+    Just tid -> P.mkPlayList lib tid n
+  where
+    n = case mn of
+      Nothing -> 10
+      Just n_ -> n_
+
 {---------------------------------------------------------------------------
-  Functions
+  Exported Functions
 ----------------------------------------------------------------------------}
 
 getTracks ::
@@ -60,24 +72,10 @@ mkPlaylist ::
   MusicLibrary ->
   Maybe TrackId -> -- optional starting track (random if not provided)
   Maybe Int -> -- number of tracks (default = 10)
-  IO Playlist
-mkPlaylist lib mtid mn =
-  case mtid of
-    Nothing -> P.mkPlayListRand lib n
-    Just tid -> P.mkPlayList lib tid n
-  where
-    n = case mn of
-      Nothing -> 10
-      Just n_ -> n_
-
-mkResolvedPlaylist ::
-  MusicLibrary ->
-  Maybe TrackId -> -- optional starting track (random if not provided)
-  Maybe Int -> -- number of tracks (default = 10)
   IO ResolvedPlaylist
-mkResolvedPlaylist lib mtid mn =
+mkPlaylist lib mtid mn =
   do
-    p <- mkPlaylist lib mtid mn
+    p <- mkPlaylist_ lib mtid mn
     case resolvePlaylist lib p of
       Just resolvedPlaylist -> return resolvedPlaylist
-      Nothing -> error "unable to resolve playlist; this shouldn't happen"
+      Nothing -> error "Unable to resolve playlist; this shouldn't happen, check your data!"

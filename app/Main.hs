@@ -1,6 +1,6 @@
 module Main (main) where
 
-import App (mkResolvedPlaylist)
+import App (mkPlaylist)
 import CLI.Render
 import Domain.Camelot (Key)
 import Domain.TrackCatalog (TrackId)
@@ -99,14 +99,12 @@ handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   do
     lib <- readLibFromFile_ libFilename
-    plist <- mkResolvedPlaylist lib opts.firstTrack opts.maxTracks
+    plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
     putStr $ printResolvedPlaylist plist
   where
     libFilename = case opts.libraryPath of
       Nothing -> "src/library.yaml"
       Just c -> c
-
--- handleMakePlaylist opts = print opts
 
 runCommand :: Command -> IO ()
 runCommand c =
