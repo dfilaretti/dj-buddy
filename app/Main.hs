@@ -100,13 +100,11 @@ handleMakePlaylist opts =
   do
     lib <- readLibFromFile_ libFilename
     plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
-    putStr $ printPlaylist lib plist
+    putStr $ printResolvedPlaylist plist
   where
     libFilename = case opts.libraryPath of
       Nothing -> "src/library.yaml"
       Just c -> c
-
--- handleMakePlaylist opts = print opts
 
 runCommand :: Command -> IO ()
 runCommand c =

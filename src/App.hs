@@ -1,4 +1,4 @@
-module App (mkPlaylist) where
+module App (mkPlaylist, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
 
 import Domain.MusicLibrary (MusicLibrary (..))
 import Domain.Playlist (Playlist)
@@ -10,21 +10,51 @@ import Domain.Transitions (Transition (..))
   Data
 ----------------------------------------------------------------------------}
 
-data PlaylistEntry = PlaylistEntry
-  { trackId :: TrackId,
-    track :: Track,
-    arrivedVia :: Maybe Transition
+data ResolvedPlaylistMember = ResolvedPlaylistMember
+  { playlistMember :: P.PlaylistMember,
+    track :: Track
   }
-  deriving (Show, Eq)
+  deriving (Show)
 
-newtype PlaylistResult = PlaylistResult [PlaylistEntry]
+type ResolvedPlaylist = [ResolvedPlaylistMember]
 
 {---------------------------------------------------------------------------
-  Functions
+  Helper Functions
 ----------------------------------------------------------------------------}
 
-f :: MusicLibrary -> Playlist -> PlaylistResult
-f = undefined
+-- TODO: refactor this! I'm sure it can be simplified using fmap etc.
+resolvePlaylistMember ::
+  MusicLibrary ->
+  P.PlaylistMember ->
+  Maybe ResolvedPlaylistMember
+resolvePlaylistMember lib pm =
+  case P.getTrack_ lib pm of
+    Just t -> Just (ResolvedPlaylistMember pm t)
+    Nothing -> Nothing
+
+resolvePlaylist ::
+  MusicLibrary ->
+  P.Playlist ->
+  Maybe ResolvedPlaylist
+resolvePlaylist lib p = sequence $ fmap (resolvePlaylistMember lib) p
+
+mkPlaylist_ ::
+  MusicLibrary ->
+  Maybe TrackId -> -- optional starting track (random if not provided)
+  Maybe Int -> -- number of tracks (default = 10)
+  IO Playlist
+mkPlaylist_ lib mtid mn =
+  case mtid of
+    Nothing -> P.mkPlayListRand lib n
+    Just tid -> P.mkPlayList lib tid n
+  where
+    n = case mn of
+      Nothing -> 10
+      Just n_ -> n_
+
+{---------------------------------------------------------------------------
+  Exported Functions
+----------------------------------------------------------------------------}
 
 getTracks ::
   MusicLibrary ->
@@ -42,12 +72,10 @@ mkPlaylist ::
   MusicLibrary ->
   Maybe TrackId -> -- optional starting track (random if not provided)
   Maybe Int -> -- number of tracks (default = 10)
-  IO Playlist
+  IO ResolvedPlaylist
 mkPlaylist lib mtid mn =
-  case mtid of
-    Nothing -> P.mkPlayListRand lib n
-    Just tid -> P.mkPlayList lib tid n
-  where
-    n = case mn of
-      Nothing -> 10
-      Just n_ -> n_
+  do
+    p <- mkPlaylist_ lib mtid mn
+    case resolvePlaylist lib p of
+      Just resolvedPlaylist -> return resolvedPlaylist
+      Nothing -> error "Unable to resolve playlist; this shouldn't happen, check your data!"
