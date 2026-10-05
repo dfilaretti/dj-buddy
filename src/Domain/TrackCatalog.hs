@@ -8,11 +8,15 @@ module Domain.TrackCatalog
     getTrackWithId,
     keyJumpSuccessors,
     sameKeySuccessors,
+    titleMatches,
+    keyMatches,
   )
 where
 
-import Domain.Camelot (Key, compatibleKeys)
 import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Data.Text qualified as T
+import Domain.Camelot (Key, compatibleKeys)
 
 {---------------------------------------------------------------------------
   Data
@@ -24,10 +28,21 @@ type TrackCatalog = Map.Map TrackId Track
 
 data Track
   = Track
-  { title :: String,
+  { title :: Text,
     key :: Key
   }
   deriving (Eq)
+
+{---------------------------------------------------------------------------
+  Predicates
+----------------------------------------------------------------------------}
+
+titleMatches :: Text -> Track -> Bool
+titleMatches s t =
+  T.isInfixOf (T.toLower s) (T.toLower t.title)
+
+keyMatches :: Key -> Track -> Bool
+keyMatches k t = k == t.key
 
 {---------------------------------------------------------------------------
   Instances
@@ -35,7 +50,7 @@ data Track
 
 instance Show Track where
   show (Track trackTitle trackKey') =
-    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+    "\"" ++ T.unpack trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 {---------------------------------------------------------------------------
   Functions

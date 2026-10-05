@@ -1,9 +1,13 @@
-module App (mkPlaylist, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
+module App (mkPlaylist, getTracks, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
 
+import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Domain.Camelot (Key)
 import Domain.MusicLibrary (MusicLibrary (..))
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
-import Domain.TrackCatalog (Track, TrackId)
+import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId)
+import Domain.TrackCatalog qualified as C
 import Domain.Transitions (Transition (..))
 
 {---------------------------------------------------------------------------
@@ -58,8 +62,16 @@ mkPlaylist_ lib mtid mn =
 
 getTracks ::
   MusicLibrary ->
-  [(TrackId, Track)] -- TODO: sure we want this? maybe add the ID into track and have a simple list instead?
-getTracks = undefined
+  Maybe Text ->
+  Maybe Key ->
+  TrackCatalog
+getTracks lib title key =
+  Map.filter
+    (\x -> all ($ x) [keyPred, titlePred])
+    lib.trackCatalog
+  where
+    titlePred = maybe (const True) C.titleMatches title
+    keyPred = maybe (const True) C.keyMatches key
 
 getTransitions ::
   MusicLibrary ->
