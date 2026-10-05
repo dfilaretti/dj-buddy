@@ -1,8 +1,10 @@
 module Main (main) where
 
-import App (mkPlaylist)
+import App (getTracks, mkPlaylist)
 import CLI.Render
+import Data.Text (Text)
 import Domain.Camelot (Key)
+import Domain.MusicLibrary (MusicLibrary (trackCatalog))
 import Domain.TrackCatalog (TrackId)
 import Options.Applicative
 import Persistence.Yaml (readLibFromFile_)
@@ -22,7 +24,7 @@ data SuggestNextTracksOptions = SuggestNextTracksOptions
 
 data ShowLibraryOptions = ShowLibraryOptions
   { libraryPath :: Maybe String,
-    title :: Maybe String,
+    title :: Maybe Text,
     key :: Maybe Key
   }
   deriving (Show)
@@ -138,7 +140,14 @@ handleMakePlaylist opts =
       Just c -> c
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
-handleShowLibrary o = print o
+handleShowLibrary o =
+  do
+    lib <- readLibFromFile_ libFilename
+    showTrackCatalog (getTracks lib o.title o.key)
+  where
+    libFilename = case o.libraryPath of
+      Nothing -> "src/library.yaml"
+      Just c -> c
 
 runCommand :: Command -> IO ()
 runCommand c =

@@ -132,6 +132,7 @@ executable dj-buddy
 
     -- Other library packages from which modules are imported.
     build-depends:
+        text ^>=2.1.3,
         base >= 4.20 && < 4.23,
         containers ^>=0.7,
         optparse-applicative,

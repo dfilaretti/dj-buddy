@@ -1,5 +1,6 @@
 module Persistence.Yaml where
 
+import Data.Text (Text)
 import Data.Yaml (FromJSON, decodeFileThrow)
 import Domain.Camelot
 import Domain.MusicLibrary
@@ -16,7 +17,7 @@ readLibFromFile_ p =
 
 data Track_raw = Track_raw
   { id :: TrackId,
-    title :: String,
+    title :: Text,
     key :: Key
   }
   deriving (Show, Generic)

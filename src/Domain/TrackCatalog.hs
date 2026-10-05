@@ -11,8 +11,10 @@ module Domain.TrackCatalog
   )
 where
 
-import Domain.Camelot (Key, compatibleKeys)
 import Data.Map.Strict qualified as Map
+import Data.Text (Text)
+import Data.Text qualified as T
+import Domain.Camelot (Key, compatibleKeys)
 
 {---------------------------------------------------------------------------
   Data
@@ -24,7 +26,7 @@ type TrackCatalog = Map.Map TrackId Track
 
 data Track
   = Track
-  { title :: String,
+  { title :: Text,
     key :: Key
   }
   deriving (Eq)
@@ -35,7 +37,7 @@ data Track
 
 instance Show Track where
   show (Track trackTitle trackKey') =
-    "\"" ++ trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+    "\"" ++ T.unpack trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 {---------------------------------------------------------------------------
   Functions
