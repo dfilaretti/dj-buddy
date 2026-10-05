@@ -8,6 +8,8 @@ module Domain.TrackCatalog
     getTrackWithId,
     keyJumpSuccessors,
     sameKeySuccessors,
+    titleMatches,
+    keyMatches,
   )
 where
 
@@ -30,6 +32,17 @@ data Track
     key :: Key
   }
   deriving (Eq)
+
+{---------------------------------------------------------------------------
+  Predicates
+----------------------------------------------------------------------------}
+
+titleMatches :: Text -> Track -> Bool
+titleMatches s t =
+  T.isInfixOf (T.toLower s) (T.toLower t.title)
+
+keyMatches :: Key -> Track -> Bool
+keyMatches k t = k == t.key
 
 {---------------------------------------------------------------------------
   Instances
