@@ -131,23 +131,18 @@ djBuddyOptions =
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   do
-    lib <- readLibFromFile_ libFilename
+    lib <- readLibFromFile_ (getLibraryPath opts.libraryPath)
     plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
     putStr $ printResolvedPlaylist plist
-  where
-    libFilename = case opts.libraryPath of
-      Nothing -> "src/library.yaml"
-      Just c -> c
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
   do
-    lib <- readLibFromFile_ libFilename
+    lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
     showTrackCatalog (getTracks lib o.title o.key)
-  where
-    libFilename = case o.libraryPath of
-      Nothing -> "src/library.yaml"
-      Just c -> c
+
+getLibraryPath :: Maybe String -> String
+getLibraryPath x = maybe "src/library.yaml" id x
 
 runCommand :: Command -> IO ()
 runCommand c =
