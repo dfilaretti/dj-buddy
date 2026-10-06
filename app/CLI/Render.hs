@@ -14,28 +14,28 @@ renderTrackCatalog =
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track
 
-printTransitionType :: Transition -> String
-printTransitionType (Tested i) = "Tested (notes: " ++ notes ++ ")"
+renderTransition :: Transition -> String
+renderTransition (Tested i) = "Tested (notes: " ++ notes ++ ")"
   where
     notes = case i.notes of
       Nothing -> "NA"
       Just msg -> msg
-printTransitionType (Harmonic t _) = "Harmonic: " ++ show t
+renderTransition (Harmonic t _) = "Harmonic: " ++ show t
 
-printPlaylistMember :: PlaylistMember -> String
-printPlaylistMember (StartingTrack _) = "start"
-printPlaylistMember (MiddleTrack t) = printTransitionType t
+renderPlaylistMember :: PlaylistMember -> String
+renderPlaylistMember (StartingTrack _) = "start"
+renderPlaylistMember (MiddleTrack t) = renderTransition t
 
-printResolvedPlaylistMember :: ResolvedPlaylistMember -> String
-printResolvedPlaylistMember pm =
-  show (pm.track) ++ " - " ++ printPlaylistMember (pm.playlistMember)
+renderResolvedPlaylistMember :: ResolvedPlaylistMember -> String
+renderResolvedPlaylistMember pm =
+  show (pm.track) ++ " - " ++ renderPlaylistMember (pm.playlistMember)
 
-printResolvedPlaylist :: ResolvedPlaylist -> String
-printResolvedPlaylist =
-  unlines . map printResolvedPlaylistMember
+renderResolvedPlaylist :: ResolvedPlaylist -> String
+renderResolvedPlaylist =
+  unlines . map renderResolvedPlaylistMember
 
 renderResolvedTransition :: ResolvedTransition -> String
-renderResolvedTransition rt = show rt.track ++ " (" ++ printTransitionType rt.transition ++ ")"
+renderResolvedTransition rt = show rt.track ++ " (" ++ renderTransition rt.transition ++ ")"
 
 renderResolvedTransitions :: [ResolvedTransition] -> String
 renderResolvedTransitions = unlines . map renderResolvedTransition

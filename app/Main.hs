@@ -158,7 +158,7 @@ handleMakePlaylist opts =
   do
     lib <- readLibFromFile_ (getLibraryPath opts.libraryPath)
     plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
-    putStr $ printResolvedPlaylist plist
+    putStr $ renderResolvedPlaylist plist
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
