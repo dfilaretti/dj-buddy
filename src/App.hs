@@ -1,4 +1,4 @@
-module App (mkPlaylist, getTracks, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
+module App (mkPlaylist, getTracks, getTransitions, getTrackFromId, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
 
 import Data.Map.Strict qualified as Map
 import Data.Text (Text)
@@ -9,10 +9,17 @@ import Domain.Playlist qualified as P
 import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId)
 import Domain.TrackCatalog qualified as C
 import Domain.Transitions (Transition (..))
+import Domain.Transitions qualified as T
 
 {---------------------------------------------------------------------------
   Data
 ----------------------------------------------------------------------------}
+
+data ResolvedTransition = ResolvedTransition
+  { transition :: Transition,
+    track :: Track
+  }
+  deriving (Show)
 
 data ResolvedPlaylistMember = ResolvedPlaylistMember
   { playlistMember :: P.PlaylistMember,
@@ -34,6 +41,15 @@ resolvePlaylistMember ::
 resolvePlaylistMember lib pm =
   case P.getTrack_ lib pm of
     Just t -> Just (ResolvedPlaylistMember pm t)
+    Nothing -> Nothing
+
+resolveTransition ::
+  MusicLibrary ->
+  Transition ->
+  Maybe ResolvedTransition
+resolveTransition lib t =
+  case T.destTrack lib.trackCatalog t of
+    Just tr -> Just (ResolvedTransition t tr)
     Nothing -> Nothing
 
 resolvePlaylist ::
@@ -60,6 +76,9 @@ mkPlaylist_ lib mtid mn =
   Exported Functions
 ----------------------------------------------------------------------------}
 
+getTrackFromId :: MusicLibrary -> TrackId -> Maybe Track
+getTrackFromId lib tid = C.getTrackWithId tid lib.trackCatalog
+
 getTracks ::
   MusicLibrary ->
   Maybe Text ->
@@ -77,8 +96,14 @@ getTransitions ::
   MusicLibrary ->
   TrackId -> -- origin track
   Int -> -- desired number of alternative transitions
-  IO [Transition] -- IO coz we may want to shuffle same-score items here
-getTransitions = undefined
+  [ResolvedTransition]
+getTransitions lib tid n =
+  case resolved of
+    Just ts -> ts
+    Nothing -> error "could not resolve transitions. something went wrong!"
+  where
+    ts = fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
+    resolved = sequence ts
 
 mkPlaylist ::
   MusicLibrary ->

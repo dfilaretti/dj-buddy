@@ -1,6 +1,6 @@
 module CLI.Render where
 
-import App (ResolvedPlaylist, ResolvedPlaylistMember (..))
+import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
 import Data.Map.Strict qualified as Map
 import Domain.Playlist (PlaylistMember (..))
 import Domain.TestedTransitions (TestedTransition (..))
@@ -33,6 +33,12 @@ printResolvedPlaylistMember pm =
 printResolvedPlaylist :: ResolvedPlaylist -> String
 printResolvedPlaylist =
   unlines . map printResolvedPlaylistMember
+
+renderResolvedTransition :: ResolvedTransition -> String
+renderResolvedTransition rt = show rt.track ++ " (" ++ printTransitionType rt.transition ++ ")"
+
+renderResolvedTransitions :: [ResolvedTransition] -> String
+renderResolvedTransitions = unlines . map renderResolvedTransition
 
 showTrackCatalog :: TrackCatalog -> IO ()
 showTrackCatalog =
