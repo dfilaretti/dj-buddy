@@ -9,7 +9,7 @@ import Options.Applicative
 import Persistence.Yaml (readLibFromFile_)
 
 {---------------------------------------------------------------------------
-  CLI parser
+  Command data structure
 ----------------------------------------------------------------------------}
 
 data Command
@@ -25,8 +25,33 @@ data MakePlaylistOptions = MakePlaylistOptions
   }
   deriving (Show)
 
-playlistParser :: ParserInfo Command
-playlistParser =
+data SuggestNextTracksOptions = SuggestNextTracksOptions
+  { libraryPath :: Maybe String,
+    track :: TrackId,
+    maxTracks :: Int
+  }
+  deriving (Show)
+
+data ShowLibraryOptions = ShowLibraryOptions
+  { libraryPath :: Maybe String,
+    title :: Maybe Text,
+    key :: Maybe Key
+  }
+  deriving (Show)
+
+{---------------------------------------------------------------------------
+  CLI parser
+----------------------------------------------------------------------------}
+
+commandParser :: Parser Command
+commandParser =
+  subparser $
+    (command "playlist" makePlaylistParser)
+      <> (command "suggest" suggestNextTracksParser)
+      <> (command "show" showLibraryParser)
+
+makePlaylistParser :: ParserInfo Command
+makePlaylistParser =
   info
     ( pure MakePlaylist
         <*> ( pure MakePlaylistOptions
@@ -59,15 +84,8 @@ playlistParser =
     )
     (progDesc "Generate a sample playlist")
 
-data SuggestNextTracksOptions = SuggestNextTracksOptions
-  { libraryPath :: Maybe String,
-    track :: TrackId,
-    maxTracks :: Int
-  }
-  deriving (Show)
-
-suggestParser :: ParserInfo Command
-suggestParser =
+suggestNextTracksParser :: ParserInfo Command
+suggestNextTracksParser =
   info
     ( pure SuggestNextTracks
         <*> ( pure SuggestNextTracksOptions
@@ -96,13 +114,6 @@ suggestParser =
             )
     )
     (progDesc "Suggest suitable next tracks")
-
-data ShowLibraryOptions = ShowLibraryOptions
-  { libraryPath :: Maybe String,
-    title :: Maybe Text,
-    key :: Maybe Key
-  }
-  deriving (Show)
 
 showLibraryParser :: ParserInfo Command
 showLibraryParser =
@@ -138,18 +149,9 @@ showLibraryParser =
     )
     (progDesc "Lists tracks in the library")
 
-commandParser :: Parser Command
-commandParser =
-  subparser $
-    (command "playlist" playlistParser)
-      <> (command "suggest" suggestParser)
-      <> (command "show" showLibraryParser)
-
-parseCliCommand :: IO Command
-parseCliCommand =
-  execParser $
-    info (helper <*> commandParser) $
-      (progDesc "Helps you become a big DJ")
+{---------------------------------------------------------------------------
+  Main & friends
+----------------------------------------------------------------------------}
 
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
@@ -164,8 +166,8 @@ handleShowLibrary o =
     lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
     putStr $ renderTrackCatalog (getTracks lib o.title o.key)
 
-handleShowSuggest :: SuggestNextTracksOptions -> IO ()
-handleShowSuggest o =
+handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
+handleSuggestNextTracks o =
   do
     lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
     let startingTrack =
@@ -181,16 +183,22 @@ handleShowSuggest o =
 getLibraryPath :: Maybe String -> String
 getLibraryPath x = maybe "src/library.yaml" id x
 
+{---------------------------------------------------------------------------
+  Main
+----------------------------------------------------------------------------}
+
 runCommand :: Command -> IO ()
 runCommand c =
   case c of
     MakePlaylist o -> handleMakePlaylist o
-    SuggestNextTracks o -> handleShowSuggest o
+    SuggestNextTracks o -> handleSuggestNextTracks o
     ShowLibrary o -> handleShowLibrary o
 
-{---------------------------------------------------------------------------
-  Main
-----------------------------------------------------------------------------}
+parseCliCommand :: IO Command
+parseCliCommand =
+  execParser $
+    info (helper <*> commandParser) $
+      (progDesc "Helps you become a big DJ")
 
 main :: IO ()
 main = do
