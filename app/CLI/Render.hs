@@ -7,8 +7,8 @@ import Domain.TestedTransitions (TestedTransition (..))
 import Domain.TrackCatalog (TrackCatalog)
 import Domain.Transitions (Transition (..))
 
-prettyPrintTrackCatalog :: TrackCatalog -> String
-prettyPrintTrackCatalog =
+renderTrackCatalog :: TrackCatalog -> String
+renderTrackCatalog =
   unlines . map formatTrack . Map.toList
   where
     formatTrack (trackId, track) =
@@ -39,7 +39,3 @@ renderResolvedTransition rt = show rt.track ++ " (" ++ printTransitionType rt.tr
 
 renderResolvedTransitions :: [ResolvedTransition] -> String
 renderResolvedTransitions = unlines . map renderResolvedTransition
-
-showTrackCatalog :: TrackCatalog -> IO ()
-showTrackCatalog =
-  putStr . prettyPrintTrackCatalog

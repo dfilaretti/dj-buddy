@@ -164,7 +164,7 @@ handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
   do
     lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
-    showTrackCatalog (getTracks lib o.title o.key)
+    putStr $ renderTrackCatalog (getTracks lib o.title o.key)
 
 handleShowSuggest :: SuggestNextTracksOptions -> IO ()
 handleShowSuggest o =
