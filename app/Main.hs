@@ -1,6 +1,6 @@
 module Main (main) where
 
-import App (getTracks, getTransitions, mkPlaylist)
+import App (getTrackFromId, getTracks, getTransitions, mkPlaylist)
 import CLI.Render
 import Data.Text (Text)
 import Domain.Camelot (Key)
@@ -170,6 +170,14 @@ handleShowSuggest :: SuggestNextTracksOptions -> IO ()
 handleShowSuggest o =
   do
     lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
+    let startingTrack =
+          maybe
+            -- TODO: is this the right way to handle errors?!
+            (error "Init track not found; this shouldn't happen")
+            show
+            (getTrackFromId lib o.track)
+    putStrLn $ "Showing suggestions for: " ++ startingTrack
+    putStrLn $ replicate 60 '-'
     putStr $ renderResolvedTransitions (getTransitions lib o.track o.maxTracks)
 
 getLibraryPath :: Maybe String -> String

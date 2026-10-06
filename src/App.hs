@@ -1,4 +1,4 @@
-module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
+module App (mkPlaylist, getTracks, getTransitions, getTrackFromId, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
 
 import Data.Map.Strict qualified as Map
 import Data.Text (Text)
@@ -75,6 +75,9 @@ mkPlaylist_ lib mtid mn =
 {---------------------------------------------------------------------------
   Exported Functions
 ----------------------------------------------------------------------------}
+
+getTrackFromId :: MusicLibrary -> TrackId -> Maybe Track
+getTrackFromId lib tid = C.getTrackWithId tid lib.trackCatalog
 
 getTracks ::
   MusicLibrary ->
