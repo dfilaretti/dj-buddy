@@ -150,8 +150,11 @@ showLibraryParser =
     (progDesc "Lists tracks in the library")
 
 {---------------------------------------------------------------------------
-  Main & friends
+  Helpers
 ----------------------------------------------------------------------------}
+
+getLibraryPath :: Maybe String -> String
+getLibraryPath x = maybe "src/library.yaml" id x
 
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
@@ -179,9 +182,6 @@ handleSuggestNextTracks o =
     putStrLn $ "Showing suggestions for: " ++ startingTrack
     putStrLn $ replicate 60 '-'
     putStr $ renderResolvedTransitions (getTransitions lib o.track o.maxTracks)
-
-getLibraryPath :: Maybe String -> String
-getLibraryPath x = maybe "src/library.yaml" id x
 
 {---------------------------------------------------------------------------
   Main
