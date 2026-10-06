@@ -9,10 +9,17 @@ import Domain.Playlist qualified as P
 import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId)
 import Domain.TrackCatalog qualified as C
 import Domain.Transitions (Transition (..))
+import Domain.Transitions qualified as T
 
 {---------------------------------------------------------------------------
   Data
 ----------------------------------------------------------------------------}
+
+data ResolvedTransition = ResolvedTransition
+  { transition :: Transition,
+    track :: Track
+  }
+  deriving (Show)
 
 data ResolvedPlaylistMember = ResolvedPlaylistMember
   { playlistMember :: P.PlaylistMember,
@@ -34,6 +41,15 @@ resolvePlaylistMember ::
 resolvePlaylistMember lib pm =
   case P.getTrack_ lib pm of
     Just t -> Just (ResolvedPlaylistMember pm t)
+    Nothing -> Nothing
+
+resolveTransition ::
+  MusicLibrary ->
+  Transition ->
+  Maybe ResolvedTransition
+resolveTransition lib t =
+  case T.destTrack lib.trackCatalog t of
+    Just tr -> Just (ResolvedTransition t tr)
     Nothing -> Nothing
 
 resolvePlaylist ::
@@ -76,9 +92,15 @@ getTracks lib title key =
 getTransitions ::
   MusicLibrary ->
   TrackId -> -- origin track
-  Int -> -- desired number of alternative transitions
-  IO [Transition] -- IO coz we may want to shuffle same-score items here
-getTransitions = undefined
+  Maybe Int -> -- desired number of alternative transitions
+  [ResolvedTransition] -- IO coz we may want to shuffle same-score items here
+getTransitions lib tid _ =
+  case resolved of
+    Just ts -> ts
+    Nothing -> error "could not resolve transitions. something went wrong!"
+  where
+    ts = fmap (resolveTransition lib) $ map fst $ T.scoredTransitions lib tid
+    resolved = sequence ts
 
 mkPlaylist ::
   MusicLibrary ->
