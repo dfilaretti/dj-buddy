@@ -1,6 +1,6 @@
 module Main (main) where
 
-import App (getTracks, mkPlaylist)
+import App (getTracks, getTransitions, mkPlaylist)
 import CLI.Render
 import Data.Text (Text)
 import Domain.Camelot (Key)
@@ -17,8 +17,9 @@ data MakePlaylistOptions = MakePlaylistOptions
   deriving (Show)
 
 data SuggestNextTracksOptions = SuggestNextTracksOptions
-  { track :: TrackId,
-    maxTracks :: Maybe Int
+  { libraryPath :: Maybe String,
+    track :: TrackId,
+    maxTracks :: Int
   }
   deriving (Show)
 
@@ -75,7 +76,32 @@ playlistParserInfo =
 suggestParser :: ParserInfo Command
 suggestParser =
   info
-    (pure $ SuggestNextTracks (SuggestNextTracksOptions "foo_id" Nothing))
+    ( pure SuggestNextTracks
+        <*> ( pure SuggestNextTracksOptions
+                <*> optional
+                  ( strOption
+                      ( long "lib"
+                          <> short 'l'
+                          <> metavar "FILE"
+                          <> help "Path to the music library YAML file"
+                      )
+                  )
+                <*> strArgument
+                  ( metavar "TRACK_ID"
+                      <> help "Track ID to find suggestions for"
+                  )
+                <*> ( option
+                        auto
+                        ( long "numTracks"
+                            <> short 'n'
+                            <> metavar "COUNT"
+                            <> value 3
+                            <> showDefault
+                            <> help "Maximum number of tracks to show"
+                        )
+                    )
+            )
+    )
     (progDesc "Suggest suitable next tracks")
 
 showLibraryParser :: Parser Command
@@ -141,6 +167,12 @@ handleShowLibrary o =
     lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
     showTrackCatalog (getTracks lib o.title o.key)
 
+handleShowSuggest :: SuggestNextTracksOptions -> IO ()
+handleShowSuggest o =
+  do
+    lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
+    putStr $ renderResolvedTransitions (getTransitions lib o.track o.maxTracks)
+
 getLibraryPath :: Maybe String -> String
 getLibraryPath x = maybe "src/library.yaml" id x
 
@@ -148,7 +180,7 @@ runCommand :: Command -> IO ()
 runCommand c =
   case c of
     MakePlaylist o -> handleMakePlaylist o
-    SuggestNextTracks _ -> undefined
+    SuggestNextTracks o -> handleShowSuggest o
     ShowLibrary o -> handleShowLibrary o
 
 main :: IO ()

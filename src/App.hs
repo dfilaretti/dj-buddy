@@ -1,4 +1,4 @@
-module App (mkPlaylist, getTracks, ResolvedPlaylist, ResolvedPlaylistMember (..)) where
+module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
 
 import Data.Map.Strict qualified as Map
 import Data.Text (Text)
@@ -92,14 +92,14 @@ getTracks lib title key =
 getTransitions ::
   MusicLibrary ->
   TrackId -> -- origin track
-  Maybe Int -> -- desired number of alternative transitions
-  [ResolvedTransition] -- IO coz we may want to shuffle same-score items here
-getTransitions lib tid _ =
+  Int -> -- desired number of alternative transitions
+  [ResolvedTransition]
+getTransitions lib tid n =
   case resolved of
     Just ts -> ts
     Nothing -> error "could not resolve transitions. something went wrong!"
   where
-    ts = fmap (resolveTransition lib) $ map fst $ T.scoredTransitions lib tid
+    ts = fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
     resolved = sequence ts
 
 mkPlaylist ::
