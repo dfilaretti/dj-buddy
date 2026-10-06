@@ -19,21 +19,21 @@ data Command
   deriving (Show)
 
 data MakePlaylistOptions = MakePlaylistOptions
-  { libraryPath :: Maybe String,
+  { libraryPath :: String,
     firstTrack :: Maybe TrackId,
     maxTracks :: Int
   }
   deriving (Show)
 
 data SuggestNextTracksOptions = SuggestNextTracksOptions
-  { libraryPath :: Maybe String,
+  { libraryPath :: String,
     track :: TrackId,
     maxTracks :: Int
   }
   deriving (Show)
 
 data ShowLibraryOptions = ShowLibraryOptions
-  { libraryPath :: Maybe String,
+  { libraryPath :: String,
     title :: Maybe Text,
     key :: Maybe Key
   }
@@ -55,14 +55,14 @@ makePlaylistParser =
   info
     ( pure MakePlaylist
         <*> ( pure MakePlaylistOptions
-                <*> optional
-                  ( strOption
-                      ( long "lib"
-                          <> short 'l'
-                          <> metavar "FILE"
-                          <> help "Path to the music library YAML file"
-                      )
-                  )
+                <*> ( strOption
+                        ( long "lib"
+                            <> short 'l'
+                            <> metavar "FILE"
+                            <> value defaultLibraryPath
+                            <> help "Path to the music library YAML file"
+                        )
+                    )
                 <*> optional
                   ( strOption -- technically, this should be TrackID
                       ( long "startTrack"
@@ -89,14 +89,14 @@ suggestNextTracksParser =
   info
     ( pure SuggestNextTracks
         <*> ( pure SuggestNextTracksOptions
-                <*> optional
-                  ( strOption
-                      ( long "lib"
-                          <> short 'l'
-                          <> metavar "FILE"
-                          <> help "Path to the music library YAML file"
-                      )
-                  )
+                <*> ( strOption
+                        ( long "lib"
+                            <> short 'l'
+                            <> metavar "FILE"
+                            <> value defaultLibraryPath
+                            <> help "Path to the music library YAML file"
+                        )
+                    )
                 <*> strArgument
                   ( metavar "TRACK_ID"
                       <> help "Track ID to find suggestions for"
@@ -120,14 +120,14 @@ showLibraryParser =
   info
     ( pure ShowLibrary
         <*> ( pure ShowLibraryOptions
-                <*> optional
-                  ( strOption
-                      ( long "lib"
-                          <> short 'l'
-                          <> metavar "FILE"
-                          <> help "Path to the music library YAML file"
-                      )
-                  )
+                <*> ( strOption
+                        ( long "lib"
+                            <> short 'l'
+                            <> metavar "FILE"
+                            <> value defaultLibraryPath
+                            <> help "Path to the music library YAML file"
+                        )
+                    )
                 <*> optional
                   ( strOption
                       ( long "title"
@@ -153,26 +153,26 @@ showLibraryParser =
   Helpers
 ----------------------------------------------------------------------------}
 
-getLibraryPath :: Maybe String -> String
-getLibraryPath x = maybe "src/library.yaml" id x
+defaultLibraryPath :: String
+defaultLibraryPath = "src/library.yaml"
 
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   do
-    lib <- readLibFromFile_ (getLibraryPath opts.libraryPath)
+    lib <- readLibFromFile_ opts.libraryPath
     plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
     putStr $ renderResolvedPlaylist plist
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
   do
-    lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
+    lib <- readLibFromFile_ o.libraryPath
     putStr $ renderTrackCatalog (getTracks lib o.title o.key)
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =
   do
-    lib <- readLibFromFile_ (getLibraryPath o.libraryPath)
+    lib <- readLibFromFile_ o.libraryPath
     let startingTrack =
           maybe
             -- TODO: is this the right way to handle errors?!
