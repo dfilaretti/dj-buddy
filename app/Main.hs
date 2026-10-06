@@ -8,26 +8,9 @@ import Domain.TrackCatalog (TrackId)
 import Options.Applicative
 import Persistence.Yaml (readLibFromFile_)
 
-data MakePlaylistOptions = MakePlaylistOptions
-  { libraryPath :: Maybe String,
-    firstTrack :: Maybe TrackId,
-    maxTracks :: Maybe Int
-  }
-  deriving (Show)
-
-data SuggestNextTracksOptions = SuggestNextTracksOptions
-  { libraryPath :: Maybe String,
-    track :: TrackId,
-    maxTracks :: Int
-  }
-  deriving (Show)
-
-data ShowLibraryOptions = ShowLibraryOptions
-  { libraryPath :: Maybe String,
-    title :: Maybe Text,
-    key :: Maybe Key
-  }
-  deriving (Show)
+{---------------------------------------------------------------------------
+  CLI parser
+----------------------------------------------------------------------------}
 
 data Command
   = MakePlaylist MakePlaylistOptions
@@ -35,42 +18,53 @@ data Command
   | ShowLibrary ShowLibraryOptions
   deriving (Show)
 
-playlistParser :: Parser Command
-playlistParser =
-  pure MakePlaylist
-    <*> ( pure MakePlaylistOptions
-            <*> optional
-              ( strOption
-                  ( long "lib"
-                      <> short 'l'
-                      <> metavar "FILE"
-                      <> help "Path to the music library YAML file"
-                  )
-              )
-            <*> optional
-              ( strOption -- technically, this should be TrackID
-                  ( long "startTrack"
-                      <> short 's'
-                      <> metavar "TRACK_ID"
-                      <> help "Track ID to use as the first track"
-                  )
-              )
-            <*> optional
-              ( option
-                  auto
-                  ( long "numTracks"
-                      <> short 'n'
-                      <> metavar "COUNT"
-                      <> help "Maximum number of tracks to include"
-                  )
-              )
-        )
+data MakePlaylistOptions = MakePlaylistOptions
+  { libraryPath :: Maybe String,
+    firstTrack :: Maybe TrackId,
+    maxTracks :: Int
+  }
+  deriving (Show)
 
-playlistParserInfo :: ParserInfo Command
-playlistParserInfo =
+playlistParser :: ParserInfo Command
+playlistParser =
   info
-    playlistParser
+    ( pure MakePlaylist
+        <*> ( pure MakePlaylistOptions
+                <*> optional
+                  ( strOption
+                      ( long "lib"
+                          <> short 'l'
+                          <> metavar "FILE"
+                          <> help "Path to the music library YAML file"
+                      )
+                  )
+                <*> optional
+                  ( strOption -- technically, this should be TrackID
+                      ( long "startTrack"
+                          <> short 's'
+                          <> metavar "TRACK_ID"
+                          <> help "Track ID to use as the first track"
+                      )
+                  )
+                <*> ( option
+                        auto
+                        ( long "numTracks"
+                            <> short 'n'
+                            <> value 10
+                            <> metavar "COUNT"
+                            <> help "Maximum number of tracks to include"
+                        )
+                    )
+            )
+    )
     (progDesc "Generate a sample playlist")
+
+data SuggestNextTracksOptions = SuggestNextTracksOptions
+  { libraryPath :: Maybe String,
+    track :: TrackId,
+    maxTracks :: Int
+  }
+  deriving (Show)
 
 suggestParser :: ParserInfo Command
 suggestParser =
@@ -103,52 +97,56 @@ suggestParser =
     )
     (progDesc "Suggest suitable next tracks")
 
-showLibraryParser :: Parser Command
-showLibraryParser =
-  pure ShowLibrary
-    <*> ( pure ShowLibraryOptions
-            <*> optional
-              ( strOption
-                  ( long "lib"
-                      <> short 'l'
-                      <> metavar "FILE"
-                      <> help "Path to the music library YAML file"
-                  )
-              )
-            <*> optional
-              ( strOption
-                  ( long "title"
-                      <> short 't'
-                      <> metavar "TITLE"
-                      <> help "Title (or part of)"
-                  )
-              )
-            <*> optional
-              ( option
-                  auto
-                  ( long "key"
-                      <> short 'k'
-                      <> metavar "KEY"
-                      <> help "Key of the tracks to show"
-                  )
-              )
-        )
+data ShowLibraryOptions = ShowLibraryOptions
+  { libraryPath :: Maybe String,
+    title :: Maybe Text,
+    key :: Maybe Key
+  }
+  deriving (Show)
 
-showLibraryParserInfo :: ParserInfo Command
-showLibraryParserInfo =
+showLibraryParser :: ParserInfo Command
+showLibraryParser =
   info
-    showLibraryParser
+    ( pure ShowLibrary
+        <*> ( pure ShowLibraryOptions
+                <*> optional
+                  ( strOption
+                      ( long "lib"
+                          <> short 'l'
+                          <> metavar "FILE"
+                          <> help "Path to the music library YAML file"
+                      )
+                  )
+                <*> optional
+                  ( strOption
+                      ( long "title"
+                          <> short 't'
+                          <> metavar "TITLE"
+                          <> help "Title (or part of)"
+                      )
+                  )
+                <*> optional
+                  ( option
+                      auto
+                      ( long "key"
+                          <> short 'k'
+                          <> metavar "KEY"
+                          <> help "Key of the tracks to show"
+                      )
+                  )
+            )
+    )
     (progDesc "Lists tracks in the library")
 
 commandParser :: Parser Command
 commandParser =
   subparser $
-    (command "playlist" playlistParserInfo)
+    (command "playlist" playlistParser)
       <> (command "suggest" suggestParser)
-      <> (command "show" showLibraryParserInfo)
+      <> (command "show" showLibraryParser)
 
-djBuddyOptions :: IO Command
-djBuddyOptions =
+parseCliCommand :: IO Command
+parseCliCommand =
   execParser $
     info (helper <*> commandParser) $
       (progDesc "Helps you become a big DJ")
@@ -190,7 +188,11 @@ runCommand c =
     SuggestNextTracks o -> handleShowSuggest o
     ShowLibrary o -> handleShowLibrary o
 
+{---------------------------------------------------------------------------
+  Main
+----------------------------------------------------------------------------}
+
 main :: IO ()
 main = do
-  selectedCommand <- djBuddyOptions
-  runCommand selectedCommand
+  c <- parseCliCommand
+  runCommand c

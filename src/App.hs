@@ -61,16 +61,12 @@ resolvePlaylist lib p = sequence $ fmap (resolvePlaylistMember lib) p
 mkPlaylist_ ::
   MusicLibrary ->
   Maybe TrackId -> -- optional starting track (random if not provided)
-  Maybe Int -> -- number of tracks (default = 10)
+  Int -> -- number of tracks (default = 10)
   IO Playlist
-mkPlaylist_ lib mtid mn =
+mkPlaylist_ lib mtid n =
   case mtid of
     Nothing -> P.mkPlayListRand lib n
     Just tid -> P.mkPlayList lib tid n
-  where
-    n = case mn of
-      Nothing -> 10
-      Just n_ -> n_
 
 {---------------------------------------------------------------------------
   Exported Functions
@@ -108,11 +104,11 @@ getTransitions lib tid n =
 mkPlaylist ::
   MusicLibrary ->
   Maybe TrackId -> -- optional starting track (random if not provided)
-  Maybe Int -> -- number of tracks (default = 10)
+  Int -> -- number of tracks
   IO ResolvedPlaylist
-mkPlaylist lib mtid mn =
+mkPlaylist lib mtid n =
   do
-    p <- mkPlaylist_ lib mtid mn
+    p <- mkPlaylist_ lib mtid n
     case resolvePlaylist lib p of
       Just resolvedPlaylist -> return resolvedPlaylist
       Nothing -> error "Unable to resolve playlist; this shouldn't happen, check your data!"
