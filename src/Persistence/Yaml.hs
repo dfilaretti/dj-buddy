@@ -1,5 +1,6 @@
 module Persistence.Yaml where
 
+import Control.Monad (foldM)
 import Data.Text (Text)
 import Data.Yaml (FromJSON, decodeFileThrow)
 import Domain.Camelot
@@ -8,10 +9,14 @@ import Domain.TestedTransitions
 import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack, emptyCatalog)
 import GHC.Generics (Generic)
 
+data YamlError
+  = MusicLibraryError MusicLibraryError
+  deriving (Show, Eq)
+
 readLibFromFile :: FilePath -> IO Lib_raw
 readLibFromFile p = decodeFileThrow p :: IO Lib_raw
 
-readLibFromFile_ :: FilePath -> IO MusicLibrary
+readLibFromFile_ :: FilePath -> IO (Either YamlError MusicLibrary)
 readLibFromFile_ p =
   fmap makeMusicLibrary (readLibFromFile p)
 
@@ -55,16 +60,23 @@ makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =
   (t.from, TestedTransition {to = t.to, notes = t.notes})
 
-makeTransitionGraph :: [Transition_raw] -> MusicLibrary -> MusicLibrary
-makeTransitionGraph ts lib = foldr insertRawTransition lib ts
+makeTransitionGraph :: [Transition_raw] -> MusicLibrary -> Either YamlError MusicLibrary
+makeTransitionGraph ts lib =
+  -- foldr insertRawTransition lib ts
+  foldM (\current tx -> insertRawTransition tx current) lib ts
 
-insertRawTransition :: Transition_raw -> MusicLibrary -> MusicLibrary
+insertRawTransition ::
+  Transition_raw ->
+  MusicLibrary ->
+  Either YamlError MusicLibrary
 insertRawTransition tx lib =
-  insertTransition from t lib
+  case insertTransition from t lib of
+    Left e -> Left (MusicLibraryError e)
+    Right newLib -> Right newLib
   where
     (from, t) = makeTransitionGraphEntry tx
 
-makeMusicLibrary :: Lib_raw -> MusicLibrary
+makeMusicLibrary :: Lib_raw -> Either YamlError MusicLibrary
 makeMusicLibrary l =
   makeTransitionGraph l.transitions intial
   where

@@ -4,6 +4,7 @@ import Data.Map.Strict qualified as Map
 import Data.Text (Text)
 import Domain.Camelot (Key)
 import Domain.MusicLibrary (MusicLibrary (..))
+import Domain.MusicLibrary qualified as L
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
 import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId)
@@ -30,6 +31,27 @@ data ResolvedPlaylistMember = ResolvedPlaylistMember
 type ResolvedPlaylist = [ResolvedPlaylistMember]
 
 {---------------------------------------------------------------------------
+  Errors
+----------------------------------------------------------------------------}
+
+data AppError
+  = TrackNotFound TrackId
+  | EmptyLibrary
+  | CouldNotResolvePlaylistMember TrackId
+  | CouldNotResolveTransition Transition
+  deriving (Show, Eq)
+
+requireTrack ::
+  MusicLibrary ->
+  TrackId ->
+  Either AppError Track
+requireTrack lib trackId =
+  maybe
+    (Left (TrackNotFound trackId))
+    Right
+    (L.getTrack trackId lib)
+
+{---------------------------------------------------------------------------
   Helper Functions
 ----------------------------------------------------------------------------}
 
@@ -46,11 +68,11 @@ resolvePlaylistMember lib pm =
 resolveTransition ::
   MusicLibrary ->
   Transition ->
-  Maybe ResolvedTransition
+  Either AppError ResolvedTransition
 resolveTransition lib t =
   case T.destTrack lib.trackCatalog t of
-    Just tr -> Just (ResolvedTransition t tr)
-    Nothing -> Nothing
+    Just tr -> Right (ResolvedTransition t tr)
+    Nothing -> Left (CouldNotResolveTransition t)
 
 resolvePlaylist ::
   MusicLibrary ->
@@ -92,14 +114,13 @@ getTransitions ::
   MusicLibrary ->
   TrackId -> -- origin track
   Int -> -- desired number of alternative transitions
-  [ResolvedTransition]
+  Either AppError [ResolvedTransition]
 getTransitions lib tid n =
-  case resolved of
-    Just ts -> ts
-    Nothing -> error "could not resolve transitions. something went wrong!"
-  where
-    ts = fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
-    resolved = sequence ts
+  sequence $
+    fmap (resolveTransition lib) $
+      map fst $
+        take n $
+          T.scoredTransitions lib tid
 
 mkPlaylist ::
   MusicLibrary ->

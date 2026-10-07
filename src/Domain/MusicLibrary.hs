@@ -1,4 +1,4 @@
-module Domain.MusicLibrary (MusicLibrary (..), insertTransition, isValidTransition, emptyMusicLibrary, getTrack) where
+module Domain.MusicLibrary (MusicLibrary (..), MusicLibraryError, insertTransition, isValidTransition, emptyMusicLibrary, getTrack) where
 
 import Domain.TestedTransitions
 import Domain.TrackCatalog
@@ -8,6 +8,10 @@ data MusicLibrary = MusicLibrary
     transitionGraph :: TestedTransitionsGraph
   }
   deriving (Show)
+
+data MusicLibraryError
+  = InsertingMalformedTransition TrackId TestedTransition
+  deriving (Show, Eq)
 
 emptyMusicLibrary :: MusicLibrary
 emptyMusicLibrary =
@@ -44,13 +48,10 @@ insertTransition ::
   TrackId ->
   TestedTransition ->
   MusicLibrary ->
-  MusicLibrary
-insertTransition tid t lib =
-  if isValidTransition (tid, t) lib
-    then
-      insertTransition_ tid t lib
-    else
-      error $ "insertTransition: track IDs '" ++ tid ++ "' and '" ++ t.to ++ "' must exist in track catalog, and can't be the same!"
+  Either MusicLibraryError MusicLibrary
+insertTransition tid t lib
+  | isValidTransition (tid, t) lib = Right (insertTransition_ tid t lib)
+  | otherwise = Left (InsertingMalformedTransition tid t)
 
 getTrack :: TrackId -> MusicLibrary -> Maybe Track
 getTrack tid lib = getTrackWithId tid lib.trackCatalog
