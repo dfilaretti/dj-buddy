@@ -21,40 +21,42 @@ data TestedTransition = TestedTransition
   { to :: TrackId,
     notes :: Maybe String
   }
-  deriving (Show)
-
--- TODO: is this "correct"? Should it obey certain laws?
-instance Eq TestedTransition where
-  t1 == t2 = t1.to == t2.to
+  deriving (Show, Eq)
 
 emptyGraph :: TestedTransitionsGraph
 emptyGraph = Map.empty
 
-safecons ::
-  TestedTransition ->
-  [TestedTransition] ->
-  [TestedTransition]
-safecons x xs =
-  if x `elem` xs
-    then
-      error $ "Transition " ++ show x ++ " already exists!"
-    else
-      x : xs
+transExists ::
+  TestedTransitionsGraph ->
+  TrackId -> -- from
+  TrackId -> -- to
+  Bool
+transExists g from to =
+  any
+    (\tt -> tt.to == to)
+    (getEdges from g)
 
 addEdge ::
   TrackId ->
   TestedTransition ->
   TestedTransitionsGraph ->
   TestedTransitionsGraph
-addEdge tid t g =
-  Map.alter f tid g
+addEdge tid t g
+  | transExists g tid t.to = error "WOOOOOO"
+  | otherwise =
+      Map.alter f tid g
   where
     f x = case x of
       Nothing -> Just [t]
-      Just ts -> Just (safecons t ts)
+      Just ts -> Just (t : ts)
 
 getEdges ::
   TrackId ->
   TestedTransitionsGraph ->
   [TestedTransition]
 getEdges = Map.findWithDefault []
+
+{-
+ [] Add Error type for this module
+ [] addEdge will then return Either ErrorType TestedTransitionsGraph
+-}
