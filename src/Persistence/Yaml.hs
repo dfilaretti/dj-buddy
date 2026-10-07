@@ -6,11 +6,12 @@ import Data.Yaml (FromJSON, decodeFileThrow)
 import Domain.Camelot
 import Domain.MusicLibrary
 import Domain.TestedTransitions
-import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId, addTrack, emptyCatalog)
+import Domain.TrackCatalog (Track (..), TrackCatalog, TrackCatalogError, TrackId, addTrack, emptyCatalog)
 import GHC.Generics (Generic)
 
 data YamlError
   = MusicLibraryError MusicLibraryError
+  | TrackCatalogError TrackCatalogError
   deriving (Show, Eq)
 
 readLibFromFile :: FilePath -> IO Lib_raw
@@ -50,11 +51,14 @@ makeTrackCatalogEntry :: Track_raw -> (TrackId, Track)
 makeTrackCatalogEntry t_raw =
   (t_raw.id, Track {title = t_raw.title, key = t_raw.key})
 
-makeTrackCatalog :: [Track_raw] -> TrackCatalog
-makeTrackCatalog = foldr insertTrack emptyCatalog
+makeTrackCatalog :: [Track_raw] -> Either YamlError TrackCatalog
+makeTrackCatalog rawTracks = foldM (\current t -> insertTrack t current) emptyCatalog rawTracks
 
-insertTrack :: Track_raw -> TrackCatalog -> TrackCatalog
-insertTrack tr c = addTrack (makeTrackCatalogEntry tr) c
+insertTrack :: Track_raw -> TrackCatalog -> Either YamlError TrackCatalog
+insertTrack tr c =
+  case addTrack (makeTrackCatalogEntry tr) c of
+    Left e -> Left $ TrackCatalogError e
+    Right c' -> Right c'
 
 makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =
@@ -62,7 +66,6 @@ makeTransitionGraphEntry t =
 
 makeTransitionGraph :: [Transition_raw] -> MusicLibrary -> Either YamlError MusicLibrary
 makeTransitionGraph ts lib =
-  -- foldr insertRawTransition lib ts
   foldM (\current tx -> insertRawTransition tx current) lib ts
 
 insertRawTransition ::
@@ -78,10 +81,9 @@ insertRawTransition tx lib =
 
 makeMusicLibrary :: Lib_raw -> Either YamlError MusicLibrary
 makeMusicLibrary l =
-  makeTransitionGraph l.transitions intial
-  where
-    intial =
-      MusicLibrary
-        { trackCatalog = makeTrackCatalog l.tracks,
-          transitionGraph = emptyGraph
-        }
+  case makeTrackCatalog l.tracks of
+    Left e -> Left e
+    Right cat ->
+      makeTransitionGraph
+        l.transitions
+        MusicLibrary {trackCatalog = cat, transitionGraph = emptyGraph}
