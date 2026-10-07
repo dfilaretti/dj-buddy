@@ -30,7 +30,6 @@ instance Eq TestedTransition where
 emptyGraph :: TestedTransitionsGraph
 emptyGraph = Map.empty
 
--- TODO: can generalize this and move into a utils file maybe?
 safecons ::
   TestedTransition ->
   [TestedTransition] ->
@@ -59,13 +58,3 @@ getEdges ::
   TestedTransitionsGraph ->
   [TestedTransition]
 getEdges = Map.findWithDefault []
-
--- getEdge :: TrackId -> TrackId -> Graph -> Maybe TestedTransition
--- getEdge tFrom tTo g =
---  case filter (\e -> e.to == tTo) (getEdges tFrom g) of
---    [] -> Nothing
---    [x] -> Just x
---    _ -> error "multiple edges with same destination - why?"
-
--- confirmedSuccessors :: TrackId -> Graph -> [TrackId]
--- confirmedSuccessors trackId = map (.to) . getEdges trackId
