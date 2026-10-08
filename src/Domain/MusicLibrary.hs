@@ -11,6 +11,7 @@ data MusicLibrary = MusicLibrary
 
 data MusicLibraryError
   = InsertingMalformedTransition TrackId TestedTransition
+  | TestedTransitionsError TestedTransitionsError
   deriving (Show, Eq)
 
 emptyMusicLibrary :: MusicLibrary
@@ -37,12 +38,16 @@ insertTransition_ ::
   TrackId ->
   TestedTransition ->
   MusicLibrary ->
-  MusicLibrary
+  Either MusicLibraryError MusicLibrary
 insertTransition_ tid t lib =
-  MusicLibrary {trackCatalog = c', transitionGraph = g'}
-  where
-    c' = lib.trackCatalog
-    g' = addEdge tid t lib.transitionGraph
+  case addEdge tid t lib.transitionGraph of
+    Left e -> Left $ TestedTransitionsError e
+    Right g' ->
+      Right $
+        MusicLibrary
+          { trackCatalog = lib.trackCatalog,
+            transitionGraph = g'
+          }
 
 insertTransition ::
   TrackId ->
@@ -50,7 +55,7 @@ insertTransition ::
   MusicLibrary ->
   Either MusicLibraryError MusicLibrary
 insertTransition tid t lib
-  | isValidTransition (tid, t) lib = Right (insertTransition_ tid t lib)
+  | isValidTransition (tid, t) lib = insertTransition_ tid t lib
   | otherwise = Left (InsertingMalformedTransition tid t)
 
 getTrack :: TrackId -> MusicLibrary -> Maybe Track

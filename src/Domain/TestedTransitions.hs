@@ -1,6 +1,7 @@
 module Domain.TestedTransitions
   ( TestedTransition (..),
     TestedTransitionsGraph,
+    TestedTransitionsError,
     emptyGraph,
     getEdges,
     addEdge,
@@ -23,6 +24,10 @@ data TestedTransition = TestedTransition
   }
   deriving (Show, Eq)
 
+data TestedTransitionsError
+  = TestedTransitionAlreadyExists TrackId TrackId
+  deriving (Show, Eq)
+
 emptyGraph :: TestedTransitionsGraph
 emptyGraph = Map.empty
 
@@ -40,11 +45,12 @@ addEdge ::
   TrackId ->
   TestedTransition ->
   TestedTransitionsGraph ->
-  TestedTransitionsGraph
-addEdge tid t g
-  | transExists g tid t.to = error "WOOOOOO"
+  Either TestedTransitionsError TestedTransitionsGraph
+addEdge from t g
+  | transExists g from t.to =
+      Left $ TestedTransitionAlreadyExists from t.to
   | otherwise =
-      Map.alter f tid g
+      Right $ Map.alter f from g
   where
     f x = case x of
       Nothing -> Just [t]
