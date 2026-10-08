@@ -160,28 +160,35 @@ handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   do
     lib <- readLibFromFile_ opts.libraryPath
-    plist <- mkPlaylist lib opts.firstTrack opts.maxTracks
-    putStr $ renderResolvedPlaylist plist
+    case lib of
+      Left e -> print e
+      Right lib' -> do
+        plist <- mkPlaylist lib' opts.firstTrack opts.maxTracks
+        case plist of
+          Left e -> print e
+          Right plist' -> putStr $ renderResolvedPlaylist plist'
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
   do
     lib <- readLibFromFile_ o.libraryPath
-    putStr $ renderTrackCatalog (getTracks lib o.title o.key)
+    case lib of
+      Left e -> print e
+      Right l_ ->
+        putStr $ renderTrackCatalog (getTracks l_ o.title o.key)
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =
   do
     lib <- readLibFromFile_ o.libraryPath
-    let startingTrack =
-          maybe
-            -- TODO: is this the right way to handle errors?!
-            (error "Init track not found; this shouldn't happen")
-            show
-            (getTrackFromId lib o.track)
-    putStrLn $ "Showing suggestions for: " ++ startingTrack
-    putStrLn $ replicate 60 '-'
-    putStr $ renderResolvedTransitions (getTransitions lib o.track o.maxTracks)
+    case lib of
+      Left e -> print e
+      Right l_ ->
+        case getTransitions l_ o.track o.maxTracks of
+          Left e -> print e
+          Right ts -> showTs ts
+  where
+    showTs ts = putStr $ renderResolvedTransitions ts
 
 {---------------------------------------------------------------------------
   Main

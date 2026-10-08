@@ -1,6 +1,7 @@
 module Domain.TrackCatalog
   ( Track (..),
     TrackCatalog,
+    TrackCatalogError,
     TrackId,
     addTrack,
     emptyCatalog,
@@ -33,6 +34,10 @@ data Track
   }
   deriving (Eq)
 
+data TrackCatalogError
+  = TrackIdAlreadyExists TrackId
+  deriving (Show, Eq)
+
 {---------------------------------------------------------------------------
   Predicates
 ----------------------------------------------------------------------------}
@@ -59,11 +64,11 @@ instance Show Track where
 emptyCatalog :: TrackCatalog
 emptyCatalog = Map.empty
 
-addTrack :: (TrackId, Track) -> TrackCatalog -> TrackCatalog
+addTrack :: (TrackId, Track) -> TrackCatalog -> Either TrackCatalogError TrackCatalog
 addTrack (tid, t) ts =
   case Map.lookup tid ts of
-    Nothing -> Map.insert tid t ts
-    Just _ -> error $ "track id '" ++ tid ++ "' already exists in track catalog!"
+    Nothing -> Right $ Map.insert tid t ts
+    Just _ -> Left $ TrackIdAlreadyExists tid
 
 getTracks :: (Track -> Bool) -> TrackCatalog -> [Track]
 getTracks p =
