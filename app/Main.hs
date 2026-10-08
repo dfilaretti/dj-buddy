@@ -162,9 +162,11 @@ handleMakePlaylist opts =
     lib <- readLibFromFile_ opts.libraryPath
     case lib of
       Left e -> print e
-      Right l_ -> do
-        plist <- mkPlaylist l_ opts.firstTrack opts.maxTracks
-        putStr $ renderResolvedPlaylist plist
+      Right lib' -> do
+        plist <- mkPlaylist lib' opts.firstTrack opts.maxTracks
+        case plist of
+          Left e -> print e
+          Right plist' -> putStr $ renderResolvedPlaylist plist'
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =

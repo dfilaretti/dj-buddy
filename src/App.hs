@@ -59,11 +59,11 @@ requireTrack lib trackId =
 resolvePlaylistMember ::
   MusicLibrary ->
   P.PlaylistMember ->
-  Maybe ResolvedPlaylistMember
+  Either AppError ResolvedPlaylistMember
 resolvePlaylistMember lib pm =
   case P.getTrack_ lib pm of
-    Just t -> Just (ResolvedPlaylistMember pm t)
-    Nothing -> Nothing
+    Just t -> Right (ResolvedPlaylistMember pm t)
+    Nothing -> Left $ CouldNotResolvePlaylistMember (P.getTrackId_ pm)
 
 resolveTransition ::
   MusicLibrary ->
@@ -77,7 +77,7 @@ resolveTransition lib t =
 resolvePlaylist ::
   MusicLibrary ->
   P.Playlist ->
-  Maybe ResolvedPlaylist
+  Either AppError ResolvedPlaylist
 resolvePlaylist lib p = sequence $ fmap (resolvePlaylistMember lib) p
 
 mkPlaylist_ ::
@@ -124,10 +124,8 @@ mkPlaylist ::
   MusicLibrary ->
   Maybe TrackId -> -- optional starting track (random if not provided)
   Int -> -- number of tracks
-  IO ResolvedPlaylist
+  IO (Either AppError ResolvedPlaylist)
 mkPlaylist lib mtid n =
   do
     p <- mkPlaylist_ lib mtid n
-    case resolvePlaylist lib p of
-      Just resolvedPlaylist -> return resolvedPlaylist
-      Nothing -> error "Unable to resolve playlist; this shouldn't happen, check your data!"
+    return $ resolvePlaylist lib p
