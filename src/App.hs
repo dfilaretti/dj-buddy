@@ -41,6 +41,10 @@ data AppError
   | CouldNotResolveTransition Transition
   deriving (Show, Eq)
 
+{---------------------------------------------------------------------------
+  Helper Functions
+----------------------------------------------------------------------------}
+
 requireTrack ::
   MusicLibrary ->
   TrackId ->
@@ -50,10 +54,6 @@ requireTrack lib trackId =
     (Left (TrackNotFound trackId))
     Right
     (L.getTrack trackId lib)
-
-{---------------------------------------------------------------------------
-  Helper Functions
-----------------------------------------------------------------------------}
 
 -- TODO: refactor this! I'm sure it can be simplified using fmap etc.
 resolvePlaylistMember ::
@@ -116,11 +116,9 @@ getTransitions ::
   Int -> -- desired number of alternative transitions
   Either AppError [ResolvedTransition]
 getTransitions lib tid n =
-  sequence $
-    fmap (resolveTransition lib) $
-      map fst $
-        take n $
-          T.scoredTransitions lib tid
+  case requireTrack lib tid of
+    Left e -> Left e
+    Right t -> sequence $ fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
 
 mkPlaylist ::
   MusicLibrary ->

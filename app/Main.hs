@@ -183,7 +183,7 @@ handleSuggestNextTracks o =
       Left e -> print e
       Right l_ ->
         case getTransitions l_ o.track o.maxTracks of
-          Left _ -> error "ouch"
+          Left e -> print e
           Right ts -> showTs ts
   where
     showTs ts = putStr $ renderResolvedTransitions ts
