@@ -116,9 +116,9 @@ getTransitions ::
   Int -> -- desired number of alternative transitions
   Either AppError [ResolvedTransition]
 getTransitions lib tid n =
-  case requireTrack lib tid of
-    Left e -> Left e
-    Right _ -> sequence $ fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
+  do
+    _ <- requireTrack lib tid
+    sequence $ fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
 
 mkPlaylist ::
   MusicLibrary ->
