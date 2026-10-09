@@ -1,9 +1,7 @@
 module Domain.Transitions where
 
 import Data.List (groupBy, sortOn)
-import Domain.MusicLibrary (MusicLibrary (..))
-import Domain.TestedTransitions (TestedTransition (..), TestedTransitionsGraph, getEdges)
-import Domain.TrackCatalog (Track, TrackCatalog, TrackId, getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
+import Domain.MusicLibrary (MusicLibrary (..), TestedTransition (..), TestedTransitionsGraph, Track, TrackCatalog, TrackId, getEdges, getTrackWithId, keyJumpSuccessors, sameKeySuccessors)
 import Domain.Utils (randomElement)
 
 data HarmonicTransType

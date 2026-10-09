@@ -3,12 +3,11 @@ module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPla
 import Data.Map.Strict qualified as Map
 import Data.Text (Text)
 import Domain.Camelot (Key)
-import Domain.MusicLibrary (MusicLibrary (..))
+import Domain.MusicLibrary (MusicLibrary (..), Track (..), TrackCatalog, TrackId)
 import Domain.MusicLibrary qualified as L
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
-import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId)
-import Domain.TrackCatalog qualified as C
+import Domain.MusicLibrary qualified as C
 import Domain.Transitions (Transition (..))
 import Domain.Transitions qualified as T
 

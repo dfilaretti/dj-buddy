@@ -3,8 +3,7 @@ module CLI.Render where
 import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
 import Data.Map.Strict qualified as Map
 import Domain.Playlist (PlaylistMember (..))
-import Domain.TestedTransitions (TestedTransition (..))
-import Domain.TrackCatalog (TrackCatalog)
+import Domain.MusicLibrary (TestedTransition (..), TrackCatalog)
 import Domain.Transitions (Transition (..))
 
 renderTrackCatalog :: TrackCatalog -> String

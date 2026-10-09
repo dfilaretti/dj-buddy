@@ -5,8 +5,6 @@ import Data.Text (Text)
 import Data.Yaml (FromJSON, decodeFileThrow)
 import Domain.Camelot
 import Domain.MusicLibrary
-import Domain.TestedTransitions
-import Domain.TrackCatalog (Track (..), TrackCatalog, TrackCatalogError, TrackId, addTrack, emptyCatalog)
 import GHC.Generics (Generic)
 
 data YamlError

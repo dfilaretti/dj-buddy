@@ -2,7 +2,6 @@ module Domain.Playlist (mkPlayListRand, mkPlayList, getTrackId_, getTrack_, Play
 
 import Data.Map.Strict qualified as Map
 import Domain.MusicLibrary
-import Domain.TrackCatalog
 import Domain.Transitions
 import Domain.Utils (randomElement)
 

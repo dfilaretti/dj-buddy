@@ -4,7 +4,7 @@ import App (getTracks, getTransitions, mkPlaylist)
 import CLI.Render
 import Data.Text (Text)
 import Domain.Camelot (Key)
-import Domain.TrackCatalog (TrackId)
+import Domain.MusicLibrary (TrackId)
 import Options.Applicative
 import Persistence.Yaml (readLibFromFile_)
 
