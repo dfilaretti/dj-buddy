@@ -9,7 +9,6 @@ import GHC.Generics (Generic)
 
 data YamlError
   = MusicLibraryError MusicLibraryError
-  | TrackCatalogError TrackCatalogError
   deriving (Show, Eq)
 
 readLibFromFile :: FilePath -> IO Lib_raw
@@ -55,7 +54,7 @@ makeTrackCatalog rawTracks = foldM (\current t -> insertTrack t current) emptyCa
 insertTrack :: Track_raw -> TrackCatalog -> Either YamlError TrackCatalog
 insertTrack tr c =
   case addTrack (makeTrackCatalogEntry tr) c of
-    Left e -> Left $ TrackCatalogError e
+    Left e -> Left $ MusicLibraryError e
     Right c' -> Right c'
 
 makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)

@@ -7,7 +7,6 @@ module Domain.MusicLibrary
     getTrack,
     Track (..),
     TrackCatalog,
-    TrackCatalogError,
     TrackId,
     addTrack,
     emptyCatalog,
@@ -19,7 +18,6 @@ module Domain.MusicLibrary
     keyMatches,
     TestedTransition (..),
     TestedTransitionsGraph,
-    TestedTransitionsError,
     emptyGraph,
     getEdges,
     addEdge,
@@ -31,13 +29,21 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Domain.Camelot (Key, compatibleKeys)
 
+---------
+
+data MusicLibraryError
+  = InsertingMalformedTransition TrackId TestedTransition
+  | TrackIdAlreadyExists TrackId
+  | TestedTransitionAlreadyExists TrackId TrackId
+  deriving (Show, Eq)
+
+-----------
+
 type TrackId = String
 
 type TrackCatalog = Map.Map TrackId Track
 
 data Track = Track {title :: Text, key :: Key} deriving (Eq)
-
-data TrackCatalogError = TrackIdAlreadyExists TrackId deriving (Show, Eq)
 
 titleMatches :: Text -> Track -> Bool
 titleMatches s t = T.isInfixOf (T.toLower s) (T.toLower t.title)
@@ -51,7 +57,7 @@ instance Show Track where
 emptyCatalog :: TrackCatalog
 emptyCatalog = Map.empty
 
-addTrack :: (TrackId, Track) -> TrackCatalog -> Either TrackCatalogError TrackCatalog
+addTrack :: (TrackId, Track) -> TrackCatalog -> Either MusicLibraryError TrackCatalog
 addTrack (tid, t) ts = case Map.lookup tid ts of
   Nothing -> Right $ Map.insert tid t ts
   Just _ -> Left $ TrackIdAlreadyExists tid
@@ -92,15 +98,13 @@ data UserRating = Nice | Omg deriving (Show, Eq, Ord)
 
 data TestedTransition = TestedTransition {to :: TrackId, notes :: Maybe String} deriving (Show, Eq)
 
-data TestedTransitionsError = TestedTransitionAlreadyExists TrackId TrackId deriving (Show, Eq)
-
 emptyGraph :: TestedTransitionsGraph
 emptyGraph = Map.empty
 
 transExists :: TestedTransitionsGraph -> TrackId -> TrackId -> Bool
 transExists g from to = any (\tt -> tt.to == to) (getEdges from g)
 
-addEdge :: TrackId -> TestedTransition -> TestedTransitionsGraph -> Either TestedTransitionsError TestedTransitionsGraph
+addEdge :: TrackId -> TestedTransition -> TestedTransitionsGraph -> Either MusicLibraryError TestedTransitionsGraph
 addEdge from t g
   | transExists g from t.to = Left $ TestedTransitionAlreadyExists from t.to
   | otherwise = Right $ Map.alter f from g
@@ -114,11 +118,6 @@ getEdges = Map.findWithDefault []
 
 data MusicLibrary = MusicLibrary {trackCatalog :: TrackCatalog, transitionGraph :: TestedTransitionsGraph} deriving (Show)
 
-data MusicLibraryError
-  = InsertingMalformedTransition TrackId TestedTransition
-  | TestedTransitionsError TestedTransitionsError
-  deriving (Show, Eq)
-
 emptyMusicLibrary :: MusicLibrary
 emptyMusicLibrary = MusicLibrary {trackCatalog = emptyCatalog, transitionGraph = emptyGraph}
 
@@ -129,7 +128,7 @@ isValidTransition (tid, t) lib = and [tid /= t.to, tid `elem` validIds, t.to `el
 
 insertTransition_ :: TrackId -> TestedTransition -> MusicLibrary -> Either MusicLibraryError MusicLibrary
 insertTransition_ tid t lib = case addEdge tid t lib.transitionGraph of
-  Left e -> Left $ TestedTransitionsError e
+  Left e -> Left e
   Right g' -> Right $ MusicLibrary {trackCatalog = lib.trackCatalog, transitionGraph = g'}
 
 insertTransition :: TrackId -> TestedTransition -> MusicLibrary -> Either MusicLibraryError MusicLibrary
