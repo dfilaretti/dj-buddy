@@ -1,4 +1,4 @@
-module App (mkPlaylist, getTracks, getTransitions, getTrackFromId, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
+module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
 
 import Data.Map.Strict qualified as Map
 import Data.Text (Text)
@@ -94,9 +94,6 @@ mkPlaylist_ lib mtid n =
   Exported Functions
 ----------------------------------------------------------------------------}
 
-getTrackFromId :: MusicLibrary -> TrackId -> Maybe Track
-getTrackFromId lib tid = C.getTrackWithId tid lib.trackCatalog
-
 getTracks ::
   MusicLibrary ->
   Maybe Text ->
@@ -116,9 +113,9 @@ getTransitions ::
   Int -> -- desired number of alternative transitions
   Either AppError [ResolvedTransition]
 getTransitions lib tid n =
-  case requireTrack lib tid of
-    Left e -> Left e
-    Right _ -> sequence $ fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
+  do
+    _ <- requireTrack lib tid
+    sequence $ fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
 
 mkPlaylist ::
   MusicLibrary ->

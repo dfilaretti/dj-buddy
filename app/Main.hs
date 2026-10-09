@@ -1,6 +1,6 @@
 module Main (main) where
 
-import App (getTrackFromId, getTracks, getTransitions, mkPlaylist)
+import App (getTracks, getTransitions, mkPlaylist)
 import CLI.Render
 import Data.Text (Text)
 import Domain.Camelot (Key)

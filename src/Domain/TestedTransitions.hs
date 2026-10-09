@@ -61,8 +61,3 @@ getEdges ::
   TestedTransitionsGraph ->
   [TestedTransition]
 getEdges = Map.findWithDefault []
-
-{-
- [] Add Error type for this module
- [] addEdge will then return Either ErrorType TestedTransitionsGraph
--}
