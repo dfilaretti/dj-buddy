@@ -17,7 +17,6 @@ module Domain.MusicLibrary
     keyMatches,
     TestedTransition (..),
     getEdges,
-    addEdge,
   )
 where
 
@@ -197,14 +196,6 @@ getTrackWithId tid (MusicLibrary lib) =
 trackKey :: TrackId -> MusicLibrary -> Maybe Key
 trackKey trackId catalog =
   fmap (.key) (getTrackWithId trackId catalog)
-
-addEdge ::
-  TrackId -> -- source id
-  TrackId -> -- dest id
-  TestedTransition -> -- transition metadata
-  MusicLibrary -> -- library to update
-  Either MusicLibraryError MusicLibrary
-addEdge = withTransition_
 
 -- TODO: return Either?
 getEdges ::

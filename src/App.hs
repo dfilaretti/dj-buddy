@@ -1,6 +1,5 @@
 module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
 
-import Data.Map.Strict qualified as Map
 import Data.Text (Text)
 import Domain.Camelot (Key)
 import Domain.MusicLibrary (MusicLibrary (..), Track (..), TrackId)
