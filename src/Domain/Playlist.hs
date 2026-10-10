@@ -17,7 +17,7 @@ getTrackId_ (StartingTrack tid) = tid
 getTrackId_ (MiddleTrack t) = destTrackId t
 
 getTrack_ :: MusicLibrary -> PlaylistMember -> Maybe Track
-getTrack_ lib pm = getTrack (getTrackId_ pm) lib
+getTrack_ lib pm = getTrackWithId (getTrackId_ pm) lib
 
 getTraskIds_ :: Playlist -> [TrackId]
 getTraskIds_ = fmap getTrackId_
@@ -28,7 +28,7 @@ mkPlayListRand ::
   IO Playlist
 mkPlayListRand lib n =
   do
-    maybeTid <- randomElement (Map.keys lib.trackCatalog)
+    maybeTid <- randomElement (getTrackIds lib)
     case maybeTid of
       Just tid -> mkPlayList lib tid n
       Nothing -> pure []

@@ -1,49 +1,132 @@
 module Domain.MusicLibrary
   ( MusicLibrary (..),
     MusicLibraryError,
-    insertTransition,
-    isValidTransition,
     emptyMusicLibrary,
-    getTrack,
     Track (..),
-    TrackCatalog,
     TrackId,
     addTrack,
-    emptyCatalog,
-    getAllTrackIds,
+    getTrackIds,
+    filterLib,
+    getPairs,
     getTrackWithId,
+    getTracks,
     keyJumpSuccessors,
+    withTransition_,
     sameKeySuccessors,
     titleMatches,
     keyMatches,
     TestedTransition (..),
-    TestedTransitionsGraph,
-    emptyGraph,
     getEdges,
     addEdge,
   )
 where
 
+import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
+import Data.Maybe (isJust)
+import Data.String (IsString)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Domain.Camelot (Key, compatibleKeys)
+import GHC.Generics (Generic)
 
----------
+{---------------------------------------------------------------------------
+  Errors
+----------------------------------------------------------------------------}
 
 data MusicLibraryError
   = InsertingMalformedTransition TrackId TestedTransition
   | TrackIdAlreadyExists TrackId
   | TestedTransitionAlreadyExists TrackId TrackId
+  | TransitionHasInvalidTrackId TrackId
+  | TransitionHasSameSourceAndDest TrackId
+  | InvalidTrackId TrackId
   deriving (Show, Eq)
 
------------
+{---------------------------------------------------------------------------
+  Data types
+----------------------------------------------------------------------------}
 
-type TrackId = String
+newtype TrackId = TrackId String
+  deriving (Show, Ord, Eq, Generic, IsString)
 
-type TrackCatalog = Map.Map TrackId Track
+data Track = Track
+  { title :: Text,
+    key :: Key
+  }
+  deriving (Eq)
 
-data Track = Track {title :: Text, key :: Key} deriving (Eq)
+data TestedTransition = TestedTransition
+  { notes :: Maybe String
+  }
+  deriving (Show, Eq)
+
+data TrackNode = TrackNode
+  { track :: Track,
+    testedTransitions :: Map TrackId TestedTransition
+  }
+
+newtype MusicLibrary = MusicLibrary (Map TrackId TrackNode)
+
+{---------------------------------------------------------------------------
+  Functions (basic)
+----------------------------------------------------------------------------}
+
+mkTrackNode :: Track -> TrackNode
+mkTrackNode t = (TrackNode t Map.empty)
+
+getNode :: TrackId -> MusicLibrary -> Maybe TrackNode
+getNode tid (MusicLibrary lib) = Map.lookup tid lib
+
+withNode :: TrackId -> TrackNode -> MusicLibrary -> MusicLibrary
+withNode tid node (MusicLibrary lib) =
+  MusicLibrary $ Map.insert tid node lib
+
+getTransition :: TrackNode -> TrackId -> Maybe TestedTransition
+getTransition node tid = Map.lookup tid (node.testedTransitions)
+
+hasTransition :: TrackNode -> TrackId -> Bool
+hasTransition node = isJust . getTransition node
+
+getTransition_ :: TrackId -> TrackId -> MusicLibrary -> Maybe TestedTransition
+getTransition_ from to lib =
+  do
+    node <- getNode from lib
+    getTransition node to
+
+hasTransition_ :: TrackId -> TrackId -> MusicLibrary -> Bool
+hasTransition_ from to = isJust . getTransition_ from to
+
+withTransition :: TrackId -> TestedTransition -> TrackNode -> TrackNode
+withTransition dest tdata node =
+  TrackNode
+    node.track
+    (Map.insert dest tdata node.testedTransitions)
+
+withTransition_ ::
+  TrackId ->
+  TrackId ->
+  TestedTransition ->
+  MusicLibrary ->
+  Either MusicLibraryError MusicLibrary
+withTransition_ from to info lib
+  | from == to = Left $ TransitionHasSameSourceAndDest from
+  | otherwise =
+      case getNode from lib of
+        Nothing -> Left $ TransitionHasInvalidTrackId from
+        Just fromNode ->
+          case getNode to lib of
+            Nothing -> Left $ TransitionHasInvalidTrackId to
+            Just _ -> Right $ withNode from updatedNode lib
+          where
+            updatedNode = withTransition to info fromNode
+
+{---------------------------------------------------------------------------
+  Functions
+----------------------------------------------------------------------------}
+
+instance Show Track where
+  show (Track trackTitle trackKey') = "\"" ++ T.unpack trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 titleMatches :: Text -> Track -> Bool
 titleMatches s t = T.isInfixOf (T.toLower s) (T.toLower t.title)
@@ -51,90 +134,87 @@ titleMatches s t = T.isInfixOf (T.toLower s) (T.toLower t.title)
 keyMatches :: Key -> Track -> Bool
 keyMatches k t = k == t.key
 
-instance Show Track where
-  show (Track trackTitle trackKey') = "\"" ++ T.unpack trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+hasTrack :: TrackId -> MusicLibrary -> Bool
+hasTrack tid (MusicLibrary lib) = Map.member tid lib
 
-emptyCatalog :: TrackCatalog
-emptyCatalog = Map.empty
+addTrack ::
+  (TrackId, Track) ->
+  MusicLibrary ->
+  Either MusicLibraryError MusicLibrary
+addTrack (tid, t) (MusicLibrary ts)
+  | Map.member tid ts = Left $ TrackIdAlreadyExists tid
+  | otherwise = Right $ MusicLibrary $ Map.insert tid (mkTrackNode t) ts
 
-addTrack :: (TrackId, Track) -> TrackCatalog -> Either MusicLibraryError TrackCatalog
-addTrack (tid, t) ts = case Map.lookup tid ts of
-  Nothing -> Right $ Map.insert tid t ts
-  Just _ -> Left $ TrackIdAlreadyExists tid
+mkTrackNodePred :: (Track -> Bool) -> (TrackNode -> Bool)
+mkTrackNodePred p =
+  \trackNode -> p trackNode.track
 
-getTracks :: (Track -> Bool) -> TrackCatalog -> [Track]
-getTracks p = Map.elems . Map.filter p
+filterLib :: (Track -> Bool) -> MusicLibrary -> MusicLibrary
+filterLib p (MusicLibrary ts) =
+  MusicLibrary $ Map.filter (mkTrackNodePred p) ts
 
-getTrackIds :: (Track -> Bool) -> TrackCatalog -> [TrackId]
-getTrackIds p = Map.keys . Map.filter p
+getTracks :: MusicLibrary -> [Track]
+getTracks (MusicLibrary lib) = fmap (.track) $ Map.elems lib
 
-getTracksWithKey :: Key -> TrackCatalog -> [TrackId]
-getTracksWithKey desiredKey = getTrackIds ((== desiredKey) . (.key))
+getPairs :: MusicLibrary -> [(TrackId, Track)]
+getPairs (MusicLibrary lib) =
+  fmap (\(tid, node) -> (tid, node.track)) $ Map.toList lib
 
-sameKeySuccessors :: TrackId -> TrackCatalog -> [TrackId]
-sameKeySuccessors trackId catalog = maybe [] (filter (/= trackId) . (`getTracksWithKey` catalog)) (trackKey trackId catalog)
+getTrackIds :: MusicLibrary -> [TrackId]
+getTrackIds (MusicLibrary lib) = Map.keys lib
 
-keyJumpSuccessors :: TrackId -> TrackCatalog -> [TrackId]
-keyJumpSuccessors trackId catalog = maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
+getTracksMatching :: (Track -> Bool) -> MusicLibrary -> [Track]
+getTracksMatching p = getTracks . filterLib p
 
-harmonicSuccessors :: TrackId -> TrackCatalog -> [TrackId]
-harmonicSuccessors trackId catalog = sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
+getTrackIdsMatching :: (Track -> Bool) -> MusicLibrary -> [TrackId]
+getTrackIdsMatching p =
+  getTrackIds . filterLib p
 
-getTracksWithKeys :: [Key] -> TrackCatalog -> [TrackId]
-getTracksWithKeys keys catalog = concatMap (`getTracksWithKey` catalog) keys
+getTracksWithKey :: Key -> MusicLibrary -> [TrackId]
+getTracksWithKey desiredKey =
+  getTrackIdsMatching ((== desiredKey) . (.key))
 
-trackKey :: TrackId -> TrackCatalog -> Maybe Key
-trackKey trackId catalog = (.key) <$> Map.lookup trackId catalog
+sameKeySuccessors :: TrackId -> MusicLibrary -> [TrackId]
+sameKeySuccessors trackId catalog =
+  maybe [] (filter (/= trackId) . (`getTracksWithKey` catalog)) (trackKey trackId catalog)
 
-getTrackWithId :: TrackId -> TrackCatalog -> Maybe Track
-getTrackWithId = Map.lookup
+keyJumpSuccessors :: TrackId -> MusicLibrary -> [TrackId]
+keyJumpSuccessors trackId catalog =
+  maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
 
-getAllTrackIds :: TrackCatalog -> [TrackId]
-getAllTrackIds = Map.keys
+harmonicSuccessors :: TrackId -> MusicLibrary -> [TrackId]
+harmonicSuccessors trackId catalog =
+  sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
 
-type TestedTransitionsGraph = Map.Map TrackId [TestedTransition]
+getTracksWithKeys :: [Key] -> MusicLibrary -> [TrackId]
+getTracksWithKeys keys catalog =
+  concatMap (`getTracksWithKey` catalog) keys
 
-data UserRating = Nice | Omg deriving (Show, Eq, Ord)
+getTrackWithId :: TrackId -> MusicLibrary -> Maybe Track
+getTrackWithId tid (MusicLibrary lib) =
+  (.track) <$> Map.lookup tid lib
 
-data TestedTransition = TestedTransition {to :: TrackId, notes :: Maybe String} deriving (Show, Eq)
+trackKey :: TrackId -> MusicLibrary -> Maybe Key
+trackKey trackId catalog =
+  fmap (.key) (getTrackWithId trackId catalog)
 
-emptyGraph :: TestedTransitionsGraph
-emptyGraph = Map.empty
+addEdge ::
+  TrackId -> -- source id
+  TrackId -> -- dest id
+  TestedTransition -> -- transition metadata
+  MusicLibrary -> -- library to update
+  Either MusicLibraryError MusicLibrary
+addEdge = withTransition_
 
-transExists :: TestedTransitionsGraph -> TrackId -> TrackId -> Bool
-transExists g from to = any (\tt -> tt.to == to) (getEdges from g)
-
-addEdge :: TrackId -> TestedTransition -> TestedTransitionsGraph -> Either MusicLibraryError TestedTransitionsGraph
-addEdge from t g
-  | transExists g from t.to = Left $ TestedTransitionAlreadyExists from t.to
-  | otherwise = Right $ Map.alter f from g
-  where
-    f x = case x of
-      Nothing -> Just [t]
-      Just ts -> Just (t : ts)
-
-getEdges :: TrackId -> TestedTransitionsGraph -> [TestedTransition]
-getEdges = Map.findWithDefault []
-
-data MusicLibrary = MusicLibrary {trackCatalog :: TrackCatalog, transitionGraph :: TestedTransitionsGraph} deriving (Show)
+-- TODO: return Either?
+getEdges ::
+  TrackId ->
+  MusicLibrary ->
+  [(TrackId, TestedTransition)]
+getEdges tid lib = do
+  case getNode tid lib of
+    Nothing -> []
+    Just node -> Map.toList $ node.testedTransitions
 
 emptyMusicLibrary :: MusicLibrary
-emptyMusicLibrary = MusicLibrary {trackCatalog = emptyCatalog, transitionGraph = emptyGraph}
-
-isValidTransition :: (TrackId, TestedTransition) -> MusicLibrary -> Bool
-isValidTransition (tid, t) lib = and [tid /= t.to, tid `elem` validIds, t.to `elem` validIds]
-  where
-    validIds = getAllTrackIds lib.trackCatalog
-
-insertTransition_ :: TrackId -> TestedTransition -> MusicLibrary -> Either MusicLibraryError MusicLibrary
-insertTransition_ tid t lib = case addEdge tid t lib.transitionGraph of
-  Left e -> Left e
-  Right g' -> Right $ MusicLibrary {trackCatalog = lib.trackCatalog, transitionGraph = g'}
-
-insertTransition :: TrackId -> TestedTransition -> MusicLibrary -> Either MusicLibraryError MusicLibrary
-insertTransition tid t lib
-  | isValidTransition (tid, t) lib = insertTransition_ tid t lib
-  | otherwise = Left (InsertingMalformedTransition tid t)
-
-getTrack :: TrackId -> MusicLibrary -> Maybe Track
-getTrack tid lib = getTrackWithId tid lib.trackCatalog
+emptyMusicLibrary = MusicLibrary $ Map.empty
