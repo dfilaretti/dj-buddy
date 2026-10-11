@@ -55,7 +55,7 @@ makeTrackCatalog rawTracks = foldM (\current t -> insertTrack t current) emptyMu
 
 insertTrack :: Track_raw -> MusicLibrary -> Either YamlError MusicLibrary
 insertTrack tr c =
-  case addTrack (makeTrackCatalogEntry tr) c of
+  case withTrack (makeTrackCatalogEntry tr) c of
     Left e -> Left $ MusicLibraryError e
     Right c' -> Right c'
 

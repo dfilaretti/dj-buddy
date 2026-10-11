@@ -4,7 +4,7 @@ module Domain.MusicLibrary
     emptyMusicLibrary,
     Track (..),
     TrackId,
-    addTrack,
+    withTrack,
     getTrackIds,
     filterLib,
     getPairs,
@@ -23,11 +23,9 @@ where
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
 import Data.Maybe (isJust)
-import Data.String (IsString)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Domain.Camelot (Key, compatibleKeys)
-import GHC.Generics (Generic)
 
 {---------------------------------------------------------------------------
   Errors
@@ -46,7 +44,7 @@ data MusicLibraryError
   Data types
 ----------------------------------------------------------------------------}
 
-type TrackId = String
+type TrackId = String -- for now...
 
 data Track = Track
   { title :: Text,
@@ -56,6 +54,8 @@ data Track = Track
 
 data TestedTransition = TestedTransition
   { notes :: Maybe String
+  -- rating
+  -- etc.
   }
   deriving (Show, Eq)
 
@@ -124,10 +124,12 @@ withTransition_ from to info lib
 ----------------------------------------------------------------------------}
 
 instance Show Track where
-  show (Track trackTitle trackKey') = "\"" ++ T.unpack trackTitle ++ "\" (" ++ show trackKey' ++ ")"
+  show (Track trackTitle trackKey') =
+    "\"" ++ T.unpack trackTitle ++ "\" (" ++ show trackKey' ++ ")"
 
 titleMatches :: Text -> Track -> Bool
-titleMatches s t = T.isInfixOf (T.toLower s) (T.toLower t.title)
+titleMatches s t =
+  T.isInfixOf (T.toLower s) (T.toLower t.title)
 
 keyMatches :: Key -> Track -> Bool
 keyMatches k t = k == t.key
@@ -135,11 +137,11 @@ keyMatches k t = k == t.key
 hasTrack :: TrackId -> MusicLibrary -> Bool
 hasTrack tid (MusicLibrary lib) = Map.member tid lib
 
-addTrack ::
+withTrack ::
   (TrackId, Track) ->
   MusicLibrary ->
   Either MusicLibraryError MusicLibrary
-addTrack (tid, t) (MusicLibrary ts)
+withTrack (tid, t) (MusicLibrary ts)
   | Map.member tid ts = Left $ TrackIdAlreadyExists tid
   | otherwise = Right $ MusicLibrary $ Map.insert tid (mkTrackNode t) ts
 
