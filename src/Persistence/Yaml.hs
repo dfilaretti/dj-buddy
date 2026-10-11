@@ -36,7 +36,7 @@ data Transition_raw = Transition_raw
 
 instance FromJSON Transition_raw
 
-instance FromJSON TrackId
+-- instance FromJSON TrackId
 
 data Lib_raw = Lib_raw
   { tracks :: [Track_raw],

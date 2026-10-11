@@ -46,8 +46,7 @@ data MusicLibraryError
   Data types
 ----------------------------------------------------------------------------}
 
-newtype TrackId = TrackId String
-  deriving (Show, Ord, Eq, Generic, IsString)
+type TrackId = String
 
 data Track = Track
   { title :: Text,
