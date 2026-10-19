@@ -18,9 +18,6 @@ getTrackId_ (MiddleTrack t) = destTrackId t
 getTrack_ :: MusicLibrary -> PlaylistMember -> Maybe Track
 getTrack_ lib pm = getTrackWithId (getTrackId_ pm) lib
 
-getTraskIds_ :: Playlist -> [TrackId]
-getTraskIds_ = fmap getTrackId_
-
 mkPlayListRand ::
   MusicLibrary ->
   Int -> -- number of tracks
@@ -30,32 +27,27 @@ mkPlayListRand lib n =
     maybeTid <- randomElement (getTrackIds lib)
     case maybeTid of
       Just tid -> mkPlayList lib tid n
-      Nothing -> pure []
+      Nothing -> pure [] -- TODO: return error instead (using Either)?
 
 mkPlayList ::
   MusicLibrary ->
   TrackId -> -- starting track
   Int -> -- number of tracks
   IO Playlist
-mkPlayList lib tid n =
-  mkPlayList_ lib tid n [StartingTrack tid]
-
-mkPlayList_ ::
-  MusicLibrary ->
-  TrackId -> -- starting track
-  Int -> -- number of tracks
-  Playlist -> -- accumulated result
-  IO Playlist
-mkPlayList_ lib tid n ts
-  | length ts == n = return ts
+mkPlayList lib start n
+  | n <= 0 = pure []
   | otherwise =
-      do
-        trans <- pickBest allTrans
-        case trans of
-          Nothing -> return ts
-          Just ((trans_, _)) ->
-            mkPlayList_ lib (destTrackId trans_) n (ts ++ [MiddleTrack trans_])
+      (StartingTrack start :) <$> go start (n - 1) [start]
   where
-    allTrans = filter notUsed $ scoredTransitions lib tid
-    usedTracks = getTraskIds_ ts
-    notUsed (t, _) = not $ destTrackId t `elem` usedTracks
+    go :: TrackId -> Int -> [TrackId] -> IO Playlist
+    go _ 0 _ = pure []
+    go current remaining used = do
+      chosen <-
+        pickBest $
+          filter (\(t, _) -> destTrackId t `notElem` used) $
+            scoredTransitions lib current
+      case chosen of
+        Nothing -> pure []
+        Just (t, _) ->
+          let next = destTrackId t
+           in (MiddleTrack t :) <$> go next (remaining - 1) (next : used)
