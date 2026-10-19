@@ -76,7 +76,7 @@ insertRawTransition tx lib =
     Left e -> Left (MusicLibraryError e)
     Right newLib -> Right newLib
   where
-    (from, t) = makeTransitionGraphEntry tx
+    (_, t) = makeTransitionGraphEntry tx
 
 makeMusicLibrary :: Lib_raw -> Either YamlError MusicLibrary
 makeMusicLibrary l =

@@ -22,7 +22,6 @@ where
 
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
-import Data.Maybe (isJust)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Domain.Camelot (Key, compatibleKeys)
@@ -80,21 +79,6 @@ withNode :: TrackId -> TrackNode -> MusicLibrary -> MusicLibrary
 withNode tid node (MusicLibrary lib) =
   MusicLibrary $ Map.insert tid node lib
 
-getTransition :: TrackNode -> TrackId -> Maybe TestedTransition
-getTransition node tid = Map.lookup tid (node.testedTransitions)
-
-hasTransition :: TrackNode -> TrackId -> Bool
-hasTransition node = isJust . getTransition node
-
-getTransition_ :: TrackId -> TrackId -> MusicLibrary -> Maybe TestedTransition
-getTransition_ from to lib =
-  do
-    node <- getNode from lib
-    getTransition node to
-
-hasTransition_ :: TrackId -> TrackId -> MusicLibrary -> Bool
-hasTransition_ from to = isJust . getTransition_ from to
-
 withTransition :: TrackId -> TestedTransition -> TrackNode -> TrackNode
 withTransition dest tdata node =
   TrackNode
@@ -134,9 +118,6 @@ titleMatches s t =
 keyMatches :: Key -> Track -> Bool
 keyMatches k t = k == t.key
 
-hasTrack :: TrackId -> MusicLibrary -> Bool
-hasTrack tid (MusicLibrary lib) = Map.member tid lib
-
 withTrack ::
   (TrackId, Track) ->
   MusicLibrary ->
@@ -163,9 +144,6 @@ getPairs (MusicLibrary lib) =
 getTrackIds :: MusicLibrary -> [TrackId]
 getTrackIds (MusicLibrary lib) = Map.keys lib
 
-getTracksMatching :: (Track -> Bool) -> MusicLibrary -> [Track]
-getTracksMatching p = getTracks . filterLib p
-
 getTrackIdsMatching :: (Track -> Bool) -> MusicLibrary -> [TrackId]
 getTrackIdsMatching p =
   getTrackIds . filterLib p
@@ -181,10 +159,6 @@ sameKeySuccessors trackId catalog =
 keyJumpSuccessors :: TrackId -> MusicLibrary -> [TrackId]
 keyJumpSuccessors trackId catalog =
   maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
-
-harmonicSuccessors :: TrackId -> MusicLibrary -> [TrackId]
-harmonicSuccessors trackId catalog =
-  sameKeySuccessors trackId catalog ++ keyJumpSuccessors trackId catalog
 
 getTracksWithKeys :: [Key] -> MusicLibrary -> [TrackId]
 getTracksWithKeys keys catalog =

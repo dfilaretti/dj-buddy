@@ -1,7 +1,6 @@
 module CLI.Render where
 
-import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..), getTracks)
-import Data.Map.Strict qualified as Map
+import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
 import Domain.MusicLibrary (MusicLibrary, TestedTransition (..))
 import Domain.MusicLibrary qualified as L
 import Domain.Playlist (PlaylistMember (..))
