@@ -1,4 +1,12 @@
-module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
+module App
+  ( mkPlaylist,
+    getTracks,
+    getTransitions,
+    ResolvedPlaylist,
+    ResolvedPlaylistMember (..),
+    ResolvedTransition (..),
+  )
+where
 
 import Data.Text (Text)
 import Domain.Camelot (Key)
@@ -52,30 +60,32 @@ requireTrack lib trackId =
     Right
     (L.getTrackWithId trackId lib)
 
--- TODO: refactor this! I'm sure it can be simplified using fmap etc.
 resolvePlaylistMember ::
   MusicLibrary ->
   P.PlaylistMember ->
   Either AppError ResolvedPlaylistMember
 resolvePlaylistMember lib pm =
-  case P.getTrack_ lib pm of
-    Just t -> Right (ResolvedPlaylistMember pm t)
-    Nothing -> Left $ CouldNotResolvePlaylistMember (P.getTrackId_ pm)
+  maybe
+    (Left $ CouldNotResolvePlaylistMember (P.getTrackId_ pm))
+    (\t -> Right (ResolvedPlaylistMember pm t))
+    (P.getTrack_ lib pm)
 
 resolveTransition ::
   MusicLibrary ->
   Transition ->
   Either AppError ResolvedTransition
 resolveTransition lib t =
-  case T.destTrack lib t of
-    Just tr -> Right (ResolvedTransition t tr)
-    Nothing -> Left (CouldNotResolveTransition t)
+  maybe
+    (Left (CouldNotResolveTransition t))
+    (\tr -> Right (ResolvedTransition t tr))
+    (T.destTrack lib t)
 
 resolvePlaylist ::
   MusicLibrary ->
   P.Playlist ->
   Either AppError ResolvedPlaylist
-resolvePlaylist lib p = sequence $ fmap (resolvePlaylistMember lib) p
+resolvePlaylist lib p =
+  sequence $ fmap (resolvePlaylistMember lib) p
 
 mkPlaylist_ ::
   MusicLibrary ->
@@ -83,9 +93,10 @@ mkPlaylist_ ::
   Int -> -- number of tracks (default = 10)
   IO Playlist
 mkPlaylist_ lib mtid n =
-  case mtid of
-    Nothing -> P.mkPlayListRand lib n
-    Just tid -> P.mkPlayList lib tid n
+  maybe
+    (P.mkPlayListRand lib n)
+    (\tid -> P.mkPlayList lib tid n)
+    mtid
 
 {---------------------------------------------------------------------------
   Exported Functions
@@ -110,7 +121,11 @@ getTransitions ::
 getTransitions lib tid n =
   do
     _ <- requireTrack lib tid
-    sequence $ fmap (resolveTransition lib) $ map fst $ take n $ T.scoredTransitions lib tid
+    sequence $
+      fmap (resolveTransition lib) $
+        map fst $
+          take n $
+            T.scoredTransitions lib tid
 
 mkPlaylist ::
   MusicLibrary ->

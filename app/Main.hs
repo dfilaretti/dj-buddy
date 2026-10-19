@@ -156,6 +156,7 @@ showLibraryParser =
 defaultLibraryPath :: String
 defaultLibraryPath = "src/library.yaml"
 
+-- TODO: I read this can be refactored using ExceptT, but haven't done it yet
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   do
