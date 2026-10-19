@@ -85,7 +85,7 @@ resolvePlaylist ::
   P.Playlist ->
   Either AppError ResolvedPlaylist
 resolvePlaylist lib p =
-  sequence $ fmap (resolvePlaylistMember lib) p
+  traverse (resolvePlaylistMember lib) p
 
 mkPlaylist_ ::
   MusicLibrary ->
@@ -121,11 +121,9 @@ getTransitions ::
 getTransitions lib tid n =
   do
     _ <- requireTrack lib tid
-    sequence $
-      fmap (resolveTransition lib) $
-        map fst $
-          take n $
-            T.scoredTransitions lib tid
+    traverse
+      (resolveTransition lib)
+      (map fst $ take n $ T.scoredTransitions lib tid)
 
 mkPlaylist ::
   MusicLibrary ->
