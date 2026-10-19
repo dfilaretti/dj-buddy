@@ -5,13 +5,10 @@ import Data.Text (Text)
 import Data.Yaml (FromJSON, decodeFileThrow)
 import Domain.Camelot
 import Domain.MusicLibrary
-import Domain.TestedTransitions
-import Domain.TrackCatalog (Track (..), TrackCatalog, TrackCatalogError, TrackId, addTrack, emptyCatalog)
 import GHC.Generics (Generic)
 
 data YamlError
   = MusicLibraryError MusicLibraryError
-  | TrackCatalogError TrackCatalogError
   deriving (Show, Eq)
 
 readLibFromFile :: FilePath -> IO Lib_raw
@@ -39,6 +36,8 @@ data Transition_raw = Transition_raw
 
 instance FromJSON Transition_raw
 
+-- instance FromJSON TrackId
+
 data Lib_raw = Lib_raw
   { tracks :: [Track_raw],
     transitions :: [Transition_raw]
@@ -51,18 +50,18 @@ makeTrackCatalogEntry :: Track_raw -> (TrackId, Track)
 makeTrackCatalogEntry t_raw =
   (t_raw.id, Track {title = t_raw.title, key = t_raw.key})
 
-makeTrackCatalog :: [Track_raw] -> Either YamlError TrackCatalog
-makeTrackCatalog rawTracks = foldM (\current t -> insertTrack t current) emptyCatalog rawTracks
+makeTrackCatalog :: [Track_raw] -> Either YamlError MusicLibrary
+makeTrackCatalog rawTracks = foldM (\current t -> insertTrack t current) emptyMusicLibrary rawTracks
 
-insertTrack :: Track_raw -> TrackCatalog -> Either YamlError TrackCatalog
+insertTrack :: Track_raw -> MusicLibrary -> Either YamlError MusicLibrary
 insertTrack tr c =
-  case addTrack (makeTrackCatalogEntry tr) c of
-    Left e -> Left $ TrackCatalogError e
+  case withTrack (makeTrackCatalogEntry tr) c of
+    Left e -> Left $ MusicLibraryError e
     Right c' -> Right c'
 
 makeTransitionGraphEntry :: Transition_raw -> (TrackId, TestedTransition)
 makeTransitionGraphEntry t =
-  (t.from, TestedTransition {to = t.to, notes = t.notes})
+  (t.from, TestedTransition {notes = t.notes})
 
 makeTransitionGraph :: [Transition_raw] -> MusicLibrary -> Either YamlError MusicLibrary
 makeTransitionGraph ts lib =
@@ -73,7 +72,7 @@ insertRawTransition ::
   MusicLibrary ->
   Either YamlError MusicLibrary
 insertRawTransition tx lib =
-  case insertTransition from t lib of
+  case withTransition_ tx.from tx.to t lib of
     Left e -> Left (MusicLibraryError e)
     Right newLib -> Right newLib
   where
@@ -86,4 +85,4 @@ makeMusicLibrary l =
     Right cat ->
       makeTransitionGraph
         l.transitions
-        MusicLibrary {trackCatalog = cat, transitionGraph = emptyGraph}
+        cat

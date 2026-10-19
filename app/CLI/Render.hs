@@ -1,21 +1,21 @@
 module CLI.Render where
 
-import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
+import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..), getTracks)
 import Data.Map.Strict qualified as Map
+import Domain.MusicLibrary (MusicLibrary, TestedTransition (..))
+import Domain.MusicLibrary qualified as L
 import Domain.Playlist (PlaylistMember (..))
-import Domain.TestedTransitions (TestedTransition (..))
-import Domain.TrackCatalog (TrackCatalog)
 import Domain.Transitions (Transition (..))
 
-renderTrackCatalog :: TrackCatalog -> String
-renderTrackCatalog =
-  unlines . map formatTrack . Map.toList
+renderTrackCatalog :: MusicLibrary -> String
+renderTrackCatalog lib =
+  unlines $ map formatTrack $ L.getPairs lib
   where
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track
 
 renderTransition :: Transition -> String
-renderTransition (Tested i) = "Tested (notes: " ++ notes ++ ")"
+renderTransition (Tested i _) = "Tested (notes: " ++ notes ++ ")"
   where
     notes = case i.notes of
       Nothing -> "NA"

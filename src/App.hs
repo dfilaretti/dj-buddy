@@ -1,14 +1,11 @@
 module App (mkPlaylist, getTracks, getTransitions, ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..)) where
 
-import Data.Map.Strict qualified as Map
 import Data.Text (Text)
 import Domain.Camelot (Key)
-import Domain.MusicLibrary (MusicLibrary (..))
+import Domain.MusicLibrary (MusicLibrary (..), Track (..), TrackId)
 import Domain.MusicLibrary qualified as L
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
-import Domain.TrackCatalog (Track (..), TrackCatalog, TrackId)
-import Domain.TrackCatalog qualified as C
 import Domain.Transitions (Transition (..))
 import Domain.Transitions qualified as T
 
@@ -53,7 +50,7 @@ requireTrack lib trackId =
   maybe
     (Left (TrackNotFound trackId))
     Right
-    (L.getTrack trackId lib)
+    (L.getTrackWithId trackId lib)
 
 -- TODO: refactor this! I'm sure it can be simplified using fmap etc.
 resolvePlaylistMember ::
@@ -70,7 +67,7 @@ resolveTransition ::
   Transition ->
   Either AppError ResolvedTransition
 resolveTransition lib t =
-  case T.destTrack lib.trackCatalog t of
+  case T.destTrack lib t of
     Just tr -> Right (ResolvedTransition t tr)
     Nothing -> Left (CouldNotResolveTransition t)
 
@@ -98,14 +95,12 @@ getTracks ::
   MusicLibrary ->
   Maybe Text ->
   Maybe Key ->
-  TrackCatalog
+  MusicLibrary
 getTracks lib title key =
-  Map.filter
-    (\x -> all ($ x) [keyPred, titlePred])
-    lib.trackCatalog
+  L.filterLib (\x -> all ($ x) [keyPred, titlePred]) lib
   where
-    titlePred = maybe (const True) C.titleMatches title
-    keyPred = maybe (const True) C.keyMatches key
+    titlePred = maybe (const True) L.titleMatches title
+    keyPred = maybe (const True) L.keyMatches key
 
 getTransitions ::
   MusicLibrary ->
