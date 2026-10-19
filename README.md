@@ -51,5 +51,6 @@ A future web UI would use the same `App` interface, sharing the existing functio
 - **Library imports:** the YAML file is currently maintained by hand. Importing track metadata from Traktor, rekordbox, and similar tools would make larger libraries easier to manage while keeping transition curation manual.
 - **Richer metadata:** the format is deliberately minimal. BPM is omitted because my sets stay around 138–140 BPM, so I already assume the tracks are tempo-compatible. Artist names are also omitted because I know this small collection well. Both would be useful additions as the library grows, but add little to the current proof of concept.
 - **Web UI:** a web view could make browsing and curating the library easier, using the same application library as the CLI.
+- **add some chaos** the program currently tries to select the "best next transition", looking 1 step ahead. This works, but we could make it smarter, e.g. what if the next immediate transition is fantastic but from then there's nothing interesting we can do from there? And, conversely, what if we pick a next transition which is just ok but then it unlocks an amazing part of the library with a lot of fantastic transitions? 
 
 Licensed under [BSD-3-Clause](LICENSE).
