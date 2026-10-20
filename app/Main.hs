@@ -170,25 +170,15 @@ handleMakePlaylist opts =
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
-  do
-    lib <- readLibFromFile_ o.libraryPath
-    case lib of
-      Left e -> print e
-      Right l_ ->
-        putStr $ renderTrackCatalog (getTracks l_ o.title o.key)
+  either print (putStr . renderTrackCatalog) =<< runExceptT do
+    lib <- ExceptT $ readLibFromFile_ o.libraryPath
+    pure $ getTracks lib o.title o.key
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =
-  do
-    lib <- readLibFromFile_ o.libraryPath
-    case lib of
-      Left e -> print e
-      Right l_ ->
-        case getTransitions l_ o.track o.maxTracks of
-          Left e -> print e
-          Right ts -> showTs ts
-  where
-    showTs ts = putStr $ renderResolvedTransitions ts
+  either print (putStr . renderResolvedTransitions) =<< runExceptT do
+    lib <- ExceptT $ readLibFromFile_ o.libraryPath
+    ExceptT $ pure $ getTransitions lib o.track o.maxTracks
 
 {---------------------------------------------------------------------------
   Main
