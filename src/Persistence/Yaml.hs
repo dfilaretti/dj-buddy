@@ -14,8 +14,8 @@ data YamlError
 readLibFromFile :: FilePath -> IO Lib_raw
 readLibFromFile p = decodeFileThrow p :: IO Lib_raw
 
-readLibFromFile_ :: FilePath -> IO (Either YamlError MusicLibrary)
-readLibFromFile_ p =
+readMusicLibrary :: FilePath -> IO (Either YamlError MusicLibrary)
+readMusicLibrary p =
   fmap makeMusicLibrary (readLibFromFile p)
 
 data Track_raw = Track_raw

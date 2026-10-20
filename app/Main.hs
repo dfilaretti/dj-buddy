@@ -1,16 +1,30 @@
+{---------------------------------------------------------------------------
+  Command data structure
+----------------------------------------------------------------------------}
+{---------------------------------------------------------------------------
+  CLI parser
+----------------------------------------------------------------------------}
+-- technically, this should be TrackID
+{---------------------------------------------------------------------------
+  Helpers
+----------------------------------------------------------------------------}
+-- TODO: I read this can be refactored using ExceptT, but haven't done it yet
+{-# LANGUAGE BlockArguments #-}
+
 module Main (main) where
 
-import App (getTracks, getTransitions, mkPlaylist)
+import App
+  ( getTracks,
+    getTransitions,
+    mkPlaylist,
+    readLibFromFile_,
+  )
 import CLI.Render
+import Control.Monad.Trans.Except (ExceptT (ExceptT), runExceptT)
 import Data.Text (Text)
 import Domain.Camelot (Key)
 import Domain.MusicLibrary (TrackId)
 import Options.Applicative
-import Persistence.Yaml (readLibFromFile_)
-
-{---------------------------------------------------------------------------
-  Command data structure
-----------------------------------------------------------------------------}
 
 data Command
   = MakePlaylist MakePlaylistOptions
@@ -39,10 +53,6 @@ data ShowLibraryOptions = ShowLibraryOptions
   }
   deriving (Show)
 
-{---------------------------------------------------------------------------
-  CLI parser
-----------------------------------------------------------------------------}
-
 commandParser :: Parser Command
 commandParser =
   subparser $
@@ -64,7 +74,7 @@ makePlaylistParser =
                         )
                     )
                 <*> optional
-                  ( strOption -- technically, this should be TrackID
+                  ( strOption
                       ( long "startTrack"
                           <> short 's'
                           <> metavar "TRACK_ID"
@@ -149,25 +159,14 @@ showLibraryParser =
     )
     (progDesc "Lists tracks in the library")
 
-{---------------------------------------------------------------------------
-  Helpers
-----------------------------------------------------------------------------}
-
 defaultLibraryPath :: String
 defaultLibraryPath = "src/library.yaml"
 
--- TODO: I read this can be refactored using ExceptT, but haven't done it yet
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
-  do
-    lib <- readLibFromFile_ opts.libraryPath
-    case lib of
-      Left e -> print e
-      Right lib' -> do
-        plist <- mkPlaylist lib' opts.firstTrack opts.maxTracks
-        case plist of
-          Left e -> print e
-          Right plist' -> putStr $ renderResolvedPlaylist plist'
+  either print (putStr . renderResolvedPlaylist) =<< runExceptT do
+    lib <- ExceptT $ readLibFromFile_ opts.libraryPath
+    ExceptT $ mkPlaylist lib opts.firstTrack opts.maxTracks
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =

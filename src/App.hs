@@ -1,5 +1,8 @@
 module App
   ( mkPlaylist,
+    readLibFromFile_,
+    mkPlaylist,
+    AppError (..),
     getTracks,
     getTransitions,
     ResolvedPlaylist,
@@ -16,6 +19,7 @@ import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
 import Domain.Transitions (Transition (..))
 import Domain.Transitions qualified as T
+import Persistence.Yaml qualified as Yaml
 
 {---------------------------------------------------------------------------
   Data
@@ -44,6 +48,7 @@ data AppError
   | EmptyLibrary
   | CouldNotResolvePlaylistMember TrackId
   | CouldNotResolveTransition Transition
+  | LibraryLoadError Yaml.YamlError
   deriving (Show, Eq)
 
 {---------------------------------------------------------------------------
@@ -101,6 +106,14 @@ mkPlaylist_ lib mtid n =
 {---------------------------------------------------------------------------
   Exported Functions
 ----------------------------------------------------------------------------}
+
+readLibFromFile_ :: FilePath -> IO (Either AppError MusicLibrary)
+readLibFromFile_ p =
+  do
+    result <- Yaml.readMusicLibrary p
+    case result of
+      Left e -> pure (Left (LibraryLoadError e))
+      Right lib -> pure (Right lib)
 
 getTracks ::
   MusicLibrary ->
