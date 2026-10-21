@@ -1,15 +1,11 @@
-import Control.Exception (SomeException, evaluate, try)
-import Data.List
-import Data.Map.Strict qualified as Map
-import Test.Tasty
-import Test.Tasty.HUnit
-import Test.Tasty.QuickCheck as QC
+import Control.Monad (foldM)
 import Domain.Camelot
-import Domain.TrackCatalog
-import Domain.TestedTransitions
 import Domain.MusicLibrary
 import Domain.Transitions
 import Domain.Utils
+import Test.Tasty
+import Test.Tasty.HUnit
+import Test.Tasty.QuickCheck as QC
 
 instance Arbitrary KeyNumber where
   arbitrary = elements [minBound .. maxBound]
@@ -17,7 +13,22 @@ instance Arbitrary KeyNumber where
 instance Arbitrary KeyType where
   arbitrary = elements [minBound .. maxBound]
 
+main :: IO ()
 main = defaultMain tests
+
+expectRight :: (Show e) => Either e a -> IO a
+expectRight = either (fail . ("Expected Right, got Left: " ++) . show) pure
+
+libraryWithTracks :: [(TrackId, Track)] -> IO MusicLibrary
+libraryWithTracks tracks =
+  expectRight $ foldM (flip withTrack) emptyMusicLibrary tracks
+
+-- Error constructors are not exported, so check their public Show representation.
+assertLibraryError :: String -> Either MusicLibraryError a -> Assertion
+assertLibraryError expected result =
+  case result of
+    Left err -> show err @?= expected
+    Right _ -> assertFailure $ "Expected Left " ++ expected ++ ", got Right"
 
 tests :: TestTree
 tests =
@@ -64,7 +75,7 @@ transitionTests =
     "Transitions"
     [ testCase "tested transitions have zero cost" $ do
         let lib = emptyMusicLibrary
-            transition = Tested (TestedTransition "42" Nothing)
+            transition = Tested (TestedTransition Nothing) "42"
         transitionCost lib transition @?= 0,
       testCase "same key transitions cost 1" $ do
         let lib = emptyMusicLibrary
@@ -75,24 +86,16 @@ transitionTests =
             transition = Harmonic CompatibleKeys "42"
         transitionCost lib transition @?= 2,
       testCase "tested transitions do not appear as harmonic transitions" $ do
-        let lib =
-              MusicLibrary
-                { transitionGraph =
-                    Map.fromList
-                      [ ("0", [TestedTransition {to = "1", notes = Nothing}])
-                      ],
-                  trackCatalog =
-                    Map.fromList
-                      [ ("0", Track "A" (Key K_1 M)),
-                        ("1", Track "B" (Key K_1 D))
-                      ]
-                }
-            allTransitions = transitions lib "0"
-            harmonic = harmonicTransitions lib.trackCatalog "0"
-            tested = testedTransitions lib.transitionGraph "0"
-        length harmonic @?= 1
-        length tested @?= 1
-        length allTransitions @?= 1 -- the harmonic transition was filtered out!
+        starting <-
+          libraryWithTracks
+            [ ("0", Track "A" (Key K_1 M)),
+              ("1", Track "B" (Key K_1 D))
+            ]
+        let info = TestedTransition Nothing
+        lib <- expectRight $ withTransition "0" "1" info starting
+        harmonicTransitions lib "0" @?= [Harmonic CompatibleKeys "1"]
+        testedTransitions lib "0" @?= [Tested info "1"]
+        transitions lib "0" @?= [Tested info "1"]
     ]
 
 propertyTests :: TestTree
@@ -122,43 +125,65 @@ graphTests =
     "Graph"
     [ testCase "inserting the first transition" $
         do
-          let g = emptyGraph
-              t = TestedTransition {to = "1", notes = Nothing}
-          addEdge "0" t g
-            @?= Map.fromList [("0", [t])],
+          starting <-
+            libraryWithTracks
+              [("0", Track "A" (read "5D")), ("1", Track "B" (read "6D"))]
+          let t = TestedTransition Nothing
+          lib <- expectRight $ withTransition "0" "1" t starting
+          getEdges "0" lib @?= [("1", t)]
+          getEdges "1" lib @?= [],
       testCase "inserting the nth transition" $
         do
-          let g = Map.fromList [("0", [t1])]
-              t1 = TestedTransition "1" Nothing
-              t2 = TestedTransition "2" Nothing
-          addEdge "0" t2 g @?= Map.fromList [("0", [t2, t1])],
-      testCase "inserting the 'same' transition twice should throw" $
+          starting <-
+            libraryWithTracks
+              [ ("0", Track "A" (read "5D")),
+                ("1", Track "B" (read "6D")),
+                ("2", Track "C" (read "7D"))
+              ]
+          let t1 = TestedTransition Nothing
+              t2 = TestedTransition (Just "second transition")
+          first <- expectRight $ withTransition "0" "1" t1 starting
+          lib <- expectRight $ withTransition "0" "2" t2 first
+          -- Destinations are now stored in a Map, ordered by track ID.
+          getEdges "0" lib @?= [("1", t1), ("2", t2)],
+      testCase "inserting the 'same' transition twice should return Left" $
         do
-          let g = emptyGraph
-              t1 = TestedTransition "1" Nothing
-              t2 = TestedTransition "1" (Just "same song, different transition")
-          result <- try (evaluate (addEdge "0" t1 $ addEdge "0" t2 g)) :: IO (Either SomeException TestedTransitionsGraph)
-          case result of
-            Left _ -> pure ()
-            Right _ -> assertFailure "expected addEdge to throw"
+          starting <-
+            libraryWithTracks
+              [("0", Track "A" (read "5D")), ("1", Track "B" (read "6D"))]
+          let t1 = TestedTransition Nothing
+              t2 = TestedTransition (Just "same song, different transition")
+          lib <- expectRight $ withTransition "0" "1" t1 starting
+          assertLibraryError "TestedTransitionAlreadyExists \"0\" \"1\"" $
+            withTransition "0" "1" t1 lib
+          assertLibraryError "TestedTransitionAlreadyExists \"0\" \"1\"" $
+            withTransition "0" "1" t2 lib
+          getEdges "0" lib @?= [("1", t1)]
+          reverseLib <- expectRight $ withTransition "1" "0" t2 lib
+          getEdges "1" reverseLib @?= [("0", t2)]
+          getEdges "0" reverseLib @?= [("1", t1)]
     ]
 
 musicLibraryTests :: TestTree
 musicLibraryTests =
   testGroup
     "MusicLibrary"
-    [testCase "to insert a transition in the music library, the to/fromIDs must exist, and must not be the same" $
+    [ testCase "to insert a transition in the music library, the to/fromIDs must exist, and must not be the same" $
         do
-          let lib =
-                Map.fromList
-                  [ ("0", Track "A" (read "5D")),
-                    ("1", Track "B" (read "6D"))
-                  ]
-              starting = MusicLibrary lib emptyGraph
-          isValidTransition ("0", TestedTransition "1" Nothing) starting @?= True
-          isValidTransition ("0", TestedTransition "0" Nothing) starting @?= False
-          isValidTransition ("99", TestedTransition "0" Nothing) starting @?= False
-          isValidTransition ("0", TestedTransition "99" Nothing) starting @?= False
+          starting <-
+            libraryWithTracks
+              [ ("0", Track "A" (read "5D")),
+                ("1", Track "B" (read "6D"))
+              ]
+          let info = TestedTransition Nothing
+          lib <- expectRight $ withTransition "0" "1" info starting
+          getEdges "0" lib @?= [("1", info)]
+          assertLibraryError "TransitionHasSameSourceAndDest \"0\"" $
+            withTransition "0" "0" info starting
+          assertLibraryError "TransitionHasInvalidTrackId \"99\"" $
+            withTransition "99" "0" info starting
+          assertLibraryError "TransitionHasInvalidTrackId \"99\"" $
+            withTransition "0" "99" info starting
     ]
 
 trackCatalogTests :: TestTree
@@ -167,16 +192,12 @@ trackCatalogTests =
     "Track Catalog"
     [ testCase "basic insert works as expected" $
         do
-          let c = emptyCatalog
-              t = Track "A" (read "5D")
-          addTrack ("0", t) c
-            @?= Map.fromList [("0", t)],
-      testCase "inserting same track twice should throw" $
+          let t = Track "A" (read "5D")
+          lib <- expectRight $ withTrack ("0", t) emptyMusicLibrary
+          getPairs lib @?= [("0", t)],
+      testCase "inserting same track twice should return Left" $
         do
-          let c = Map.fromList [("0", t)]
-              t = Track "A" (read "5D")
-          result <- try (evaluate (addTrack ("0", t) c)) :: IO (Either SomeException TrackCatalog)
-          case result of
-            Left _ -> pure ()
-            Right _ -> assertFailure "expected addTrack to throw"
+          let t = Track "A" (read "5D")
+          lib <- expectRight $ withTrack ("0", t) emptyMusicLibrary
+          assertLibraryError "TrackIdAlreadyExists \"0\"" $ withTrack ("0", t) lib
     ]

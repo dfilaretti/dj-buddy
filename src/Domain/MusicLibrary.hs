@@ -85,7 +85,6 @@ withNodeTransition dest tdata node =
     node.track
     (Map.insert dest tdata node.testedTransitions)
 
--- TODO: refactor this; ExceptT?
 withTransition ::
   TrackId ->
   TrackId ->
@@ -97,7 +96,9 @@ withTransition from to info lib
   | otherwise = do
       fromNode <- requireNode from
       _ <- requireNode to
-      pure $ withNode from (withNodeTransition to info fromNode) lib
+      if Map.member to fromNode.testedTransitions
+        then Left $ TestedTransitionAlreadyExists from to
+        else pure $ withNode from (withNodeTransition to info fromNode) lib
   where
     requireNode tid =
       maybe
