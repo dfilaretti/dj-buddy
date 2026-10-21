@@ -11,7 +11,7 @@ module Domain.MusicLibrary
     getTrackWithId,
     getTracks,
     keyJumpSuccessors,
-    withTransition_,
+    withTransition,
     sameKeySuccessors,
     titleMatches,
     keyMatches,
@@ -79,29 +79,31 @@ withNode :: TrackId -> TrackNode -> MusicLibrary -> MusicLibrary
 withNode tid node (MusicLibrary lib) =
   MusicLibrary $ Map.insert tid node lib
 
-withTransition :: TrackId -> TestedTransition -> TrackNode -> TrackNode
-withTransition dest tdata node =
+withNodeTransition :: TrackId -> TestedTransition -> TrackNode -> TrackNode
+withNodeTransition dest tdata node =
   TrackNode
     node.track
     (Map.insert dest tdata node.testedTransitions)
 
-withTransition_ ::
+-- TODO: refactor this; ExceptT?
+withTransition ::
   TrackId ->
   TrackId ->
   TestedTransition ->
   MusicLibrary ->
   Either MusicLibraryError MusicLibrary
-withTransition_ from to info lib
+withTransition from to info lib
   | from == to = Left $ TransitionHasSameSourceAndDest from
-  | otherwise =
-      case getNode from lib of
-        Nothing -> Left $ TransitionHasInvalidTrackId from
-        Just fromNode ->
-          case getNode to lib of
-            Nothing -> Left $ TransitionHasInvalidTrackId to
-            Just _ -> Right $ withNode from updatedNode lib
-          where
-            updatedNode = withTransition to info fromNode
+  | otherwise = do
+      fromNode <- requireNode from
+      _ <- requireNode to
+      pure $ withNode from (withNodeTransition to info fromNode) lib
+  where
+    requireNode tid =
+      maybe
+        (Left $ TransitionHasInvalidTrackId tid)
+        Right
+        (getNode tid lib)
 
 {---------------------------------------------------------------------------
   Functions

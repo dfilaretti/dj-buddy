@@ -72,7 +72,7 @@ insertRawTransition ::
   MusicLibrary ->
   Either YamlError MusicLibrary
 insertRawTransition tx lib =
-  case withTransition_ tx.from tx.to t lib of
+  case withTransition tx.from tx.to t lib of
     Left e -> Left (MusicLibraryError e)
     Right newLib -> Right newLib
   where
