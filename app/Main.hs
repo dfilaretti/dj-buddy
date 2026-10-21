@@ -1,16 +1,3 @@
-{---------------------------------------------------------------------------
-  Command data structure
-----------------------------------------------------------------------------}
-{---------------------------------------------------------------------------
-  CLI parser
-----------------------------------------------------------------------------}
--- technically, this should be TrackID
-{---------------------------------------------------------------------------
-  Helpers
-----------------------------------------------------------------------------}
--- TODO: I read this can be refactored using ExceptT, but haven't done it yet
-{-# LANGUAGE BlockArguments #-}
-
 module Main (main) where
 
 import App
@@ -20,11 +7,19 @@ import App
     readLibFromFile_,
   )
 import CLI.Render
+import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Trans.Except (ExceptT (ExceptT), runExceptT)
 import Data.Text (Text)
 import Domain.Camelot (Key)
 import Domain.MusicLibrary (TrackId)
 import Options.Applicative
+
+-- TODO: move those helpers somewhere shared
+catchExceptT :: (Monad m) => ExceptT e m a -> (e -> m a) -> m a
+catchExceptT m hdl = runExceptT m >>= either hdl pure
+
+handleExceptT :: (Monad m) => (e -> m a) -> ExceptT e m a -> m a
+handleExceptT = flip catchExceptT
 
 data Command
   = MakePlaylist MakePlaylistOptions
@@ -164,21 +159,24 @@ defaultLibraryPath = "src/library.yaml"
 
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
-  either print (putStr . renderResolvedPlaylist) =<< runExceptT do
+  handleExceptT print do
     lib <- ExceptT $ readLibFromFile_ opts.libraryPath
-    ExceptT $ mkPlaylist lib opts.firstTrack opts.maxTracks
+    plist <- ExceptT $ mkPlaylist lib opts.firstTrack opts.maxTracks
+    liftIO $ putStr $ renderResolvedPlaylist plist
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
-  either print (putStr . renderTrackCatalog) =<< runExceptT do
+  handleExceptT print do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
-    pure $ getTracks lib o.title o.key
+    ts <- pure $ getTracks lib o.title o.key
+    liftIO $ putStr $ renderTrackCatalog ts
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =
-  either print (putStr . renderResolvedTransitions) =<< runExceptT do
+  handleExceptT print do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
-    ExceptT $ pure $ getTransitions lib o.track o.maxTracks
+    ts <- ExceptT $ pure $ getTransitions lib o.track o.maxTracks
+    liftIO $ putStr $ renderResolvedTransitions ts
 
 {---------------------------------------------------------------------------
   Main

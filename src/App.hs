@@ -1,7 +1,6 @@
 module App
   ( mkPlaylist,
     readLibFromFile_,
-    mkPlaylist,
     AppError (..),
     getTracks,
     getTransitions,
