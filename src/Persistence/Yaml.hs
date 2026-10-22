@@ -2,21 +2,32 @@ module Persistence.Yaml where
 
 import Control.Monad (foldM)
 import Data.Text (Text)
-import Data.Yaml (FromJSON, decodeFileThrow)
+import Data.Yaml (FromJSON, decodeFileEither)
 import Domain.Camelot
 import Domain.MusicLibrary
 import GHC.Generics (Generic)
 
 data YamlError
   = MusicLibraryError MusicLibraryError
+  | YamlFileNotFound FilePath
   deriving (Show, Eq)
 
-readLibFromFile :: FilePath -> IO Lib_raw
-readLibFromFile p = decodeFileThrow p :: IO Lib_raw
+readLibFromFile :: FilePath -> IO (Either YamlError Lib_raw)
+readLibFromFile yamlFile = do
+  parsedYaml <- decodeFileEither yamlFile
+  case parsedYaml of
+    Left _ -> pure $ Left $ YamlFileNotFound yamlFile
+    Right rawLib -> pure $ Right rawLib
 
 readMusicLibrary :: FilePath -> IO (Either YamlError MusicLibrary)
-readMusicLibrary p =
-  fmap makeMusicLibrary (readLibFromFile p)
+readMusicLibrary filename = do
+  rawLibLoadResult <- readLibFromFile filename
+  case rawLibLoadResult of
+    Left e -> pure $ Left e
+    Right rawLib ->
+      case makeMusicLibrary rawLib of
+        Left e -> pure $ Left $ e
+        Right lib -> pure $ Right lib
 
 data Track_raw = Track_raw
   { id :: TrackId,
