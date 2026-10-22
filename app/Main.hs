@@ -21,6 +21,12 @@ catchExceptT m hdl = runExceptT m >>= either hdl pure
 handleExceptT :: (Monad m) => (e -> m a) -> ExceptT e m a -> m a
 handleExceptT = flip catchExceptT
 
+handleExceptTFail :: (Monad m, MonadFail m, Show e) => ExceptT e m a -> m a
+handleExceptTFail x =
+  handleExceptT (fail . show) x
+
+-----------------------------------------------------------
+
 data Command
   = MakePlaylist MakePlaylistOptions
   | SuggestNextTracks SuggestNextTracksOptions
@@ -159,21 +165,21 @@ defaultLibraryPath = "src/library.yaml"
 
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
-  handleExceptT print do
+  handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ opts.libraryPath
     plist <- ExceptT $ mkPlaylist lib opts.firstTrack opts.maxTracks
     liftIO $ putStr $ renderResolvedPlaylist plist
 
 handleShowLibrary :: ShowLibraryOptions -> IO ()
 handleShowLibrary o =
-  handleExceptT print do
+  handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
     ts <- pure $ getTracks lib o.title o.key
     liftIO $ putStr $ renderTrackCatalog ts
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =
-  handleExceptT print do
+  handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
     ts <- ExceptT $ pure $ getTransitions lib o.track o.maxTracks
     liftIO $ putStr $ renderResolvedTransitions ts
