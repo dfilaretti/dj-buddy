@@ -6,8 +6,7 @@ module Domain.MusicLibrary
     TrackId,
     withTrack,
     getTrackIds,
-    filterLib,
-    getPairs,
+    getTracksMatching,
     getTrackWithId,
     getTracks,
     keyJumpSuccessors,
@@ -133,23 +132,21 @@ mkTrackNodePred :: (Track -> Bool) -> (TrackNode -> Bool)
 mkTrackNodePred p =
   \trackNode -> p trackNode.track
 
-filterLib :: (Track -> Bool) -> MusicLibrary -> MusicLibrary
-filterLib p (MusicLibrary ts) =
-  MusicLibrary $ Map.filter (mkTrackNodePred p) ts
+getTracksMatching :: (Track -> Bool) -> MusicLibrary -> [(TrackId, Track)]
+getTracksMatching p (MusicLibrary ts) =
+  fmap
+    (\kv -> (fst kv, (.track) $ snd kv))
+    (Map.toList $ Map.filter (mkTrackNodePred p) ts)
 
-getTracks :: MusicLibrary -> [Track]
-getTracks (MusicLibrary lib) = fmap (.track) $ Map.elems lib
-
-getPairs :: MusicLibrary -> [(TrackId, Track)]
-getPairs (MusicLibrary lib) =
-  fmap (\(tid, node) -> (tid, node.track)) $ Map.toList lib
+getTracks :: MusicLibrary -> [(TrackId, Track)]
+getTracks = getTracksMatching (const True)
 
 getTrackIds :: MusicLibrary -> [TrackId]
 getTrackIds (MusicLibrary lib) = Map.keys lib
 
 getTrackIdsMatching :: (Track -> Bool) -> MusicLibrary -> [TrackId]
 getTrackIdsMatching p =
-  getTrackIds . filterLib p
+  fmap fst . getTracksMatching p
 
 getTracksWithKey :: Key -> MusicLibrary -> [TrackId]
 getTracksWithKey desiredKey =

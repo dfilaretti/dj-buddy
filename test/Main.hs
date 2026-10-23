@@ -194,7 +194,7 @@ libraryInsertTracksTests =
         do
           let t = Track "A" (read "5D")
           lib <- expectRight $ withTrack ("0", t) emptyMusicLibrary
-          getPairs lib @?= [("0", t)],
+          getTracks lib @?= [("0", t)],
       testCase "inserting same track twice should return Left" $
         do
           let t = Track "A" (read "5D")

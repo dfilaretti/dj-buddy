@@ -1,14 +1,13 @@
 module CLI.Render where
 
 import App (ResolvedPlaylist, ResolvedPlaylistMember (..), ResolvedTransition (..))
-import Domain.MusicLibrary (MusicLibrary, TestedTransition (..))
-import Domain.MusicLibrary qualified as L
+import Domain.MusicLibrary (TestedTransition (..), Track, TrackId)
 import Domain.Playlist (PlaylistMember (..))
 import Domain.Transitions (Transition (..))
 
-renderMusicLibrary :: MusicLibrary -> String
+renderMusicLibrary :: [(TrackId, Track)] -> String
 renderMusicLibrary lib =
-  unlines $ map formatTrack $ L.getPairs lib
+  unlines $ map formatTrack $ lib
   where
     formatTrack (trackId, track) =
       show trackId ++ ": " ++ show track

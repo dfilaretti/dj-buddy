@@ -118,9 +118,9 @@ getTracks ::
   MusicLibrary ->
   Maybe Text ->
   Maybe Key ->
-  MusicLibrary
+  [(TrackId, Track)]
 getTracks lib title key =
-  L.filterLib (\x -> all ($ x) [keyPred, titlePred]) lib
+  L.getTracksMatching (\x -> all ($ x) [keyPred, titlePred]) lib
   where
     titlePred = maybe (const True) L.titleMatches title
     keyPred = maybe (const True) L.keyMatches key
