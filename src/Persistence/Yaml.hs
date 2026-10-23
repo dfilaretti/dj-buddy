@@ -61,16 +61,20 @@ data Lib_raw = Lib_raw
 
 instance FromJSON Lib_raw
 
-makeTrackCatalogEntry :: Track_raw -> (TrackId, Track)
-makeTrackCatalogEntry t_raw =
+makeLibEntry :: Track_raw -> (TrackId, Track)
+makeLibEntry t_raw =
   (t_raw.id, Track {title = t_raw.title, key = t_raw.key})
 
-makeTrackCatalog :: [Track_raw] -> Either YamlError MusicLibrary
-makeTrackCatalog rawTracks = foldM (\current t -> insertTrack t current) emptyMusicLibrary rawTracks
+insertTracks :: [Track_raw] -> Either YamlError MusicLibrary
+insertTracks rawTracks =
+  foldM
+    (\current t -> insertTrack t current)
+    emptyMusicLibrary
+    rawTracks
 
 insertTrack :: Track_raw -> MusicLibrary -> Either YamlError MusicLibrary
 insertTrack tr c =
-  case withTrack (makeTrackCatalogEntry tr) c of
+  case withTrack (makeLibEntry tr) c of
     Left e -> Left $ MusicLibraryError e
     Right c' -> Right c'
 
@@ -95,7 +99,7 @@ insertRawTransition tx lib =
 
 makeMusicLibrary :: Lib_raw -> Either YamlError MusicLibrary
 makeMusicLibrary l =
-  case makeTrackCatalog l.tracks of
+  case insertTracks l.tracks of
     Left e -> Left e
     Right cat ->
       makeTransitionGraph

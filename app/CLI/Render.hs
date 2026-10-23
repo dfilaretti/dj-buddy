@@ -6,8 +6,8 @@ import Domain.MusicLibrary qualified as L
 import Domain.Playlist (PlaylistMember (..))
 import Domain.Transitions (Transition (..))
 
-renderTrackCatalog :: MusicLibrary -> String
-renderTrackCatalog lib =
+renderMusicLibrary :: MusicLibrary -> String
+renderMusicLibrary lib =
   unlines $ map formatTrack $ L.getPairs lib
   where
     formatTrack (trackId, track) =

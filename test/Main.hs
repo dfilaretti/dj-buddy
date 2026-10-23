@@ -36,10 +36,10 @@ tests =
     "Tests"
     [ camelotTests,
       graphTests,
-      trackCatalogTests,
+      libraryInsertTracksTests,
       transitionTests,
       propertyTests,
-      musicLibraryTests,
+      libraryTransitionTest,
       miscTests
     ]
 
@@ -164,10 +164,10 @@ graphTests =
           getEdges "0" reverseLib @?= [("1", t1)]
     ]
 
-musicLibraryTests :: TestTree
-musicLibraryTests =
+libraryTransitionTest :: TestTree
+libraryTransitionTest =
   testGroup
-    "MusicLibrary"
+    "MusicLibrary: inserting transitions"
     [ testCase "to insert a transition in the music library, the to/fromIDs must exist, and must not be the same" $
         do
           starting <-
@@ -186,10 +186,10 @@ musicLibraryTests =
             withTransition "0" "99" info starting
     ]
 
-trackCatalogTests :: TestTree
-trackCatalogTests =
+libraryInsertTracksTests :: TestTree
+libraryInsertTracksTests =
   testGroup
-    "Track Catalog"
+    "MusicLibrary: inserting tracks"
     [ testCase "basic insert works as expected" $
         do
           let t = Track "A" (read "5D")

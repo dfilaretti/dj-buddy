@@ -175,7 +175,7 @@ handleShowLibrary o =
   handleExceptTFail do
     lib <- ExceptT $ readLibFromFile_ o.libraryPath
     ts <- pure $ getTracks lib o.title o.key
-    liftIO $ putStr $ renderTrackCatalog ts
+    liftIO $ putStr $ renderMusicLibrary ts
 
 handleSuggestNextTracks :: SuggestNextTracksOptions -> IO ()
 handleSuggestNextTracks o =
