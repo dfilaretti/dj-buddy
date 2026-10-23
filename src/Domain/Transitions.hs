@@ -2,7 +2,7 @@ module Domain.Transitions where
 
 import Data.List (groupBy, sortOn)
 import Domain.MusicLibrary
-  ( MusicLibrary (..),
+  ( MusicLibrary,
     TestedTransition (..),
     Track,
     TrackId,

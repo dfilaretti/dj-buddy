@@ -1,6 +1,6 @@
 module Domain.MusicLibrary
-  ( MusicLibrary (..),
-    MusicLibraryError,
+  ( MusicLibrary,
+    MusicLibraryError (..),
     emptyMusicLibrary,
     Track (..),
     TrackId,

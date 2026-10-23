@@ -12,7 +12,7 @@ where
 
 import Data.Text (Text)
 import Domain.Camelot (Key)
-import Domain.MusicLibrary (MusicLibrary (..), Track (..), TrackId)
+import Domain.MusicLibrary (MusicLibrary, Track (..), TrackId)
 import Domain.MusicLibrary qualified as L
 import Domain.Playlist (Playlist)
 import Domain.Playlist qualified as P
