@@ -175,15 +175,15 @@ trackKey :: TrackId -> MusicLibrary -> Maybe Key
 trackKey trackId lib =
   fmap (.key) (getTrackWithId trackId lib)
 
--- TODO: return Either?
 getEdges ::
   TrackId ->
   MusicLibrary ->
   [(TrackId, TestedTransition)]
-getEdges tid lib = do
-  case getNode tid lib of
-    Nothing -> []
-    Just node -> Map.toList $ node.testedTransitions
+getEdges tid lib =
+  maybe
+    []
+    (Map.toList . (.testedTransitions))
+    (getNode tid lib)
 
 emptyMusicLibrary :: MusicLibrary
 emptyMusicLibrary = MusicLibrary $ Map.empty
