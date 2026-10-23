@@ -1,4 +1,8 @@
-module Persistence.Yaml where
+module Persistence.Yaml
+  ( readMusicLibrary,
+    YamlError,
+  )
+where
 
 import Control.Monad (foldM)
 import Data.Text (Text)
