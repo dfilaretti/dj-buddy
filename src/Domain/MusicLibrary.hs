@@ -156,24 +156,24 @@ getTracksWithKey desiredKey =
   getTrackIdsMatching ((== desiredKey) . (.key))
 
 sameKeySuccessors :: TrackId -> MusicLibrary -> [TrackId]
-sameKeySuccessors trackId catalog =
-  maybe [] (filter (/= trackId) . (`getTracksWithKey` catalog)) (trackKey trackId catalog)
+sameKeySuccessors trackId lib =
+  maybe [] (filter (/= trackId) . (`getTracksWithKey` lib)) (trackKey trackId lib)
 
 keyJumpSuccessors :: TrackId -> MusicLibrary -> [TrackId]
-keyJumpSuccessors trackId catalog =
-  maybe [] (flip getTracksWithKeys catalog . compatibleKeys) (trackKey trackId catalog)
+keyJumpSuccessors trackId lib =
+  maybe [] (flip getTracksWithKeys lib . compatibleKeys) (trackKey trackId lib)
 
 getTracksWithKeys :: [Key] -> MusicLibrary -> [TrackId]
-getTracksWithKeys keys catalog =
-  concatMap (`getTracksWithKey` catalog) keys
+getTracksWithKeys keys lib =
+  concatMap (`getTracksWithKey` lib) keys
 
 getTrackWithId :: TrackId -> MusicLibrary -> Maybe Track
 getTrackWithId tid (MusicLibrary lib) =
   (.track) <$> Map.lookup tid lib
 
 trackKey :: TrackId -> MusicLibrary -> Maybe Key
-trackKey trackId catalog =
-  fmap (.key) (getTrackWithId trackId catalog)
+trackKey trackId lib =
+  fmap (.key) (getTrackWithId trackId lib)
 
 -- TODO: return Either?
 getEdges ::
