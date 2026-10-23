@@ -54,6 +54,8 @@ data ShowLibraryOptions = ShowLibraryOptions
   }
   deriving (Show)
 
+-- TODO: all those subcommands share the "lib" option; c
+-- consider factoring it out instead of repeating it inside each sub parser
 commandParser :: Parser Command
 commandParser =
   subparser $
