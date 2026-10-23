@@ -1,6 +1,6 @@
 # dj-buddy
 
-<img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="300">
+<img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="400">
 
 A Haskell command-line tool for planning DJ sets. Browse a music library, suggest next tracks, and generate playlists using harmonic key compatibility and transitions you've tested yourself.
 
