@@ -165,6 +165,9 @@ showLibraryParser =
 defaultLibraryPath :: String
 defaultLibraryPath = "src/library.yaml"
 
+-- TODO: this is a bit of an anti-pattern according to
+-- https://www.schoolofhaskell.com/user/commercial/content/exceptions-best-practices
+-- Should revisit this at some point!
 handleMakePlaylist :: MakePlaylistOptions -> IO ()
 handleMakePlaylist opts =
   handleExceptTFail do
