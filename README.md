@@ -4,7 +4,7 @@
   <img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="400">
 </p>
 
-A Haskell command-line tool for planning DJ sets. Browse a music library, suggest next tracks, and generate playlists using harmonic key compatibility and transitions you've tested yourself.
+A Haskell tool for planning DJ sets, with a CLI and a basic web app. Browse a music library, suggest next tracks, and generate playlists using harmonic key compatibility and transitions you've tested yourself.
 
 This started with a piece of paper next to the decks. Harmonic compatibility suggested transitions to try, but only some sounded good, so I wrote down the ones that worked. As that list grew, I wanted a way to organise it and use that accumulated knowledge to build better sets.
 
@@ -23,6 +23,26 @@ cabal run dj-buddy -- playlist -s melody_express -n 10
 ```
 
 Playlists prefer tested transitions, then same-key matches, then compatible keys. Ties are chosen randomly, tracks aren't repeated, and a playlist may end early if no suitable unused track remains. Omit `-s` to start with a random track.
+
+### Web app
+
+Start the Scotty server from the project root:
+
+```sh
+cabal run dj-buddy-web
+```
+
+Open one of these URLs in your browser. Responses are plain text for now:
+
+| Route | Parameters | Example |
+| --- | --- | --- |
+| `/show` | Optional `title` and `key` filters | [Show matching tracks](http://localhost:3000/show?title=Summer&key=3D) |
+| `/playlist` | Optional `start` track ID; integer `n` defaults to `10` | [Generate a playlist](http://localhost:3000/playlist?start=melody_express&n=10) |
+| `/suggest` | Required `track` ID; integer `n` defaults to `3` | [Suggest next tracks](http://localhost:3000/suggest?track=melody_express&n=3) |
+
+Use [http://localhost:3000/show](http://localhost:3000/show) to list all tracks, or [http://localhost:3000/playlist](http://localhost:3000/playlist) to generate a playlist starting with a random track. All three routes accept an optional `lib` parameter, for example `/show?lib=path/to/library.yaml`. Paths are relative to the server's working directory.
+
+Separate query parameters with `&`, omit quotes around values, and URL-encode spaces as `%20`. Invalid keys or non-integer `n` values return HTTP 400. Stop the server with Ctrl+C; restart it after code changes.
 
 ## Music library
 
@@ -46,15 +66,15 @@ Keys use numbers `1`–`12` followed by `D` or `M`. Tested transitions are direc
 
 ## Architecture
 
-The project separates a reusable Haskell library from the CLI. `Domain` contains the music library, harmonic compatibility, transition scoring, and playlist logic. `App` exposes application-level operations for browsing tracks, suggesting transitions, and generating playlists; the CLI calls these operations through `App`.
+The project separates a reusable Haskell library in `src` from the CLI in `app` and the Scotty web app in `web`. `Domain` contains the music library, harmonic compatibility, transition scoring, and playlist logic. `App` exposes application-level operations for browsing tracks, suggesting transitions, and generating playlists; both executables call these operations through `App`.
 
-A future web UI would use the same `App` interface, sharing the existing functionality.
+The web app currently returns plain text; a richer UI can build on the same handlers.
 
 ## Future work
 
 - **Library imports:** the YAML file is currently maintained by hand. Importing track metadata from Traktor, rekordbox, and similar tools would make larger libraries easier to manage while keeping transition curation manual.
 - **Richer metadata:** the format is deliberately minimal. BPM is omitted because my sets stay around 138–140 BPM, so I already assume the tracks are tempo-compatible. Artist names are also omitted because I know this small collection well. Both would be useful additions as the library grows, but add little to the current proof of concept.
-- **Web UI:** a web view could make browsing and curating the library easier, using the same application library as the CLI.
+- **Web UI:** replace the web app's plain-text output with a richer interface for browsing the library, exploring suggestions, and generating playlists.
 - **add some chaos:** the program currently tries to select the "best next transition", looking 1 step ahead. This works, but we could make it smarter, e.g. what if the next immediate transition is fantastic but from then there's nothing interesting we can do from there? And, conversely, what if we pick a next transition which is just ok but then it unlocks an amazing part of the library with a lot of fantastic transitions?
 - **clean up the Haskell:** as much as I like learning and playing with Haskell, I'm aware the code isn't probably as clean and idiomatic as it could be.
 
