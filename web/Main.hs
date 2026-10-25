@@ -1,4 +1,4 @@
-import App (getTracks, mkPlaylist, readLibFromFile_)
+import App (getTracks, getTransitions, mkPlaylist, readLibFromFile_)
 import Data.Text.Lazy qualified as Text
 import Domain.Camelot (Key)
 import Network.HTTP.Types.Status (badRequest400, internalServerError500)
@@ -9,6 +9,7 @@ main :: IO ()
 main = scotty 3000 $ do
   showHandler
   playlistHandler
+  suggestHandler
   defaultHandler_
 
 defaultLibFile :: String
@@ -64,6 +65,37 @@ playlistHandler =
             text $ Text.pack $ show err
           Right playlist ->
             text $ Text.pack $ unlines $ map show playlist
+
+suggestHandler :: ScottyM ()
+suggestHandler =
+  get "/suggest" $ do
+    libFile <- queryParamMaybe "lib"
+    rawTrack <- queryParamMaybe "track"
+    track <- case rawTrack of
+      Just trackId -> pure trackId
+      Nothing -> do
+        status badRequest400
+        text "Missing track. Provide a track ID with ?track=TRACK_ID."
+        finish
+    rawN <- queryParamMaybe "n"
+    n <- case traverse (readEither :: String -> Either String Int) rawN of
+      Right parsedN -> pure $ maybe 3 id parsedN
+      Left _ -> do
+        status badRequest400
+        text "Invalid n. Expected an integer."
+        finish
+    musicLibE <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
+    case musicLibE of
+      Left err -> do
+        status internalServerError500
+        text $ Text.pack $ show err
+      Right lib ->
+        case getTransitions lib track n of
+          Left err -> do
+            status badRequest400
+            text $ Text.pack $ show err
+          Right transitions ->
+            text $ Text.pack $ unlines $ map show transitions
 
 defaultHandler_ :: ScottyM ()
 defaultHandler_ =
