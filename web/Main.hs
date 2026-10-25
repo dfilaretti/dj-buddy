@@ -10,9 +10,13 @@ main = scotty 3000 $ do
   showHandler
   defaultHandler_
 
+defaultLibFile :: String
+defaultLibFile = "src/library.yaml"
+
 showHandler :: ScottyM ()
 showHandler =
   get "/show" $ do
+    libFile <- queryParamMaybe "lib"
     title <- queryParamMaybe "title"
     rawKey <- queryParamMaybe "key"
     key <- case traverse (readEither :: String -> Either String Key) rawKey of
@@ -21,7 +25,7 @@ showHandler =
         status badRequest400
         text "Invalid key. Expected a number from 1 to 12 followed by D or M, for example 3D or 4M."
         finish
-    result <- liftIO $ readLibFromFile_ "src/library.yaml"
+    result <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
     case result of
       Left err -> do
         status internalServerError500
