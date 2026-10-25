@@ -144,6 +144,19 @@ executable dj-buddy
     -- Base language which the package is written in.
     default-language: GHC2021
 
+executable dj-buddy-web
+    import:           extensions
+    import:           ghc-options
+
+    ghc-options:      -threaded
+
+    main-is:          Main.hs
+    hs-source-dirs:   web
+
+    build-depends:
+        base >= 4.20 && < 4.23,
+        scotty
+
 test-suite dj-buddy-test
     -- Common language extensions
     import:           extensions
