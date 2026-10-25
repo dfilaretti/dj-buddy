@@ -155,7 +155,10 @@ executable dj-buddy-web
 
     build-depends:
         base >= 4.20 && < 4.23,
-        scotty
+        scotty,
+        dj-buddy,
+        text,
+        http-types
 
 test-suite dj-buddy-test
     -- Common language extensions
