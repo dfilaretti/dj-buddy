@@ -30,8 +30,8 @@ showHandler =
         status badRequest400
         render $ Left "Invalid key. Expected a number from 1 to 12 followed by D or M, for example 3D or 4M."
         finish
-    result <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
-    case result of
+    musicLibraryE <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
+    case musicLibraryE of
       Left err -> do
         status internalServerError500
         render $ Left $ show err
