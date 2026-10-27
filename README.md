@@ -32,7 +32,7 @@ Start the Scotty server from the project root:
 cabal run dj-buddy-web
 ```
 
-Open one of these URLs in your browser. Responses are plain text for now:
+Open one of these URLs in your browser. `/show` has a simple HTML page with title and key textboxes and an **Apply filters** button. Leave either textbox empty to omit that filter. Playlist and suggestion responses are plain text for now:
 
 | Route | Parameters | Example |
 | --- | --- | --- |
@@ -68,7 +68,7 @@ Keys use numbers `1`–`12` followed by `D` or `M`. Tested transitions are direc
 
 The project separates a reusable Haskell library in `src` from the CLI in `app` and the Scotty web app in `web`. `Domain` contains the music library, harmonic compatibility, transition scoring, and playlist logic. `App` exposes application-level operations for browsing tracks, suggesting transitions, and generating playlists; both executables call these operations through `App`.
 
-The web app currently returns plain text; a richer UI can build on the same handlers.
+The web app has a basic library filter form and plain-text playlist and suggestion output; a richer UI can build on the same handlers.
 
 ## Future work
 

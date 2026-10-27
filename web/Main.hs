@@ -1,9 +1,11 @@
 import App (getTracks, getTransitions, mkPlaylist, readLibFromFile_)
+import Data.Text qualified as StrictText
 import Data.Text.Lazy qualified as Text
 import Domain.Camelot (Key)
 import Network.HTTP.Types.Status (badRequest400, internalServerError500)
 import Text.Read (readEither)
 import Web.Scotty hiding (readEither)
+import Web.ShowPage (renderShowPage)
 
 main :: IO ()
 main = scotty 3000 $ do
@@ -21,24 +23,24 @@ showHandler =
     libFile <- queryParamMaybe "lib"
     title <- queryParamMaybe "title"
     rawKey <- queryParamMaybe "key"
-    key <- case traverse (readEither :: String -> Either String Key) rawKey of
+    let render = html . renderShowPage libFile title rawKey
+    key <- case traverse (readEither :: String -> Either String Key) (nonEmpty rawKey) of
       Right parsedKey -> pure parsedKey
       Left _ -> do
         status badRequest400
-        text "Invalid key. Expected a number from 1 to 12 followed by D or M, for example 3D or 4M."
+        render $ Left "Invalid key. Expected a number from 1 to 12 followed by D or M, for example 3D or 4M."
         finish
     result <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
     case result of
       Left err -> do
         status internalServerError500
-        text $ Text.pack $ show err
+        render $ Left $ show err
       Right lib ->
-        text $
-          Text.pack $
-            unlines
-              [ trackId ++ ": " ++ show track
-              | (trackId, track) <- getTracks lib title key
-              ]
+        render $ Right $ getTracks lib (StrictText.pack <$> nonEmpty title) key
+
+nonEmpty :: Maybe String -> Maybe String
+nonEmpty (Just "") = Nothing
+nonEmpty value = value
 
 playlistHandler :: ScottyM ()
 playlistHandler =
