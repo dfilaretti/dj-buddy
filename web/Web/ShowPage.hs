@@ -1,11 +1,8 @@
 module Web.ShowPage (renderShowPage) where
 
-import Data.Text qualified as StrictText
-import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import Data.Text.Lazy (Text)
-import Data.Text.Lazy qualified as Text
 import Domain.MusicLibrary (Track, TrackId)
-import Network.HTTP.Types.URI (renderQuery)
+import Web.Html (page, escape, queryUrl)
 
 renderShowPage ::
   Maybe String ->
@@ -15,10 +12,8 @@ renderShowPage ::
   Either String [(TrackId, Track)] ->
   Text
 renderShowPage libFile title key resultCount result =
-  mconcat
-    [ "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Music library</title></head><body>",
-      "<h1>Music library</h1>",
-      "<form method=\"get\" action=\"/show\">",
+  page "Music library" $ mconcat
+    [ "<form method=\"get\" action=\"/show\">",
       "<p><label for=\"title\">Title</label> ",
       input "text" "title" (maybe "" id title),
       "</p><p><label for=\"key\">Key (e.g. 3D)</label> ",
@@ -31,8 +26,7 @@ renderShowPage libFile title key resultCount result =
       case result of
         Left message -> "<p role=\"alert\">" <> escape message <> "</p>"
         Right [] -> "<p>No tracks found.</p>"
-        Right tracks -> "<ul>" <> mconcat (map (renderTrack libFile resultCount) tracks) <> "</ul>",
-      "</body></html>"
+        Right tracks -> "<ul>" <> mconcat (map (renderTrack libFile resultCount) tracks) <> "</ul>"
     ]
 
 input :: Text -> Text -> String -> Text
@@ -59,20 +53,9 @@ renderTrack libFile resultCount (trackId, track) =
 
 trackUrl :: String -> String -> Maybe String -> Maybe String -> TrackId -> String
 trackUrl route trackParam libFile resultCount trackId =
-  route ++ StrictText.unpack (decodeUtf8 (renderQuery True parameters))
+  queryUrl route parameters
   where
     parameters =
-      [(encode trackParam, Just (encode trackId))]
-        ++ [("n", Just (encode n)) | Just n <- [resultCount], n /= ""]
-        ++ [("lib", Just (encode path)) | Just path <- [libFile]]
-    encode = encodeUtf8 . StrictText.pack
-
-escape :: String -> Text
-escape = Text.pack . concatMap escapeChar
-  where
-    escapeChar '&' = "&amp;"
-    escapeChar '<' = "&lt;"
-    escapeChar '>' = "&gt;"
-    escapeChar '"' = "&quot;"
-    escapeChar '\'' = "&#39;"
-    escapeChar c = [c]
+      [(trackParam, trackId)]
+        ++ [("n", n) | Just n <- [resultCount], n /= ""]
+        ++ [("lib", path) | Just path <- [libFile]]

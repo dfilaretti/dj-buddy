@@ -152,7 +152,10 @@ executable dj-buddy-web
 
     main-is:          Main.hs
     hs-source-dirs:   web
-    other-modules:    Web.ShowPage
+    other-modules:
+        Web.Html
+        Web.ResultsPage
+        Web.ShowPage
 
     build-depends:
         base >= 4.20 && < 4.23,

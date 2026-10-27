@@ -1,11 +1,11 @@
 import App (getTracks, getTransitions, mkPlaylist, readLibFromFile_)
 import Data.Text qualified as StrictText
-import Data.Text.Lazy qualified as Text
 import Domain.Camelot (Key)
 import Network.HTTP.Types.Status (badRequest400, internalServerError500)
 import Text.Read (readEither)
 import Web.Scotty hiding (readEither)
 import Web.ShowPage (renderShowPage)
+import Web.ResultsPage (renderPlaylistPage, renderSuggestPage)
 
 main :: IO ()
 main = scotty 3000 $ do
@@ -53,58 +53,60 @@ playlistHandler :: ScottyM ()
 playlistHandler =
   get "/playlist" $ do
     libFile <- queryParamMaybe "lib"
+    let render = html . renderPlaylistPage libFile
     start <- queryParamMaybe "start" :: ActionM (Maybe String)
     rawN <- queryParamMaybe "n"
     n <- case traverse (readEither :: String -> Either String Int) rawN of
       Right parsedN -> pure $ maybe 10 id parsedN
       Left _ -> do
         status badRequest400
-        text "Invalid n. Expected an integer."
+        render $ Left "Invalid n. Expected an integer."
         finish
     musicLibE <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
     case musicLibE of
       Left err -> do
         status internalServerError500
-        text $ Text.pack $ show err
+        render $ Left $ show err
       Right lib -> do
         playlistE <- liftIO $ mkPlaylist lib start n
         case playlistE of
           Left err -> do
             status internalServerError500
-            text $ Text.pack $ show err
+            render $ Left $ show err
           Right playlist ->
-            text $ Text.pack $ unlines $ map show playlist
+            render $ Right playlist
 
 suggestHandler :: ScottyM ()
 suggestHandler =
   get "/suggest" $ do
     libFile <- queryParamMaybe "lib"
+    let render = html . renderSuggestPage libFile
     rawTrack <- queryParamMaybe "track"
     track <- case rawTrack of
       Just trackId -> pure trackId
       Nothing -> do
         status badRequest400
-        text "Missing track. Provide a track ID with ?track=TRACK_ID."
+        render $ Left "Missing track. Provide a track ID with ?track=TRACK_ID."
         finish
     rawN <- queryParamMaybe "n"
     n <- case traverse (readEither :: String -> Either String Int) rawN of
       Right parsedN -> pure $ maybe 3 id parsedN
       Left _ -> do
         status badRequest400
-        text "Invalid n. Expected an integer."
+        render $ Left "Invalid n. Expected an integer."
         finish
     musicLibE <- liftIO $ readLibFromFile_ (maybe defaultLibFile id libFile)
     case musicLibE of
       Left err -> do
         status internalServerError500
-        text $ Text.pack $ show err
+        render $ Left $ show err
       Right lib ->
         case getTransitions lib track n of
           Left err -> do
             status badRequest400
-            text $ Text.pack $ show err
+            render $ Left $ show err
           Right transitions ->
-            text $ Text.pack $ unlines $ map show transitions
+            render $ Right transitions
 
 defaultHandler_ :: ScottyM ()
 defaultHandler_ =

@@ -32,7 +32,7 @@ Start the Scotty server from the project root:
 cabal run dj-buddy-web
 ```
 
-Open one of these URLs in your browser. `/show` has a simple HTML page with title and key textboxes and an **Apply filters** button. Leave either textbox empty to omit that filter. Playlist and suggestion responses are plain text for now:
+Open one of these URLs in your browser. `/show` has a simple HTML page with title and key textboxes and an **Apply filters** button. Leave either textbox empty to omit that filter. Playlist and suggestion pages display numbered track lists with a link back to the library:
 
 | Route | Parameters | Example |
 | --- | --- | --- |
@@ -68,13 +68,13 @@ Keys use numbers `1`–`12` followed by `D` or `M`. Tested transitions are direc
 
 The project separates a reusable Haskell library in `src` from the CLI in `app` and the Scotty web app in `web`. `Domain` contains the music library, harmonic compatibility, transition scoring, and playlist logic. `App` exposes application-level operations for browsing tracks, suggesting transitions, and generating playlists; both executables call these operations through `App`.
 
-The web app has a basic library filter form and plain-text playlist and suggestion output; a richer UI can build on the same handlers.
+The web app has a basic library filter form and HTML playlist and suggestion pages; a richer UI can build on the same handlers.
 
 ## Future work
 
 - **Library imports:** the YAML file is currently maintained by hand. Importing track metadata from Traktor, rekordbox, and similar tools would make larger libraries easier to manage while keeping transition curation manual.
 - **Richer metadata:** the format is deliberately minimal. BPM is omitted because my sets stay around 138–140 BPM, so I already assume the tracks are tempo-compatible. Artist names are also omitted because I know this small collection well. Both would be useful additions as the library grows, but add little to the current proof of concept.
-- **Web UI:** replace the web app's plain-text output with a richer interface for browsing the library, exploring suggestions, and generating playlists.
+- **Web UI:** expand the basic HTML pages into a richer interface for browsing the library, exploring suggestions, and generating playlists.
 - **add some chaos:** the program currently tries to select the "best next transition", looking 1 step ahead. This works, but we could make it smarter, e.g. what if the next immediate transition is fantastic but from then there's nothing interesting we can do from there? And, conversely, what if we pick a next transition which is just ok but then it unlocks an amazing part of the library with a lot of fantastic transitions?
 - **clean up the Haskell:** as much as I like learning and playing with Haskell, I'm aware the code isn't probably as clean and idiomatic as it could be.
 
