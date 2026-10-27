@@ -29,7 +29,7 @@ showHandler =
       Right _ -> pure ()
       Left _ -> do
         status badRequest400
-        render $ Left "Invalid playlist length. Expected an integer."
+        render $ Left "Invalid number of tracks. Expected an integer."
         finish
     key <- case traverse (readEither :: String -> Either String Key) (nonEmpty rawKey) of
       Right parsedKey -> pure parsedKey

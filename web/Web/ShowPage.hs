@@ -14,7 +14,7 @@ renderShowPage ::
   Maybe String ->
   Either String [(TrackId, Track)] ->
   Text
-renderShowPage libFile title key playlistLength result =
+renderShowPage libFile title key resultCount result =
   mconcat
     [ "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Music library</title></head><body>",
       "<h1>Music library</h1>",
@@ -23,15 +23,15 @@ renderShowPage libFile title key playlistLength result =
       input "text" "title" (maybe "" id title),
       "</p><p><label for=\"key\">Key (e.g. 3D)</label> ",
       input "text" "key" (maybe "" id key),
-      "</p><p><label for=\"n\">Playlist length (default 10)</label> ",
-      input "number" "n" (maybe "" id playlistLength),
+      "</p><p><label for=\"n\">Number of tracks (defaults: playlist 10, suggestions 3)</label> ",
+      input "number" "n" (maybe "" id resultCount),
       "</p>",
       maybe "" (input "hidden" "lib") libFile,
       " <button type=\"submit\">Apply filters</button></form>",
       case result of
         Left message -> "<p role=\"alert\">" <> escape message <> "</p>"
         Right [] -> "<p>No tracks found.</p>"
-        Right tracks -> "<ul>" <> mconcat (map (renderTrack libFile playlistLength) tracks) <> "</ul>",
+        Right tracks -> "<ul>" <> mconcat (map (renderTrack libFile resultCount) tracks) <> "</ul>",
       "</body></html>"
     ]
 
@@ -48,20 +48,22 @@ input inputType name value =
     <> "\">"
 
 renderTrack :: Maybe String -> Maybe String -> (TrackId, Track) -> Text
-renderTrack libFile playlistLength (trackId, track) =
+renderTrack libFile resultCount (trackId, track) =
   "<li>"
     <> escape (trackId ++ ": " ++ show track)
     <> " <a href=\""
-    <> escape (playlistUrl libFile playlistLength trackId)
-    <> "\">Generate playlist</a></li>"
+    <> escape (trackUrl "/playlist" "start" libFile resultCount trackId)
+    <> "\">Generate playlist</a> <a href=\""
+    <> escape (trackUrl "/suggest" "track" libFile resultCount trackId)
+    <> "\">Suggest compatible</a></li>"
 
-playlistUrl :: Maybe String -> Maybe String -> TrackId -> String
-playlistUrl libFile playlistLength trackId =
-  "/playlist" ++ StrictText.unpack (decodeUtf8 (renderQuery True parameters))
+trackUrl :: String -> String -> Maybe String -> Maybe String -> TrackId -> String
+trackUrl route trackParam libFile resultCount trackId =
+  route ++ StrictText.unpack (decodeUtf8 (renderQuery True parameters))
   where
     parameters =
-      [("start", Just (encode trackId))]
-        ++ [("n", Just (encode n)) | Just n <- [playlistLength], n /= ""]
+      [(encode trackParam, Just (encode trackId))]
+        ++ [("n", Just (encode n)) | Just n <- [resultCount], n /= ""]
         ++ [("lib", Just (encode path)) | Just path <- [libFile]]
     encode = encodeUtf8 . StrictText.pack
 
