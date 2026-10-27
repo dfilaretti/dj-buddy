@@ -23,7 +23,14 @@ showHandler =
     libFile <- queryParamMaybe "lib"
     title <- queryParamMaybe "title"
     rawKey <- queryParamMaybe "key"
-    let render = html . renderShowPage libFile title rawKey
+    rawN <- queryParamMaybe "n"
+    let render = html . renderShowPage libFile title rawKey rawN
+    case traverse (readEither :: String -> Either String Int) (nonEmpty rawN) of
+      Right _ -> pure ()
+      Left _ -> do
+        status badRequest400
+        render $ Left "Invalid playlist length. Expected an integer."
+        finish
     key <- case traverse (readEither :: String -> Either String Key) (nonEmpty rawKey) of
       Right parsedKey -> pure parsedKey
       Left _ -> do
