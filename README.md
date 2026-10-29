@@ -45,13 +45,7 @@ cabal run dj-buddy-web
 
 Open [localhost:3000/show](http://localhost:3000/show) to browse the library, filter by title or key, and generate playlists or suggestions from each track. Set the number of tracks in the form, or leave it blank for the defaults below.
 
-| Route | Parameters | Example |
-| --- | --- | --- |
-| `/show` | Optional `title` and `key` filters | [Show matching tracks](http://localhost:3000/show?title=Summer&key=3D) |
-| `/playlist` | Optional `start` track ID; integer `n` defaults to `10` | [Generate a playlist](http://localhost:3000/playlist?start=melody_express&n=10) |
-| `/suggest` | Required `track` ID; integer `n` defaults to `3` | [Suggest next tracks](http://localhost:3000/suggest?track=melody_express&n=3) |
 
-Omit `start` to begin a playlist with a random track. All three routes accept an optional `lib` parameter, for example `/show?lib=path/to/library.yaml`. Paths are relative to the server's working directory.
 
 ## Music library
 
