@@ -12,7 +12,7 @@ dj-buddy helps you explore and build on those data, discovering song suggestions
 
 It works entirely with metadata: no audio files, song analysis, or AI. Your ears and taste guide the library.
 
-Detailed explanation is in this [blog post](www.google.com)
+Detailed explanation is in this [blog post](https://dfilaretti.github.io/dj-buddy/)
 
 ## Build and run
 
