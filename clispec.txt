@@ -1,0 +1,3 @@
+dj-buddy suggest -lib lib.yaml "song_ID"
+dj-buddy suggest -lib lib.yaml "song_ID" -n 6
+dj-buddy suggest "song_ID"
