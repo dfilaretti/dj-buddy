@@ -4,13 +4,15 @@
   <img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="400">
 </p>
 
-A Haskell utility for planning DJ sets, with a CLI and a rudimentary web app.
+A Haskell utility for planning DJ sets, with a CLI and a (currently rudimentary) web app.
 
-Browse a music library, suggest next tracks, and generate playlists using harmonic key compatibility and transitions you've tested yourself.
+The core idea is to augment the existing harmonic mixing facilities provided by modern DJ software with a curated library of transitions you trust.
 
-This started with a piece of paper next to the decks. Harmonic compatibility suggested transitions to try, but only some sounded good, so I wrote down the ones that worked. As that list grew, I wanted a way to organise it and build better sets.
+dj-buddy helps you explore and build on those data, discovering song suggestions or building entire playlists.
 
-The core idea is to curate a library of transitions you trust. dj-buddy helps you explore and build on those choices. It works entirely with metadata: no audio files, song analysis, or AI. Your ears and taste guide the library.
+It works entirely with metadata: no audio files, song analysis, or AI. Your ears and taste guide the library.
+
+Detailed explanation is in this [blog post](www.google.com)
 
 ## Build and run
 
@@ -28,6 +30,14 @@ cabal test
 
 ### Use from the terminal
 
+First, you can get help:
+
+```sh
+cabal run dj-buddy -- --help
+```
+
+Here are some examples:
+
 ```sh
 cabal run dj-buddy -- show
 cabal run dj-buddy -- show --title "Summer" --key 3D
@@ -37,15 +47,13 @@ cabal run dj-buddy -- playlist -s melody_express -n 10
 
 ### Use from the browser
 
-Start the Scotty server from the project root:
+Start the server from the project root:
 
 ```sh
 cabal run dj-buddy-web
 ```
 
 Open [localhost:3000/show](http://localhost:3000/show) to browse the library, filter by title or key, and generate playlists or suggestions from each track. Set the number of tracks in the form, or leave it blank for the defaults below.
-
-
 
 ## Music library
 
@@ -64,6 +72,8 @@ transitions:
     to: second_track
     notes: "Mix after the breakdown" # optional
 ```
+
+(or you can also pass the `lib` option in the URL if using from a browser)
 
 Keys use numbers `1`–`12` followed by `D` or `M`. Tested transitions are directional; use `transitions: []` if you have none.
 
