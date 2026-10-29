@@ -9,8 +9,13 @@ import Network.HTTP.Types.URI (renderQuery)
 page :: String -> Text -> Text
 page title body =
   "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>"
-    <> escape title <> "</title></head><body><h1>" <> escape title
-    <> "</h1>" <> body <> "</body></html>"
+    <> escape title
+    <> "</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    <> "<link rel=\"stylesheet\" href=\"/static/style.css\"></head><body><main><h1>"
+    <> escape title
+    <> "</h1>"
+    <> body
+    <> "</main></body></html>"
 
 queryUrl :: String -> [(String, String)] -> String
 queryUrl route parameters =

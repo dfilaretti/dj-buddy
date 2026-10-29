@@ -9,6 +9,9 @@ import Web.ResultsPage (renderPlaylistPage, renderSuggestPage)
 
 main :: IO ()
 main = scotty 3000 $ do
+  get "/static/style.css" $ do
+    setHeader "Content-Type" "text/css; charset=utf-8"
+    file "web/static/style.css"
   showHandler
   playlistHandler
   suggestHandler

@@ -1,0 +1,103 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #0b100d;
+  color: #9dff80;
+  font: 16px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  color: #65ff5c;
+  font-size: 1.6rem;
+}
+
+h1::before {
+  content: '> ';
+}
+
+a {
+  color: #65ff5c;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: #d5ffca;
+}
+
+form {
+  border: 1px solid #34523a;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+form p {
+  margin: 0 0 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+input, button {
+  font: inherit;
+  color: inherit;
+  background: #111b14;
+  border: 1px solid #537a55;
+  border-radius: 3px;
+  padding: 0.4rem 0.6rem;
+}
+
+input {
+  width: 24rem;
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+  margin: 0.3rem 0;
+}
+
+button:hover {
+  background: #203b23;
+  border-color: #65ff5c;
+}
+
+:focus-visible {
+  outline: 2px solid #65ff5c;
+  outline-offset: 3px;
+}
+
+ul, ol {
+  padding-left: 1.6rem;
+}
+
+li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #243b29;
+  overflow-wrap: anywhere;
+}
+
+li a {
+  display: inline-block;
+  margin-left: 0.75rem;
+}
+
+[role='alert'] {
+  color: #ffb482;
+  border-left: 3px solid currentColor;
+  padding-left: 0.75rem;
+}
