@@ -3,9 +3,9 @@ import Data.Text qualified as StrictText
 import Domain.Camelot (Key)
 import Network.HTTP.Types.Status (badRequest400, internalServerError500)
 import Text.Read (readEither)
+import Web.ResultsPage (renderPlaylistPage, renderSuggestPage)
 import Web.Scotty hiding (readEither)
 import Web.ShowPage (renderShowPage)
-import Web.ResultsPage (renderPlaylistPage, renderSuggestPage)
 
 main :: IO ()
 main = scotty 3000 $ do
