@@ -58,7 +58,7 @@ Open [localhost:3000/show](http://localhost:3000/show) to browse the library, fi
 You'll see something like this:
 
 <p align="center">
-  <img src="img/ui-tuto.png" alt="Camelot wheel" width="700">
+  <img src="img/ui-tuto.png">
 </p>
 
 (the stuff in comic sans are explanations!)
