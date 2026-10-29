@@ -24,6 +24,22 @@ cabal build
 cabal test
 ```
 
+
+## Use from the browser
+
+Start the server from the project root:
+
+```sh
+cabal run dj-buddy-web
+```
+
+Open [localhost:3000/show](http://localhost:3000/show) and, if you're lucky, you'll see something like this:
+
+<p align="center">
+  <img src="img/ui-tuto.png">
+</p>
+
+
 ## Use from the terminal
 
 First, you can get help:
@@ -40,21 +56,6 @@ cabal run dj-buddy -- show --title "Summer" --key 3D
 cabal run dj-buddy -- suggest melody_express -n 3
 cabal run dj-buddy -- playlist -s melody_express -n 10
 ```
-
-## Use from the browser
-
-Start the server from the project root:
-
-```sh
-cabal run dj-buddy-web
-```
-
-Open [localhost:3000/show](http://localhost:3000/show) and, if you're lucky, you'll see something like this:
-
-<p align="center">
-  <img src="img/ui-tuto.png">
-</p>
-
 
 
 ## Music library
