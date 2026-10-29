@@ -22,7 +22,8 @@ renderShowPage libFile title key resultCount result =
       input "number" "n" (maybe "" id resultCount),
       "</p>",
       maybe "" (input "hidden" "lib") libFile,
-      " <button type=\"submit\">Apply filters</button></form>",
+      " <button type=\"submit\">Apply filters</button>",
+      " <button type=\"submit\" formaction=\"/playlist\">Random playlist</button></form>",
       case result of
         Left message -> "<p role=\"alert\">" <> escape message <> "</p>"
         Right [] -> "<p>No tracks found.</p>"

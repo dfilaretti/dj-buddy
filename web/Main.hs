@@ -56,7 +56,7 @@ playlistHandler =
     let render = html . renderPlaylistPage libFile
     start <- queryParamMaybe "start" :: ActionM (Maybe String)
     rawN <- queryParamMaybe "n"
-    n <- case traverse (readEither :: String -> Either String Int) rawN of
+    n <- case traverse (readEither :: String -> Either String Int) (nonEmpty rawN) of
       Right parsedN -> pure $ maybe 10 id parsedN
       Left _ -> do
         status badRequest400
