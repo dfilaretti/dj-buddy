@@ -1,7 +1,7 @@
 # dj-buddy
 
 <p align="center">
-  <img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="400">
+  <img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="300">
 </p>
 
 A Haskell utility for planning DJ sets, with a CLI and a (currently rudimentary) web app.
@@ -14,7 +14,7 @@ It works entirely with metadata: no audio files, song analysis, or AI. Your ears
 
 Detailed explanation is in this [blog post](https://dfilaretti.github.io/dj-buddy/)
 
-## Build and run
+## Build and run tests
 
 Install GHC and Cabal with [GHCup](https://www.haskell.org/ghcup/), then build from the project root:
 
@@ -28,7 +28,7 @@ cabal build
 cabal test
 ```
 
-### Use from the terminal
+## Use from the terminal
 
 First, you can get help:
 
@@ -45,7 +45,7 @@ cabal run dj-buddy -- suggest melody_express -n 3
 cabal run dj-buddy -- playlist -s melody_express -n 10
 ```
 
-### Use from the browser
+## Use from the browser
 
 Start the server from the project root:
 
@@ -54,6 +54,14 @@ cabal run dj-buddy-web
 ```
 
 Open [localhost:3000/show](http://localhost:3000/show) to browse the library, filter by title or key, and generate playlists or suggestions from each track. Set the number of tracks in the form, or leave it blank for the defaults below.
+
+You'll see something like this:
+
+<p align="center">
+  <img src="img/ui-tuto.png" alt="Camelot wheel" width="700">
+</p>
+
+(the stuff in comic sans are explanations!)
 
 ## Music library
 
