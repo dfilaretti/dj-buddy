@@ -20,11 +20,7 @@ Install GHC and Cabal with [GHCup](https://www.haskell.org/ghcup/), then build f
 
 ```sh
 cabal build
-```
 
-### Unit tests
-
-```sh
 cabal test
 ```
 
