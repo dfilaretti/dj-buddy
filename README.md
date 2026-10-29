@@ -16,19 +16,35 @@ See [blog post](www.google.com) for all the details for detailed informations.
 
 ## Build and run
 
-Requires GHC 9.10–9.14 and Cabal. Run these commands from the project root:
+Requires Haskell (GHC) and Cabal to be installed.
+Please refer to [ghcup](https://www.haskell.org/ghcup/) to set things up.
+
+Once Haskell is installed,
 
 ```sh
 cabal build
+```
+
+should build the project.
+
+### Unit tests
+
+```sh
+cabal run test
+```
+
+### Use from the terminal
+
+The app can be used from the terminal:
+
+```sh
 cabal run dj-buddy -- show
 cabal run dj-buddy -- show --title "Summer" --key 3D
 cabal run dj-buddy -- suggest melody_express -n 3
 cabal run dj-buddy -- playlist -s melody_express -n 10
 ```
 
-Playlists prefer tested transitions, then same-key matches, then compatible keys. Ties are chosen randomly, tracks aren't repeated, and a playlist may end early if no suitable unused track remains. Omit `-s` to start with a random track.
-
-### Web app
+### Use from the browser
 
 Start the Scotty server from the project root:
 
