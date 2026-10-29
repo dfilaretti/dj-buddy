@@ -20,7 +20,6 @@ Install GHC and Cabal with [GHCup](https://www.haskell.org/ghcup/), then build f
 
 ```sh
 cabal build
-
 cabal test
 ```
 
