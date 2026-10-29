@@ -4,15 +4,14 @@
   <img src="img/camelot-1-transparent.png" alt="Camelot wheel" width="300">
 </p>
 
-A Haskell utility for planning DJ sets, with a CLI and a (currently rudimentary) web app.
+A Haskell utility for planning DJ sets and make you a big DJ 😎.
+Can be used from the terminal or from a (rudimentary) web app.
 
 The core idea is to augment the existing harmonic mixing facilities provided by modern DJ software with a curated library of transitions you trust.
-
 dj-buddy helps you explore and build on those data, discovering song suggestions or building entire playlists.
 
-It works entirely with metadata: no audio files, song analysis, or AI. Your ears and taste guide the library.
 
-Detailed explanation is in this [blog post](https://dfilaretti.github.io/dj-buddy/)
+Detailed explanation in the [blog post](https://dfilaretti.github.io/dj-buddy/)
 
 ## Build and run tests
 
