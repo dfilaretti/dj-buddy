@@ -5,7 +5,8 @@
 </p>
 
 A Haskell utility for planning DJ sets and make you a big DJ 😎.
-Can be used from the terminal or from a (rudimentary) web app.
+
+Use it from the terminal or from the browser.
 
 The core idea is to augment the existing harmonic mixing facilities provided by modern DJ software with a curated library of transitions you trust.
 dj-buddy helps you explore and build on those data, discovering song suggestions or building entire playlists.
