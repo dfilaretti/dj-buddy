@@ -51,13 +51,12 @@ cabal run dj-buddy-web
 
 Open [localhost:3000/show](http://localhost:3000/show) to browse the library, filter by title or key, and generate playlists or suggestions from each track. Set the number of tracks in the form, or leave it blank for the defaults below.
 
-You'll see something like this:
 
 <p align="center">
   <img src="img/ui-tuto.png">
 </p>
 
-(the stuff in comic sans are explanations!)
+
 
 ## Music library
 
