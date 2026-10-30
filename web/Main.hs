@@ -48,6 +48,7 @@ showHandler =
       Right lib ->
         render $ Right $ getTracks lib (StrictText.pack <$> nonEmpty title) key
 
+-- not sure about this, feels like a bit of a hack...
 nonEmpty :: Maybe String -> Maybe String
 nonEmpty (Just "") = Nothing
 nonEmpty value = value
