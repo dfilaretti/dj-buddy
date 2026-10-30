@@ -1,10 +1,9 @@
 import App (getTracks, getTransitions, mkPlaylist, readLibFromFile_)
 import Data.Text qualified as StrictText
-import Domain.Camelot (Key)
 import Network.HTTP.Types.Status (badRequest400, internalServerError500)
-import Text.Read (readEither)
+import Text.Read (readMaybe)
 import Web.ResultsPage (renderPlaylistPage, renderSuggestPage)
-import Web.Scotty hiding (readEither)
+import Web.Scotty
 import Web.ShowPage (renderShowPage)
 
 main :: IO ()
@@ -28,15 +27,15 @@ showHandler =
     rawKey <- queryParamMaybe "key"
     rawN <- queryParamMaybe "n"
     let render = html . renderShowPage libFile title rawKey rawN
-    case traverse (readEither :: String -> Either String Int) (nonEmpty rawN) of
-      Right _ -> pure ()
-      Left _ -> do
+    case traverse (readMaybe :: String -> Maybe Int) (nonEmpty rawN) of
+      Just _ -> pure ()
+      Nothing -> do
         status badRequest400
         render $ Left "Invalid number of tracks. Expected an integer."
         finish
-    key <- case traverse (readEither :: String -> Either String Key) (nonEmpty rawKey) of
-      Right parsedKey -> pure parsedKey
-      Left _ -> do
+    key <- case traverse readMaybe (nonEmpty rawKey) of
+      Just parsedKey -> pure parsedKey
+      Nothing -> do
         status badRequest400
         render $ Left "Invalid key. Expected a number from 1 to 12 followed by D or M, for example 3D or 4M."
         finish
@@ -60,9 +59,9 @@ playlistHandler =
     let render = html . renderPlaylistPage libFile
     start <- queryParamMaybe "start" :: ActionM (Maybe String)
     rawN <- queryParamMaybe "n"
-    n <- case traverse (readEither :: String -> Either String Int) (nonEmpty rawN) of
-      Right parsedN -> pure $ maybe 10 id parsedN
-      Left _ -> do
+    n <- case traverse readMaybe (nonEmpty rawN) of
+      Just parsedN -> pure $ maybe 10 id parsedN
+      Nothing -> do
         status badRequest400
         render $ Left "Invalid n. Expected an integer."
         finish
@@ -93,9 +92,9 @@ suggestHandler =
         render $ Left "Missing track. Provide a track ID with ?track=TRACK_ID."
         finish
     rawN <- queryParamMaybe "n"
-    n <- case traverse (readEither :: String -> Either String Int) rawN of
-      Right parsedN -> pure $ maybe 3 id parsedN
-      Left _ -> do
+    n <- case traverse (readMaybe :: String -> Maybe Int) rawN of
+      Just parsedN -> pure $ maybe 3 id parsedN
+      Nothing -> do
         status badRequest400
         render $ Left "Invalid n. Expected an integer."
         finish
